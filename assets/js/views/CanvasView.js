@@ -59,15 +59,33 @@ class CanvasView {
     }
     
     /**
-     * Ajoute un effet feu d'artifice
+     * Ajoute un effet feu d'artifice avec configuration aléatoire
      * @param {number} x
      * @param {number} y
      * @returns {void}
      */
     addFirework(x, y) {
-        const firework = new FireworkEffect(x, y);
+        // Configuration aléatoire pour chaque explosion
+        const config = {
+            power: 100 + Math.random() * 200,           // 100-300 px/s
+            spread: 30 + Math.random() * 120,           // 30-150°
+            angle: -120 + Math.random() * 60,           // -120° à -60° (bias vers le haut)
+            gravity: 200 + Math.random() * 200,         // 200-400 px/s²
+            friction: 0.95 + Math.random() * 0.04,      // 0.95-0.99
+            particleCount: 20 + Math.floor(Math.random() * 40), // 20-60 particules
+            particleSize: {
+                min: 2 + Math.random() * 2,             // 2-4
+                max: 5 + Math.random() * 5              // 5-10
+            },
+            lifetime: {
+                min: 1.0 + Math.random() * 0.5,         // 1.0-1.5s
+                max: 1.5 + Math.random() * 1.0          // 1.5-2.5s
+            }
+        };
+        
+        const firework = new FireworkEffect(x, y, config);
         this.effects.push(firework);
-        this.debug.debug('Feu d\'artifice créé', { x, y });
+        this.debug.debug('Feu d\'artifice créé', { x, y, config });
     }
     
     /**
