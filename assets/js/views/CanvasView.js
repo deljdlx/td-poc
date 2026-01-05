@@ -14,6 +14,9 @@ class CanvasView {
     /** @type {Debug} */
     debug = null;
     
+    /** @type {Array<FireworkEffect>} */
+    effects = [];
+    
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
@@ -53,6 +56,45 @@ class CanvasView {
      */
     clear() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    
+    /**
+     * Ajoute un effet feu d'artifice
+     * @param {number} x
+     * @param {number} y
+     * @returns {void}
+     */
+    addFirework(x, y) {
+        const firework = new FireworkEffect(x, y);
+        this.effects.push(firework);
+        this.debug.debug('Feu d\'artifice créé', { x, y });
+    }
+    
+    /**
+     * Met à jour et dessine tous les effets autonomes
+     * @param {number} deltaTime - en secondes
+     * @returns {void}
+     */
+    updateAndRenderEffects(deltaTime) {
+        // Clear canvas
+        this.clear();
+        
+        // Dessiner les connexions de la grille
+        const selectedCells = [];
+        // TODO: récupérer les cellules sélectionnées si besoin
+        
+        // Update effets
+        this.effects.forEach(effect => effect.update(deltaTime));
+        
+        // Supprimer les effets morts
+        const beforeCount = this.effects.length;
+        this.effects = this.effects.filter(effect => !effect.isDead);
+        if (this.effects.length < beforeCount) {
+            this.debug.debug(`${beforeCount - this.effects.length} effet(s) supprimé(s)`);
+        }
+        
+        // Dessiner les effets
+        this.effects.forEach(effect => effect.draw(this.ctx));
     }
     
     /**

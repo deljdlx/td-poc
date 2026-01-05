@@ -20,6 +20,11 @@ function bootstrapDI() {
         return new CoordinateSystem();
     });
     
+    // GameClock (singleton)
+    container.registerFactory('gameClock', (container) => {
+        return new GameClock(container);
+    });
+    
     // Autres services à ajouter au besoin...
 }
 

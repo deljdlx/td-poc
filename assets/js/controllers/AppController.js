@@ -23,6 +23,9 @@ class AppController {
     /** @type {DIContainer} */
     container = null;
     
+    /** @type {GameClock} */
+    gameClock = null;
+    
     /**
      * @param {DIContainer} container
      */
@@ -40,6 +43,7 @@ class AppController {
         
         // Récupération des services via DI
         this.coordSystem = this.container.get('coordinateSystem');
+        this.gameClock = this.container.get('gameClock');
         
         // Initialisation avec injection
         this.model = new GridModel(6, 8, this.container);
@@ -57,6 +61,44 @@ class AppController {
         
         // Bind events
         this.bindEvents();
+        
+        // Configurer et démarrer GameClock
+        this.setupGameClock();
+    }
+    
+    /**
+     * Configure la GameClock
+     * @returns {void}
+     */
+    setupGameClock() {
+        // Update gameplay (fixed timestep)
+        this.gameClock.setUpdateCallback(this.updateGameplay.bind(this));
+        
+        // Render (variable timestep)
+        this.gameClock.setRenderCallback(this.render.bind(this));
+        
+        // Démarrer
+        this.gameClock.start();
+    }
+    
+    /**
+     * Update gameplay (appelé à 60 Hz fixe)
+     * @param {number} deltaTime - en secondes
+     * @returns {void}
+     */
+    updateGameplay(deltaTime) {
+        // Pour l'instant, rien dans le gameplay
+        // Plus tard: update des tours, ennemis, projectiles
+    }
+    
+    /**
+     * Render (appelé chaque frame)
+     * @param {number} deltaTime - en secondes
+     * @returns {void}
+     */
+    render(deltaTime) {
+        // Update et render des effets autonomes
+        this.canvasView.updateAndRenderEffects(deltaTime);
     }
     
     /**
@@ -89,6 +131,10 @@ class AppController {
                 before: cell.selected,
                 after: !cell.selected
             });
+            
+            // Effet feu d'artifice au centre de la cellule
+            const center = this.coordSystem.getElementCenter(cell.element);
+            this.canvasView.addFirework(center.x, center.y);
             
             cell.toggle();
             this.gridView.updateCell(cell);
