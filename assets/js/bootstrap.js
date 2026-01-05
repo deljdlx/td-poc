@@ -25,6 +25,11 @@ function bootstrapDI() {
         return new GameClock(container);
     });
     
+    // EntityManager (singleton)
+    container.registerFactory('entityManager', (container) => {
+        return new EntityManager(container);
+    });
+    
     // Autres services à ajouter au besoin...
 }
 

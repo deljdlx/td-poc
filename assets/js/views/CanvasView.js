@@ -116,6 +116,17 @@ class CanvasView {
     }
     
     /**
+     * Render game entities (missiles, towers, enemies, etc.)
+     * @param {Array<Entity>} entities
+     * @returns {void}
+     */
+    renderEntities(entities) {
+        for (const entity of entities) {
+            entity.draw(this.ctx);
+        }
+    }
+    
+    /**
      * Dessine des lignes entre les cellules sélectionnées
      * @param {Cell[]} selectedCells
      * @returns {void}
