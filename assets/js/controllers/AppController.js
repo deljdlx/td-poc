@@ -150,7 +150,13 @@ class AppController {
             );
             if (targetCell) {
                 const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
-                const missile = new Missile(center.x, center.y, targetCenter.x, targetCenter.y, 200);
+                
+                // Callback pour créer une explosion à l'arrivée
+                const onArrival = (x, y) => {
+                    this.canvasView.addFirework(x, y);
+                };
+                
+                const missile = new Missile(center.x, center.y, targetCenter.x, targetCenter.y, 200, onArrival);
                 this.entityManager.addEntity(missile);
             }
             

@@ -49,13 +49,19 @@ class Missile extends Entity {
     trailLength;
     
     /**
+     * @type {Function|null}
+     */
+    onArrival;
+    
+    /**
      * @param {number} x - Start X position
      * @param {number} y - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
      * @param {number} speed - Missile speed in pixels/second (default: 200)
+     * @param {Function} onArrival - Callback when missile reaches target
      */
-    constructor(x, y, targetX, targetY, speed = 200) {
+    constructor(x, y, targetX, targetY, speed = 200, onArrival = null) {
         super('missile', x, y);
         
         this.targetX = targetX;
@@ -75,6 +81,7 @@ class Missile extends Entity {
         this.size = 4;
         this.trail = [];
         this.trailLength = 10;
+        this.onArrival = onArrival;
     }
     
     /**
@@ -99,6 +106,10 @@ class Missile extends Entity {
         const distanceToTarget = Math.sqrt(dx * dx + dy * dy);
         
         if (distanceToTarget < 5) {
+            // Trigger arrival callback before death
+            if (this.onArrival) {
+                this.onArrival(this.targetX, this.targetY);
+            }
             this.kill();
         }
     }
