@@ -25,22 +25,83 @@ class FireworkEffect {
     /** @type {number} */
     friction;
     
+    /** @type {number} */
+    power;
+    
+    /** @type {number} */
+    spread;
+    
+    /** @type {number} */
+    angle;
+    
+    /** @type {number} */
+    particleCount;
+    
+    /** @type {Object} */
+    particleSize;
+    
+    /** @type {Object} */
+    particleLifetime;
+    
     /**
      * @param {number} x - Center X position
      * @param {number} y - Center Y position
-     * @param {Array<Particle>} particles - Optional array of particle instances
+     * @param {Object|Array<Particle>} particlesOrConfig - Particle instances OR configuration object
+     * @param {number} particlesOrConfig.power - Particle initial speed (default: 150)
+     * @param {number} particlesOrConfig.spread - Dispersion angle in degrees (default: 72)
+     * @param {number} particlesOrConfig.angle - Main direction in degrees (default: -90 = up)
+     * @param {number} particlesOrConfig.gravity - Gravity force (default: 300)
+     * @param {number} particlesOrConfig.friction - Air friction (default: 0.98)
+     * @param {number} particlesOrConfig.particleCount - Number of particles (default: 30)
+     * @param {Object} particlesOrConfig.particleSize - {min, max} particle size (default: {min: 3, max: 7})
+     * @param {Object} particlesOrConfig.lifetime - {min, max} particle lifetime (default: {min: 1.5, max: 2.0})
+     * @param {Array<Particle>} particlesOrConfig.particles - Pre-created particle instances
      */
-    constructor(x, y, particles = null) {
+    constructor(x, y, particlesOrConfig = null) {
         this.x = x;
         this.y = y;
         this.particles = [];
-        this.life = 2.0; // 2 seconds lifetime
-        this.maxLife = 2.0;
-        this.gravity = 300; // pixels per second squared
-        this.friction = 0.98; // air resistance
         
-        if (particles && particles.length > 0) {
-            this.particles = particles;
+        // Default configuration
+        const defaults = {
+            power: 150,
+            spread: 72,
+            angle: -90,
+            gravity: 300,
+            friction: 0.98,
+            particleCount: 30,
+            particleSize: { min: 3, max: 7 },
+            lifetime: { min: 1.5, max: 2.0 },
+            particles: null
+        };
+        
+        // Merge with provided config
+        let config = defaults;
+        if (particlesOrConfig) {
+            if (Array.isArray(particlesOrConfig)) {
+                // Legacy: array of particles passed directly
+                config.particles = particlesOrConfig;
+            } else {
+                // Configuration object
+                config = { ...defaults, ...particlesOrConfig };
+            }
+        }
+        
+        // Store configuration
+        this.power = config.power;
+        this.spread = config.spread;
+        this.angle = config.angle;
+        this.gravity = config.gravity;
+        this.friction = config.friction;
+        this.particleCount = config.particleCount;
+        this.particleSize = config.particleSize;
+        this.particleLifetime = config.lifetime;
+        
+        this.life = config.lifetime.max;
+        this.maxLife = config.lifetime.max;
+        
+        if (config.particles && config.particles.length > 0) {
+            this.particles = config.particles;
         } else {
             this.createDefaultParticles();
         }
@@ -48,10 +109,9 @@ class FireworkEffect {
     
     /**
      * Create default particle mix (circles, squares, stars, triangles, diamonds)
-     * Called when no particles are injected via constructor
+     * Uses configuration parameters for power, spread, angle, etc.
      */
     createDefaultParticles() {
-        const particleCount = 30;
         const colors = [
             '#ff6b6b',
             '#4ecdc4',
@@ -73,20 +133,23 @@ class FireworkEffect {
             DiamondParticle
         ];
         
-        for (let i = 0; i < particleCount; i++) {
-            // Angle biased upward: -90° ± 72° (range: -162° to -18°)
-            const baseAngle = -Math.PI / 2; // -90° (straight up)
-            const spreadAngle = Math.PI * 0.8; // ±72° spread
+        // Convert angles to radians
+        const baseAngle = this.angle * (Math.PI / 180);
+        const spreadAngle = this.spread * (Math.PI / 180);
+        
+        for (let i = 0; i < this.particleCount; i++) {
+            // Calculate particle angle with spread
             const angle = baseAngle + (Math.random() - 0.5) * spreadAngle;
             
-            // Random speed: 100-300 pixels per second
-            const speed = 100 + Math.random() * 200;
+            // Random speed based on power (±50% variation)
+            const speedVariation = 0.5 + Math.random();
+            const speed = this.power * speedVariation;
             const vx = Math.cos(angle) * speed;
             const vy = Math.sin(angle) * speed;
             
             const color = colors[Math.floor(Math.random() * colors.length)];
-            const size = 3 + Math.random() * 4;
-            const maxLife = 1.5 + Math.random() * 0.5; // 1.5-2s lifetime
+            const size = this.particleSize.min + Math.random() * (this.particleSize.max - this.particleSize.min);
+            const maxLife = this.particleLifetime.min + Math.random() * (this.particleLifetime.max - this.particleLifetime.min);
             
             // Randomly select particle type
             const ParticleClass = particleTypes[Math.floor(Math.random() * particleTypes.length)];
