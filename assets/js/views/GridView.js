@@ -46,6 +46,9 @@ class GridView {
     createCellElement(cell) {
         const div = document.createElement('div');
         div.className = 'grid-cell';
+        if (cell.isTarget) {
+            div.classList.add('target-cell');
+        }
         div.textContent = cell.getLabel();
         div.dataset.row = cell.row.toString();
         div.dataset.col = cell.col.toString();
@@ -62,6 +65,12 @@ class GridView {
                 cell.element.classList.add('selected');
             } else {
                 cell.element.classList.remove('selected');
+            }
+            
+            if (cell.isTarget) {
+                cell.element.classList.add('target-cell');
+            } else {
+                cell.element.classList.remove('target-cell');
             }
         }
     }

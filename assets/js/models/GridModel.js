@@ -11,6 +11,9 @@ class GridModel {
     /** @type {Cell[][]} */
     cells = [];
     
+    /** @type {Cell|null} */
+    targetCell = null;
+    
     /** @type {Debug} */
     debug = null;
     
@@ -64,5 +67,35 @@ class GridModel {
             }
         }
         return selected;
+    }
+    
+    /**
+     * Set a random cell as target
+     * @returns {Cell}
+     */
+    setRandomTarget() {
+        // Clear previous target
+        if (this.targetCell) {
+            this.targetCell.setTarget(false);
+        }
+        
+        // Pick random cell
+        const randomRow = Math.floor(Math.random() * this.rows);
+        const randomCol = Math.floor(Math.random() * this.cols);
+        
+        this.targetCell = this.getCell(randomRow, randomCol);
+        this.targetCell.setTarget(true);
+        
+        this.debug.info(`Target cell set to [${randomRow}, ${randomCol}]`);
+        
+        return this.targetCell;
+    }
+    
+    /**
+     * Get the current target cell
+     * @returns {Cell|null}
+     */
+    getTargetCell() {
+        return this.targetCell;
     }
 }

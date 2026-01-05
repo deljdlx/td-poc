@@ -11,6 +11,9 @@ class Cell {
     /** @type {boolean} */
     selected = false;
     
+    /** @type {boolean} */
+    isTarget = false;
+    
     /** @type {HTMLElement|null} */
     element = null;
     
@@ -28,6 +31,14 @@ class Cell {
      */
     toggle() {
         this.selected = !this.selected;
+    }
+    
+    /**
+     * @param {boolean} value
+     * @returns {void}
+     */
+    setTarget(value) {
+        this.isTarget = value;
     }
     
     /**

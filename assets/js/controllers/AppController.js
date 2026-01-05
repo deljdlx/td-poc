@@ -63,6 +63,10 @@ class AppController {
         // Rendu initial
         this.gridView.render();
         
+        // Définir une cellule cible aléatoire
+        this.model.setRandomTarget();
+        this.gridView.updateCell(this.model.getTargetCell());
+        
         // Bind events
         this.bindEvents();
         
@@ -144,10 +148,7 @@ class AppController {
             this.canvasView.addFirework(center.x, center.y);
             
             // Créer un missile vers le centre de la grille
-            const targetCell = this.model.getCell(
-                Math.floor(this.model.rows / 2),
-                Math.floor(this.model.cols / 2)
-            );
+            const targetCell = this.model.getTargetCell();
             if (targetCell) {
                 const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
                 

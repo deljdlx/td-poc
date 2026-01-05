@@ -133,6 +133,35 @@ body, html {
     transform: scale(var(--hover-scale)) rotate(2deg);
 }
 
+/* Target cell state */
+.grid-cell.target-cell {
+    background: linear-gradient(135deg, #f59e0b, #dc2626);
+    border-color: #ea580c;
+    border-width: 3px;
+    color: white;
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
+    animation: target-pulse 1.5s ease-in-out infinite;
+}
+
+.grid-cell.target-cell::after {
+    content: '🎯';
+    position: absolute;
+    font-size: 32px;
+    opacity: 0.8;
+}
+
+/* Animation pulse pour la cellule cible */
+@keyframes target-pulse {
+    0%, 100% {
+        box-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(220, 38, 38, 1);
+        transform: scale(1.08);
+    }
+}
+
 /* Animation pulse pour les cellules sélectionnées */
 @keyframes pulse {
     0%, 100% {
