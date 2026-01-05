@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POC - Grid DOM + Canvas Layer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Canvas Layer (non-interactif, overlay) -->
+    <canvas id="canvas-layer"></canvas>
+    
+    <!-- DOM Grid (interactif) -->
+    <div id="grid-container"></div>
+    
+    <!-- Info Panel -->
+    <div id="info-panel">
+        <h2>Interactive Grid POC</h2>
+        <p>Click on cells to toggle selection</p>
+        <p>Canvas layer draws connections between selected cells</p>
+        <div id="stats">
+            <span>Selected: <strong id="selected-count">0</strong></span>
+        </div>
+    </div>
+    
+    <!-- Utils -->
+    <script src="js/utils/CoordinateSystem.js"></script>
+    
+    <!-- Models -->
+    <script src="js/models/Cell.js"></script>
+    <script src="js/models/GridModel.js"></script>
+    
+    <!-- Views -->
+    <script src="js/views/GridView.js"></script>
+    <script src="js/views/CanvasView.js"></script>
+    <script src="js/views/InfoView.js"></script>
+    
+    <!-- Controllers -->
+    <script src="js/controllers/AppController.js"></script>
+    
+    <!-- Main -->
+    <script src="js/main.js"></script>
+</body>
+</html>
