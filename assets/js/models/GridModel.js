@@ -11,14 +11,19 @@ class GridModel {
     /** @type {Cell[][]} */
     cells = [];
     
+    /** @type {Debug} */
+    debug = null;
+    
     /**
      * @param {number} rows
      * @param {number} cols
      */
     constructor(rows, cols) {
+        this.debug = new Debug('GridModel', true);
         this.rows = rows;
         this.cols = cols;
         this.initCells();
+        this.debug.success(`Grille créée : ${rows}x${cols} = ${rows * cols} cellules`);
     }
     
     /**

@@ -17,16 +17,28 @@ class AppController {
     /** @type {CoordinateSystem} */
     coordSystem = null;
     
+    /** @type {Debug} */
+    debug = null;
+    
     /**
      * @returns {void}
      */
     init() {
+        // Debug
+        this.debug = new Debug('AppController', true);
+        this.debug.info('🚀 Initialisation de l\'application');
+        
         // Initialisation
         this.coordSystem = new CoordinateSystem();
         this.model = new GridModel(6, 8);
         this.gridView = new GridView('grid-container', this.model);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem);
         this.infoView = new InfoView();
+        
+        this.debug.success('Application initialisée avec succès', {
+            rows: this.model.rows,
+            cols: this.model.cols
+        });
         
         // Rendu initial
         this.gridView.render();
@@ -61,6 +73,11 @@ class AppController {
         const cell = this.model.getCell(row, col);
         
         if (cell) {
+            this.debug.event(`Click sur cellule [${row}, ${col}]`, {
+                before: cell.selected,
+                after: !cell.selected
+            });
+            
             cell.toggle();
             this.gridView.updateCell(cell);
             this.updateCanvas();
@@ -80,6 +97,9 @@ class AppController {
      */
     updateCanvas() {
         const selectedCells = this.model.getSelectedCells();
+        this.debug.data('Mise à jour du canvas', {
+            cellCount: selectedCells.length
+        });
         this.canvasView.drawConnections(selectedCells);
     }
     

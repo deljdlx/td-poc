@@ -11,15 +11,23 @@ class CanvasView {
     /** @type {CoordinateSystem} */
     coordSystem = null;
     
+    /** @type {Debug} */
+    debug = null;
+    
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
      */
     constructor(canvasId, coordSystem) {
+        this.debug = new Debug('CanvasView', true);
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
         this.coordSystem = coordSystem;
         this.setupCanvas();
+        this.debug.info('Canvas configuré', {
+            width: this.canvas.width,
+            height: this.canvas.height
+        });
     }
     
     /**
@@ -55,8 +63,18 @@ class CanvasView {
         this.clear();
         
         if (selectedCells.length < 2) {
+            this.debug.debug('Pas assez de cellules pour dessiner des connexions', {
+                count: selectedCells.length
+            });
             return;
         }
+        
+        this.debug.debug(`Dessin de ${selectedCells.length - 1} connexions`);
+        this.debug.groupCollapsed('Détails des connexions', () => {
+            selectedCells.forEach((cell, i) => {
+                console.log(`Cell ${i}: [${cell.row}, ${cell.col}]`);
+            });
+        });
         
         // Style du dessin
         this.ctx.strokeStyle = '#ec4899';
