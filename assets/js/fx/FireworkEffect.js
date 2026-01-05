@@ -1,145 +1,147 @@
 /**
- * Effet feu d'artifice avec particules qui montent
- * FX autonome avec micro-physique
+ * FireworkEffect - Autonomous particle effect system
+ * Manages particle lifecycle, physics, and rendering
+ * Accepts injected particle instances for flexible visual effects
  */
 class FireworkEffect {
     /** @type {number} */
-    x = 0;
+    x;
     
     /** @type {number} */
-    y = 0;
+    y;
     
-    /** @type {Array<Object>} */
-    particles = [];
-    
-    /** @type {number} */
-    age = 0;
+    /** @type {Array<Particle>} */
+    particles;
     
     /** @type {number} */
-    maxAge = 2.0; // 2 secondes
+    life;
     
-    /** @type {boolean} */
-    isDead = false;
+    /** @type {number} */
+    maxLife;
+    
+    /** @type {number} */
+    gravity;
+    
+    /** @type {number} */
+    friction;
     
     /**
-     * @param {number} x - Position X
-     * @param {number} y - Position Y
+     * @param {number} x - Center X position
+     * @param {number} y - Center Y position
+     * @param {Array<Particle>} particles - Optional array of particle instances
      */
-    constructor(x, y) {
+    constructor(x, y, particles = null) {
         this.x = x;
         this.y = y;
-        this.createParticles();
+        this.particles = [];
+        this.life = 2.0; // 2 seconds lifetime
+        this.maxLife = 2.0;
+        this.gravity = 300; // pixels per second squared
+        this.friction = 0.98; // air resistance
+        
+        if (particles && particles.length > 0) {
+            this.particles = particles;
+        } else {
+            this.createDefaultParticles();
+        }
     }
     
     /**
-     * Crée les particules du feu d'artifice
-     * @returns {void}
+     * Create default particle mix (circles, squares, stars, triangles, diamonds)
+     * Called when no particles are injected via constructor
      */
-    createParticles() {
+    createDefaultParticles() {
         const particleCount = 30;
-        const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#f0abfc'];
+        const colors = [
+            '#ff6b6b',
+            '#4ecdc4',
+            '#45b7d1',
+            '#f9ca24',
+            '#f0932b',
+            '#eb4d4b',
+            '#6c5ce7',
+            '#a29bfe',
+            '#fd79a8',
+            '#fdcb6e'
+        ];
+        
+        const particleTypes = [
+            CircleParticle,
+            SquareParticle,
+            StarParticle,
+            TriangleParticle,
+            DiamondParticle
+        ];
         
         for (let i = 0; i < particleCount; i++) {
-            // Angle avec biais vers le haut (-90° = haut, dispersion ±60°)
-            const baseAngle = -Math.PI / 2; // -90° (vers le haut)
-            const spread = (Math.random() - 0.5) * Math.PI * 0.8; // ±72°
-            const angle = baseAngle + spread;
+            // Angle biased upward: -90° ± 72° (range: -162° to -18°)
+            const baseAngle = -Math.PI / 2; // -90° (straight up)
+            const spreadAngle = Math.PI * 0.8; // ±72° spread
+            const angle = baseAngle + (Math.random() - 0.5) * spreadAngle;
             
-            // Vitesse variable
-            const speed = 100 + Math.random() * 150; // pixels/seconde
+            // Random speed: 100-300 pixels per second
+            const speed = 100 + Math.random() * 200;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
             
-            this.particles.push({
-                x: this.x,
-                y: this.y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                radius: 2 + Math.random() * 3,
-                life: 1.0,
-                decay: 0.3 + Math.random() * 0.4, // Vitesse de disparition
-                color: colors[Math.floor(Math.random() * colors.length)],
-                trail: [] // Pour l'effet de traînée
-            });
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = 3 + Math.random() * 4;
+            const maxLife = 1.5 + Math.random() * 0.5; // 1.5-2s lifetime
+            
+            // Randomly select particle type
+            const ParticleClass = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+            
+            // Special handling for StarParticle (can have different spike counts)
+            if (ParticleClass === StarParticle) {
+                const spikes = 4 + Math.floor(Math.random() * 3); // 4, 5, or 6 spikes
+                this.particles.push(new ParticleClass(this.x, this.y, vx, vy, color, size, maxLife, spikes));
+            } else {
+                this.particles.push(new ParticleClass(this.x, this.y, vx, vy, color, size, maxLife));
+            }
         }
     }
     
     /**
-     * Met à jour l'effet
-     * @param {number} deltaTime - Temps écoulé en secondes
-     * @returns {void}
+     * Add a particle to the effect
+     * @param {Particle} particle - Particle instance to add
+     */
+    addParticle(particle) {
+        this.particles.push(particle);
+    }
+    
+    /**
+     * Update particle physics
+     * Delegates physics to individual particles
+     * @param {number} deltaTime - Time delta in seconds
+     * @returns {boolean} - True if effect is still alive
      */
     update(deltaTime) {
-        this.age += deltaTime;
+        // Update global lifetime
+        this.life -= deltaTime;
         
-        if (this.age >= this.maxAge) {
-            this.isDead = true;
-            return;
+        // Update each particle (particles handle their own physics)
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const particle = this.particles[i];
+            const isAlive = particle.update(deltaTime, this.gravity, this.friction);
+            
+            // Remove dead particles
+            if (!isAlive) {
+                this.particles.splice(i, 1);
+            }
         }
         
-        const gravity = 300; // pixels/s²
-        
-        this.particles.forEach(particle => {
-            // Physique
-            particle.vy += gravity * deltaTime; // Gravité
-            particle.x += particle.vx * deltaTime;
-            particle.y += particle.vy * deltaTime;
-            
-            // Friction de l'air (ralentit progressivement)
-            particle.vx *= (1 - 0.5 * deltaTime);
-            
-            // Disparition progressive
-            particle.life -= particle.decay * deltaTime;
-            
-            // Trail (garder les dernières positions)
-            particle.trail.push({ x: particle.x, y: particle.y, life: particle.life });
-            if (particle.trail.length > 5) {
-                particle.trail.shift();
-            }
-        });
+        // Effect dies when all particles are gone OR global lifetime expires
+        return this.particles.length > 0 && this.life > 0;
     }
     
     /**
-     * Dessine l'effet sur le canvas
+     * Draw all particles
+     * Delegates rendering to individual particles
      * @param {CanvasRenderingContext2D} ctx
-     * @returns {void}
      */
     draw(ctx) {
-        this.particles.forEach(particle => {
-            if (particle.life <= 0) return;
-            
-            ctx.save();
-            
-            // Dessiner la traînée
-            if (particle.trail.length > 1) {
-                ctx.strokeStyle = particle.color;
-                ctx.lineWidth = 1;
-                ctx.globalAlpha = particle.life * 0.3;
-                
-                ctx.beginPath();
-                ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
-                for (let i = 1; i < particle.trail.length; i++) {
-                    ctx.lineTo(particle.trail[i].x, particle.trail[i].y);
-                }
-                ctx.stroke();
-            }
-            
-            // Dessiner la particule
-            ctx.globalAlpha = particle.life;
-            ctx.fillStyle = particle.color;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = particle.color;
-            
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Point brillant au centre
-            ctx.globalAlpha = particle.life * 0.8;
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.radius * 0.4, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.restore();
-        });
+        for (const particle of this.particles) {
+            particle.draw(ctx);
+        }
     }
 }
