@@ -20,20 +20,32 @@ class AppController {
     /** @type {Debug} */
     debug = null;
     
+    /** @type {DIContainer} */
+    container = null;
+    
+    /**
+     * @param {DIContainer} container
+     */
+    constructor(container) {
+        this.container = container;
+        // Injection du debug
+        this.debug = container.createDebug('AppController', true);
+    }
+    
     /**
      * @returns {void}
      */
     init() {
-        // Debug
-        this.debug = new Debug('AppController', true);
         this.debug.info('🚀 Initialisation de l\'application');
         
-        // Initialisation
-        this.coordSystem = new CoordinateSystem();
-        this.model = new GridModel(6, 8);
-        this.gridView = new GridView('grid-container', this.model);
-        this.canvasView = new CanvasView('canvas-layer', this.coordSystem);
-        this.infoView = new InfoView();
+        // Récupération des services via DI
+        this.coordSystem = this.container.get('coordinateSystem');
+        
+        // Initialisation avec injection
+        this.model = new GridModel(6, 8, this.container);
+        this.gridView = new GridView('grid-container', this.model, this.container);
+        this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
+        this.infoView = new InfoView(this.container);
         
         this.debug.success('Application initialisée avec succès', {
             rows: this.model.rows,

@@ -17,9 +17,10 @@ class GridModel {
     /**
      * @param {number} rows
      * @param {number} cols
+     * @param {DIContainer} container
      */
-    constructor(rows, cols) {
-        this.debug = new Debug('GridModel', true);
+    constructor(rows, cols, container) {
+        this.debug = container.createDebug('GridModel', true);
         this.rows = rows;
         this.cols = cols;
         this.initCells();

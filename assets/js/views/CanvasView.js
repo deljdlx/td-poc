@@ -17,9 +17,10 @@ class CanvasView {
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
+     * @param {DIContainer} diContainer
      */
-    constructor(canvasId, coordSystem) {
-        this.debug = new Debug('CanvasView', true);
+    constructor(canvasId, coordSystem, diContainer) {
+        this.debug = diContainer.createDebug('CanvasView', true);
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
         this.coordSystem = coordSystem;

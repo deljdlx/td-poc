@@ -5,8 +5,16 @@ class InfoView {
     /** @type {HTMLElement} */
     countElement = null;
     
-    constructor() {
+    /** @type {Debug} */
+    debug = null;
+    
+    /**
+     * @param {DIContainer} diContainer
+     */
+    constructor(diContainer) {
+        this.debug = diContainer.createDebug('InfoView', true);
         this.countElement = document.getElementById('selected-count');
+        this.debug.info('InfoView initialisée');
     }
     
     /**

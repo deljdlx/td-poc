@@ -8,13 +8,19 @@ class GridView {
     /** @type {GridModel} */
     model = null;
     
+    /** @type {Debug} */
+    debug = null;
+    
     /**
      * @param {string} containerId
      * @param {GridModel} model
+     * @param {DIContainer} diContainer
      */
-    constructor(containerId, model) {
+    constructor(containerId, model, diContainer) {
+        this.debug = diContainer.createDebug('GridView', true);
         this.container = document.getElementById(containerId);
         this.model = model;
+        this.debug.info('GridView initialisée');
     }
     
     /**
