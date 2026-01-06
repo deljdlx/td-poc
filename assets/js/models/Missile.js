@@ -54,14 +54,25 @@ class Missile extends Entity {
     onArrival;
     
     /**
+     * @type {number}
+     */
+    age;
+    
+    /**
+     * @type {number}
+     */
+    maxLifeTime;
+    
+    /**
      * @param {number} x - Start X position
      * @param {number} y - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
      * @param {number} speed - Missile speed in pixels/second (default: 200)
      * @param {Function} onArrival - Callback when missile reaches target
+     * @param {number} maxLifeTime - Maximum lifetime in seconds (default: 3.0)
      */
-    constructor(x, y, targetX, targetY, speed = 200, onArrival = null) {
+    constructor(x, y, targetX, targetY, speed = 200, onArrival = null, maxLifeTime = 3.0) {
         super('missile', x, y);
         
         this.targetX = targetX;
@@ -82,6 +93,8 @@ class Missile extends Entity {
         this.trail = [];
         this.trailLength = 10;
         this.onArrival = onArrival;
+        this.age = 0;
+        this.maxLifeTime = maxLifeTime;
     }
     
     /**
@@ -90,6 +103,15 @@ class Missile extends Entity {
      * @returns {void}
      */
     update(deltaTime) {
+        // Increment age
+        this.age += deltaTime;
+        
+        // Check if exceeded max lifetime
+        if (this.age >= this.maxLifeTime) {
+            this.kill();
+            return;
+        }
+        
         // Store current position for trail
         this.trail.push({ x: this.x, y: this.y });
         if (this.trail.length > this.trailLength) {
