@@ -1,7 +1,7 @@
 /**
  * Vue DOM pour la grille
  */
-class GridView {
+export class GridView {
     /** @type {HTMLElement} */
     container = null;
     

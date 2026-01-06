@@ -1,7 +1,7 @@
 /**
  * Gère la conversion entre coordonnées DOM et Canvas
  */
-class CoordinateSystem {
+export class CoordinateSystem {
     /** @type {number} */
     viewportWidth = window.innerWidth;
     

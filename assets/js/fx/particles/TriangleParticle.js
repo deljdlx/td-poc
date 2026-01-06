@@ -1,7 +1,9 @@
+import { Particle } from './Particle.js';
+
 /**
  * TriangleParticle - Triangle particle with rotation
  */
-class TriangleParticle extends Particle {
+export class TriangleParticle extends Particle {
     /**
      * Draw triangle particle with rotation
      * @param {CanvasRenderingContext2D} ctx

@@ -1,8 +1,11 @@
+import { DefaultTrailRenderer } from './DefaultTrailRenderer.js';
+import { ParticleTrailRenderer } from './ParticleTrailRenderer.js';
+
 /**
  * MissileRenderer - Renders missile entities on canvas
  * Handles both missile head and trail rendering
  */
-class MissileRenderer {
+export class MissileRenderer {
     /**
      * @type {TrailRenderer}
      */

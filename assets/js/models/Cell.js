@@ -1,7 +1,7 @@
 /**
  * Représente une cellule de la grille
  */
-class Cell {
+export class Cell {
     /** @type {number} */
     row = 0;
     

@@ -2,7 +2,7 @@
  * Système de debug avec console.log stylisé
  * Peut être injecté dans les classes pour un debugging visuel
  */
-class Debug {
+export class Debug {
     /** @type {boolean} */
     enabled = true;
     

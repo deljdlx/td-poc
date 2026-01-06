@@ -1,7 +1,9 @@
+import { Particle } from './Particle.js';
+
 /**
  * CircleParticle - Circular particle with glow effect
  */
-class CircleParticle extends Particle {
+export class CircleParticle extends Particle {
     /**
      * Draw circular particle with glow
      * @param {CanvasRenderingContext2D} ctx

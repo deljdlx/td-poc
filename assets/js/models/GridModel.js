@@ -1,7 +1,9 @@
+import { Cell } from './Cell.js';
+
 /**
  * Modèle de la grille
  */
-class GridModel {
+export class GridModel {
     /** @type {number} */
     rows = 6;
     

@@ -2,7 +2,7 @@
  * Entity - Base class for all game entities
  * Abstract class defining common interface for missiles, towers, enemies, etc.
  */
-class Entity {
+export class Entity {
     /**
      * @type {string}
      */

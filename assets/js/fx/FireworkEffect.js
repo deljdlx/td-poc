@@ -1,9 +1,15 @@
+import { CircleParticle } from './particles/CircleParticle.js';
+import { SquareParticle } from './particles/SquareParticle.js';
+import { StarParticle } from './particles/StarParticle.js';
+import { TriangleParticle } from './particles/TriangleParticle.js';
+import { DiamondParticle } from './particles/DiamondParticle.js';
+
 /**
  * FireworkEffect - Autonomous particle effect system
  * Manages particle lifecycle, physics, and rendering
  * Accepts injected particle instances for flexible visual effects
  */
-class FireworkEffect {
+export class FireworkEffect {
     /** @type {number} */
     x;
 

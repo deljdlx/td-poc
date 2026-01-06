@@ -2,7 +2,7 @@
  * Conteneur d'injection de dépendances simple
  * Permet d'enregistrer et d'injecter des services dans les classes
  */
-class DIContainer {
+export class DIContainer {
     /** @type {Map<string, Object>} */
     services = new Map();
     

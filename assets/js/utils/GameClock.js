@@ -1,7 +1,7 @@
 /**
  * Horloge de jeu avec fixed timestep pour le gameplay
  */
-class GameClock {
+export class GameClock {
     /** @type {number} - FPS cible pour le gameplay */
     targetFPS = 60;
     

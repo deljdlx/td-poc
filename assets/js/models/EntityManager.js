@@ -2,7 +2,7 @@
  * EntityManager - Manages all game entities lifecycle
  * Centralized manager for missiles, towers, enemies, projectiles, etc.
  */
-class EntityManager {
+export class EntityManager {
     /**
      * @type {Array<Entity>}
      */

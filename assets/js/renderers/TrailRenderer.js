@@ -2,7 +2,7 @@
  * TrailRenderer - Base class for trail rendering strategies
  * Abstract class defining interface for missile trail rendering
  */
-class TrailRenderer {
+export class TrailRenderer {
     /**
      * Draw missile trail on canvas
      * @param {CanvasRenderingContext2D} ctx - Canvas context

@@ -1,7 +1,9 @@
+import { Particle } from './Particle.js';
+
 /**
  * DiamondParticle - Diamond/rhombus particle with rotation
  */
-class DiamondParticle extends Particle {
+export class DiamondParticle extends Particle {
     /**
      * Draw diamond particle with rotation
      * @param {CanvasRenderingContext2D} ctx

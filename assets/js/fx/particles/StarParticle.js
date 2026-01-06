@@ -1,7 +1,9 @@
+import { Particle } from './Particle.js';
+
 /**
  * StarParticle - Star-shaped particle with rotation
  */
-class StarParticle extends Particle {
+export class StarParticle extends Particle {
     /**
      * @type {number}
      */

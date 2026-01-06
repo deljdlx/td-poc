@@ -1,8 +1,10 @@
+import { TrailRenderer } from './TrailRenderer.js';
+
 /**
  * DefaultTrailRenderer - Simple line trail renderer
  * Draws a fading line following the missile path
  */
-class DefaultTrailRenderer extends TrailRenderer {
+export class DefaultTrailRenderer extends TrailRenderer {
     /**
      * Draw simple line trail
      * @param {CanvasRenderingContext2D} ctx

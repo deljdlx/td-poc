@@ -1,3 +1,9 @@
+import { DIContainer } from './utils/DIContainer.js';
+import { Debug } from './utils/Debug.js';
+import { CoordinateSystem } from './utils/CoordinateSystem.js';
+import { GameClock } from './utils/GameClock.js';
+import { EntityManager } from './models/EntityManager.js';
+
 /**
  * Configuration et initialisation du conteneur DI
  */
@@ -9,7 +15,7 @@ const container = new DIContainer();
  * Enregistre tous les services de base
  * @returns {void}
  */
-function bootstrapDI() {
+export function bootstrapDI() {
     // Factory pour créer des instances de Debug
     container.registerFactory('debug.factory', () => {
         return (context, enabled = true) => new Debug(context, enabled);
@@ -33,5 +39,5 @@ function bootstrapDI() {
     // Autres services à ajouter au besoin...
 }
 
-// Initialiser au chargement
-bootstrapDI();
+// Export du container
+export { container };

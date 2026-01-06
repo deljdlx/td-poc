@@ -1,8 +1,10 @@
+import { Entity } from './Entity.js';
+
 /**
  * Missile - Projectile entity that travels from source to target
  * Managed by EntityManager, updated by GameClock
  */
-class Missile extends Entity {
+export class Missile extends Entity {
     /**
      * @type {number}
      */

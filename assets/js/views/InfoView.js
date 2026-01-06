@@ -1,7 +1,7 @@
 /**
  * Vue pour le panneau d'information
  */
-class InfoView {
+export class InfoView {
     /** @type {HTMLElement} */
     countElement = null;
     

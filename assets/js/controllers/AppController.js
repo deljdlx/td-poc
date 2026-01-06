@@ -1,7 +1,13 @@
+import { GridModel } from '../models/GridModel.js';
+import { GridView } from '../views/GridView.js';
+import { CanvasView } from '../views/CanvasView.js';
+import { InfoView } from '../views/InfoView.js';
+import { Missile } from '../models/Missile.js';
+
 /**
  * Contrôleur principal de l'application
  */
-class AppController {
+export class AppController {
     /** @type {GridModel} */
     model = null;
     

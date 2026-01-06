@@ -3,7 +3,7 @@
  * Handles physics (position, velocity, lifetime)
  * Subclasses implement their own draw() method
  */
-class Particle {
+export class Particle {
     /**
      * @type {number}
      */

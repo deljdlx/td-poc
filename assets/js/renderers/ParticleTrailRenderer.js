@@ -1,8 +1,10 @@
+import { TrailRenderer } from './TrailRenderer.js';
+
 /**
  * ParticleTrailRenderer - Particle-based trail renderer
  * Draws small particles along the missile trail
  */
-class ParticleTrailRenderer extends TrailRenderer {
+export class ParticleTrailRenderer extends TrailRenderer {
     /**
      * Draw particle trail
      * @param {CanvasRenderingContext2D} ctx

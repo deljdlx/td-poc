@@ -1,7 +1,9 @@
+import { Particle } from './Particle.js';
+
 /**
  * SquareParticle - Square particle with rotation
  */
-class SquareParticle extends Particle {
+export class SquareParticle extends Particle {
     /**
      * Draw square particle with rotation
      * @param {CanvasRenderingContext2D} ctx

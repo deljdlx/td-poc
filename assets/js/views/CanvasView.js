@@ -1,7 +1,10 @@
+import { MissileRenderer } from '../renderers/MissileRenderer.js';
+import { FireworkEffect } from '../fx/FireworkEffect.js';
+
 /**
  * Vue Canvas pour dessiner des connexions
  */
-class CanvasView {
+export class CanvasView {
     /** @type {HTMLCanvasElement} */
     canvas = null;
     
