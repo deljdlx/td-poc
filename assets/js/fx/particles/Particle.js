@@ -55,6 +55,11 @@ export class Particle {
     rotationSpeed;
     
     /**
+     * @type {Function|number|null}
+     */
+    fadeConfig;
+    
+    /**
      * @param {number} x - Initial X position
      * @param {number} y - Initial Y position
      * @param {number} vx - Initial X velocity (pixels/second)
@@ -62,8 +67,12 @@ export class Particle {
      * @param {string} color - Particle color
      * @param {number} size - Particle size
      * @param {number} maxLife - Maximum lifetime in seconds
+     * @param {Function|number|null} fadeConfig - Fade configuration:
+     *   - Function: (life, maxLife) => opacity (0-1)
+     *   - Number: fade duration in milliseconds (fade on last X ms)
+     *   - null: default linear fade over entire lifetime
      */
-    constructor(x, y, vx, vy, color, size, maxLife = 2.0) {
+    constructor(x, y, vx, vy, color, size, maxLife = 2.0, fadeConfig = null) {
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -74,6 +83,7 @@ export class Particle {
         this.maxLife = maxLife;
         this.rotation = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() - 0.5) * 4; // radians per second
+        this.fadeConfig = fadeConfig;
     }
     
     /**
@@ -105,10 +115,28 @@ export class Particle {
     }
     
     /**
-     * Get current opacity based on lifetime
+     * Get current opacity based on lifetime and fadeConfig
      * @returns {number} - Opacity (0-1)
      */
     getOpacity() {
+        // Custom fade function
+        if (typeof this.fadeConfig === 'function') {
+            return Math.max(0, Math.min(1, this.fadeConfig(this.life, this.maxLife)));
+        }
+        
+        // Fade duration in milliseconds (fade on last X ms)
+        if (typeof this.fadeConfig === 'number') {
+            const fadeDuration = this.fadeConfig / 1000; // convert to seconds
+            const lifeRemaining = this.life;
+            
+            if (lifeRemaining > fadeDuration) {
+                return 1.0; // No fade yet
+            } else {
+                return Math.max(0, lifeRemaining / fadeDuration); // Linear fade
+            }
+        }
+        
+        // Default: linear fade over entire lifetime
         return Math.max(0, this.life / this.maxLife);
     }
     
