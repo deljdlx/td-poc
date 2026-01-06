@@ -17,6 +17,9 @@ export class Cell {
     /** @type {HTMLElement|null} */
     element = null;
     
+    /** @type {Tower|null} */
+    tower = null;
+    
     /**
      * @param {number} row
      * @param {number} col
@@ -46,5 +49,30 @@ export class Cell {
      */
     getLabel() {
         return `${this.row},${this.col}`;
+    }
+    
+    /**
+     * Set tower on this cell
+     * @param {Tower} tower
+     * @returns {void}
+     */
+    setTower(tower) {
+        this.tower = tower;
+    }
+    
+    /**
+     * Get tower on this cell
+     * @returns {Tower|null}
+     */
+    getTower() {
+        return this.tower;
+    }
+    
+    /**
+     * Check if cell has a tower
+     * @returns {boolean}
+     */
+    hasTower() {
+        return this.tower !== null;
     }
 }

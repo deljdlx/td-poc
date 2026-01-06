@@ -100,4 +100,38 @@ export class GridModel {
     getTargetCell() {
         return this.targetCell;
     }
+    
+    /**
+     * Get all empty cells (no tower, not target)
+     * @returns {Cell[]}
+     */
+    getEmptyCells() {
+        const empty = [];
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.cols; col++) {
+                const cell = this.cells[row][col];
+                if (!cell.hasTower() && !cell.isTarget) {
+                    empty.push(cell);
+                }
+            }
+        }
+        return empty;
+    }
+    
+    /**
+     * Get all cells with towers
+     * @returns {Cell[]}
+     */
+    getCellsWithTowers() {
+        const withTowers = [];
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.cols; col++) {
+                const cell = this.cells[row][col];
+                if (cell.hasTower()) {
+                    withTowers.push(cell);
+                }
+            }
+        }
+        return withTowers;
+    }
 }

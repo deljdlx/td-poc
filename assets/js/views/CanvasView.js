@@ -1,4 +1,5 @@
 import { MissileRenderer } from '../renderers/MissileRenderer.js';
+import { TowerRenderer } from '../renderers/TowerRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
 import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
 import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
@@ -60,27 +61,15 @@ export class CanvasView {
      * @returns {void}
      */
     setupRenderers() {
-        // Test different sprite renderers (uncomment ONE to test)
-        
-        // Circle (default)
-        // this.renderers['missile'] = new MissileRenderer(null, new CircleSpriteRenderer());
-        
-        // Star with 6 spikes
+        // Missiles - star sprite
         const starSprite = new StarSpriteRenderer(6, 3);
         this.renderers['missile'] = new MissileRenderer(null, starSprite);
-        console.log('✅ StarSpriteRenderer configured:', starSprite);
-
-        // Square rotating fast
-        // this.renderers['missile'] = new MissileRenderer(null, new SquareSpriteRenderer(4));
-
-        // Triangle
-        // this.renderers['missile'] = new MissileRenderer(null, new TriangleSpriteRenderer(2));
         
-        // Diamond
-        // this.renderers['missile'] = new MissileRenderer(null, new DiamondSpriteRenderer(3));
+        // Towers - diamond sprite
+        const towerSprite = new DiamondSpriteRenderer(1.5);
+        this.renderers['tower'] = new TowerRenderer(towerSprite);
         
-        // Future: this.renderers['tower'] = new TowerRenderer();
-        // Future: this.renderers['enemy'] = new EnemyRenderer();
+        this.debug.success('Renderers configured', { missile: 'Star', tower: 'Diamond' });
     }
     
     /**

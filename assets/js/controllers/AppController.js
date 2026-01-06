@@ -3,6 +3,7 @@ import { GridView } from '../views/GridView.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { InfoView } from '../views/InfoView.js';
 import { Missile } from '../models/Missile.js';
+import { Tower } from '../models/Tower.js';
 
 /**
  * Contrôleur principal de l'application
@@ -73,6 +74,9 @@ export class AppController {
         this.model.setRandomTarget();
         this.gridView.updateCell(this.model.getTargetCell());
         
+        // Placer des tours aléatoirement
+        this.placeRandomTowers(5);
+        
         // Bind events
         this.bindEvents();
         
@@ -93,6 +97,56 @@ export class AppController {
         
         // Démarrer
         this.gameClock.start();
+    }
+    
+    /**
+     * Place N towers randomly on empty cells
+     * @param {number} count - Number of towers to place
+     * @returns {void}
+     */
+    placeRandomTowers(count) {
+        const emptyCells = this.model.getEmptyCells();
+        
+        if (emptyCells.length < count) {
+            this.debug.warning(`Not enough empty cells for ${count} towers, placing ${emptyCells.length}`);
+            count = emptyCells.length;
+        }
+        
+        // Shuffle and take first N cells
+        const shuffled = emptyCells.sort(() => Math.random() - 0.5);
+        const selectedCells = shuffled.slice(0, count);
+        
+        selectedCells.forEach(cell => {
+            const tower = new Tower(cell, this.createMissileFromTower.bind(this), this.container);
+            cell.setTower(tower);
+            this.entityManager.addEntity(tower);
+            this.gridView.updateCell(cell);
+        });
+        
+        this.debug.success(`Placed ${count} towers randomly`);
+    }
+    
+    /**
+     * Create missile from tower position to target
+     * @param {number} x - Start X
+     * @param {number} y - Start Y
+     * @param {number} targetX - Target X
+     * @param {number} targetY - Target Y
+     * @returns {void}
+     */
+    createMissileFromTower(x, y, targetX, targetY) {
+        const missile = new Missile(
+            x, y,
+            targetX, targetY,
+            300, // speed
+            (mx, my) => {
+                this.canvasView.addFirework(mx, my);
+            },
+            3.0 // maxLifeTime
+        );
+        
+        this.entityManager.addEntity(missile);
+        this.debug.event('Tower fired missile');
     }
     
     /**
@@ -143,34 +197,27 @@ export class AppController {
         const col = parseInt(target.dataset.col);
         const cell = this.model.getCell(row, col);
         
-        if (cell) {
-            this.debug.event(`Click sur cellule [${row}, ${col}]`, {
-                before: cell.selected,
-                after: !cell.selected
-            });
+        if (!cell) {
+            return;
+        }
+        
+        // Check if cell has a tower
+        if (cell.hasTower()) {
+            this.debug.event(`Tower clicked at [${row}, ${col}]`);
             
-            // Effet feu d'artifice au centre de la cellule
-            const center = this.coordSystem.getElementCenter(cell.element);
-            this.canvasView.addFirework(center.x, center.y);
-            
-            // Créer un missile vers le centre de la grille
+            // Get target cell and shoot
             const targetCell = this.model.getTargetCell();
             if (targetCell) {
                 const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
-                
-                // Callback pour créer une explosion à l'arrivée
-                const onArrival = (x, y) => {
-                    this.canvasView.addFirework(x, y);
-                };
-                
-                const missile = new Missile(center.x, center.y, targetCenter.x, targetCenter.y, 200, onArrival);
-                this.entityManager.addEntity(missile);
+                cell.getTower().shoot(targetCenter.x, targetCenter.y);
+            } else {
+                this.debug.warning('No target cell defined');
             }
-            
-            cell.toggle();
-            this.gridView.updateCell(cell);
-            this.updateCanvas();
-            this.updateInfo();
+        } else {
+            // Empty cell clicked - visual feedback only
+            this.debug.event(`Empty cell clicked [${row}, ${col}]`);
+            const center = this.coordSystem.getElementCenter(cell.element);
+            this.canvasView.addFirework(center.x, center.y);
         }
     }
     

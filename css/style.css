@@ -149,6 +149,26 @@ body, html {
     opacity: 0.8;
 }
 
+/* Cell with tower state */
+.grid-cell.has-tower {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border-color: #2563eb;
+    border-width: 3px;
+    cursor: pointer;
+}
+
+.grid-cell.has-tower::after {
+    content: '🗼';
+    position: absolute;
+    font-size: 28px;
+    opacity: 0.9;
+}
+
+.grid-cell.has-tower:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+}
+
 /* Animation pulse pour la cellule cible */
 @keyframes target-pulse {
     0%, 100% {

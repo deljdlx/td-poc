@@ -179,6 +179,12 @@ export class GridView {
             } else {
                 cell.element.classList.remove('target-cell');
             }
+            
+            if (cell.hasTower()) {
+                cell.element.classList.add('has-tower');
+            } else {
+                cell.element.classList.remove('has-tower');
+            }
         }
     }
     
