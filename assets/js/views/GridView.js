@@ -44,11 +44,25 @@ export class GridView {
      * @returns {HTMLElement}
      */
     createCellElement(cell) {
+        // Get CSS variables
+        const root = document.documentElement;
+        const cellSize = parseInt(getComputedStyle(root).getPropertyValue('--cell-size'));
+        const cellGap = parseInt(getComputedStyle(root).getPropertyValue('--cell-gap'));
+        
+        // Calculate absolute position
+        const left = cell.col * (cellSize + cellGap);
+        const top = cell.row * (cellSize + cellGap);
+        
         const div = document.createElement('div');
         div.className = 'grid-cell';
         if (cell.isTarget) {
             div.classList.add('target-cell');
         }
+        
+        // Apply absolute positioning
+        div.style.left = `${left}px`;
+        div.style.top = `${top}px`;
+        
         div.textContent = cell.getLabel();
         div.dataset.row = cell.row.toString();
         div.dataset.col = cell.col.toString();

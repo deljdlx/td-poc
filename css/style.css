@@ -63,10 +63,9 @@ body, html {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    display: grid;
-    grid-template-columns: repeat(var(--grid-cols), var(--cell-size));
-    grid-template-rows: repeat(var(--grid-rows), var(--cell-size));
-    gap: var(--cell-gap);
+    /* Dimensions calculées : (cols * cell-size) + ((cols - 1) * gap) */
+    width: calc(var(--grid-cols) * var(--cell-size) + (var(--grid-cols) - 1) * var(--cell-gap) + 40px);
+    height: calc(var(--grid-rows) * var(--cell-size) + (var(--grid-rows) - 1) * var(--cell-gap) + 40px);
     padding: 20px;
     z-index: 1;
 }
@@ -75,6 +74,7 @@ body, html {
    GRID CELL
    ========================================== */
 .grid-cell {
+    position: absolute;
     width: var(--cell-size);
     height: var(--cell-size);
     background: var(--color-surface);
@@ -88,7 +88,6 @@ body, html {
     font-size: 14px;
     font-weight: 600;
     color: var(--color-text-dim);
-    position: relative;
     overflow: hidden;
 }
 
