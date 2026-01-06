@@ -6,10 +6,10 @@
 class FireworkEffect {
     /** @type {number} */
     x;
-    
+
     /** @type {number} */
     y;
-    
+
     /** @type {Array<Particle>} */
     particles;
     

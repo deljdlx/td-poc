@@ -135,48 +135,4 @@ class Missile extends Entity {
             this.kill();
         }
     }
-    
-    /**
-     * Draw missile on canvas
-     * @param {CanvasRenderingContext2D} ctx
-     * @returns {void}
-     */
-    draw(ctx) {
-        ctx.save();
-        
-        // Draw trail
-        if (this.trail.length > 1) {
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.4;
-            
-            ctx.beginPath();
-            ctx.moveTo(this.trail[0].x, this.trail[0].y);
-            for (let i = 1; i < this.trail.length; i++) {
-                const alpha = i / this.trail.length;
-                ctx.globalAlpha = alpha * 0.4;
-                ctx.lineTo(this.trail[i].x, this.trail[i].y);
-            }
-            ctx.stroke();
-        }
-        
-        // Draw missile head with glow
-        ctx.globalAlpha = 1.0;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = this.color;
-        ctx.fillStyle = this.color;
-        
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Bright center
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.restore();
-    }
 }

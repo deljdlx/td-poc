@@ -17,6 +17,9 @@ class CanvasView {
     /** @type {Array<FireworkEffect>} */
     effects = [];
     
+    /** @type {Object<string, Object>} */
+    renderers = {};
+    
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
@@ -28,6 +31,7 @@ class CanvasView {
         this.ctx = this.canvas.getContext('2d');
         this.coordSystem = coordSystem;
         this.setupCanvas();
+        this.setupRenderers();
         this.debug.info('Canvas configuré', {
             width: this.canvas.width,
             height: this.canvas.height
@@ -41,6 +45,17 @@ class CanvasView {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         window.addEventListener('resize', this.handleResize.bind(this));
+    }
+    
+    /**
+     * Setup entity renderers
+     * @returns {void}
+     */
+    setupRenderers() {
+        // Register renderers for each entity type
+        this.renderers['missile'] = new MissileRenderer();
+        // Future: this.renderers['tower'] = new TowerRenderer();
+        // Future: this.renderers['enemy'] = new EnemyRenderer();
     }
     
     /**
@@ -122,7 +137,12 @@ class CanvasView {
      */
     renderEntities(entities) {
         for (const entity of entities) {
-            entity.draw(this.ctx);
+            const renderer = this.renderers[entity.getType()];
+            if (renderer) {
+                renderer.render(this.ctx, entity);
+            } else {
+                this.debug.warning(`No renderer found for entity type: ${entity.getType()}`);
+            }
         }
     }
     

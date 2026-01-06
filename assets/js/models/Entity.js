@@ -45,15 +45,6 @@ class Entity {
     }
     
     /**
-     * Draw entity on canvas (must be implemented by subclasses)
-     * @param {CanvasRenderingContext2D} ctx
-     * @returns {void}
-     */
-    draw(ctx) {
-        throw new Error('Entity.draw() must be implemented by subclass');
-    }
-    
-    /**
      * Check if entity is still alive
      * @returns {boolean}
      */
