@@ -1,5 +1,10 @@
 import { MissileRenderer } from '../renderers/MissileRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
+import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
+import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
+import { SquareSpriteRenderer } from '../renderers/sprites/SquareSpriteRenderer.js';
+import { TriangleSpriteRenderer } from '../renderers/sprites/TriangleSpriteRenderer.js';
+import { DiamondSpriteRenderer } from '../renderers/sprites/DiamondSpriteRenderer.js';
 
 /**
  * Vue Canvas pour dessiner des connexions
@@ -55,8 +60,25 @@ export class CanvasView {
      * @returns {void}
      */
     setupRenderers() {
-        // Register renderers for each entity type
-        this.renderers['missile'] = new MissileRenderer();
+        // Test different sprite renderers (uncomment ONE to test)
+        
+        // Circle (default)
+        // this.renderers['missile'] = new MissileRenderer(null, new CircleSpriteRenderer());
+        
+        // Star with 6 spikes
+        const starSprite = new StarSpriteRenderer(6, 3);
+        this.renderers['missile'] = new MissileRenderer(null, starSprite);
+        console.log('✅ StarSpriteRenderer configured:', starSprite);
+
+        // Square rotating fast
+        // this.renderers['missile'] = new MissileRenderer(null, new SquareSpriteRenderer(4));
+
+        // Triangle
+        // this.renderers['missile'] = new MissileRenderer(null, new TriangleSpriteRenderer(2));
+        
+        // Diamond
+        // this.renderers['missile'] = new MissileRenderer(null, new DiamondSpriteRenderer(3));
+        
         // Future: this.renderers['tower'] = new TowerRenderer();
         // Future: this.renderers['enemy'] = new EnemyRenderer();
     }
@@ -136,13 +158,14 @@ export class CanvasView {
     /**
      * Render game entities (missiles, towers, enemies, etc.)
      * @param {Array<Entity>} entities
+     * @param {number} deltaTime - Time delta in seconds
      * @returns {void}
      */
-    renderEntities(entities) {
+    renderEntities(entities, deltaTime = 0) {
         for (const entity of entities) {
             const renderer = this.renderers[entity.getType()];
             if (renderer) {
-                renderer.render(this.ctx, entity);
+                renderer.render(this.ctx, entity, deltaTime);
             } else {
                 this.debug.warning(`No renderer found for entity type: ${entity.getType()}`);
             }

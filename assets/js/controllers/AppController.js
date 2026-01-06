@@ -115,7 +115,7 @@ export class AppController {
         this.canvasView.updateAndRenderEffects(deltaTime);
         
         // Render game entities
-        this.canvasView.renderEntities(this.entityManager.getEntities());
+        this.canvasView.renderEntities(this.entityManager.getEntities(), deltaTime);
     }
     
     /**

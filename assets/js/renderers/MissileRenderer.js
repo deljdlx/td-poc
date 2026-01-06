@@ -1,9 +1,10 @@
 import { DefaultTrailRenderer } from './DefaultTrailRenderer.js';
 import { ParticleTrailRenderer } from './ParticleTrailRenderer.js';
+import { CircleSpriteRenderer } from './sprites/CircleSpriteRenderer.js';
 
 /**
  * MissileRenderer - Renders missile entities on canvas
- * Handles both missile head and trail rendering
+ * Handles both missile sprite and trail rendering
  */
 export class MissileRenderer {
     /**
@@ -12,42 +13,43 @@ export class MissileRenderer {
     trailRenderer;
     
     /**
-     * @param {TrailRenderer} trailRenderer - Trail rendering strategy
+     * @type {SpriteRenderer}
      */
-    constructor(trailRenderer = null) {
-        // this.trailRenderer = trailRenderer || new DefaultTrailRenderer();
+    spriteRenderer;
+    
+    /**
+     * @param {TrailRenderer} trailRenderer - Trail rendering strategy
+     * @param {SpriteRenderer} spriteRenderer - Sprite rendering strategy
+     */
+    constructor(trailRenderer = null, spriteRenderer = null) {
         this.trailRenderer = trailRenderer || new ParticleTrailRenderer();
+        this.spriteRenderer = spriteRenderer || new CircleSpriteRenderer();
+        console.log('🎯 MissileRenderer created with sprite:', this.spriteRenderer.constructor.name);
     }
     
     /**
      * Render missile on canvas
      * @param {CanvasRenderingContext2D} ctx
      * @param {Missile} missile
+     * @param {number} deltaTime - Time delta in seconds (optional, for sprite animation)
      * @returns {void}
      */
-    render(ctx, missile) {
-        ctx.save();
+    render(ctx, missile, deltaTime = 0) {
+        // Debug: log sprite type on first render
+        if (!this._debugLogged) {
+            console.log('🔍 Rendering with sprite:', this.spriteRenderer.constructor.name, this.spriteRenderer);
+            this._debugLogged = true;
+        }
+        
+        // Update sprite animation if it has an update method
+        if (this.spriteRenderer.update && typeof this.spriteRenderer.update === 'function') {
+            this.spriteRenderer.update(deltaTime);
+        }
         
         // Delegate trail rendering to trailRenderer
         this.trailRenderer.draw(ctx, missile.trail, missile);
         
-        // Draw missile head with glow
-        ctx.globalAlpha = 1.0;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = missile.color;
-        ctx.fillStyle = missile.color;
-        
-        ctx.beginPath();
-        ctx.arc(missile.x, missile.y, missile.size, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Bright center
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(missile.x, missile.y, missile.size * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.restore();
+        // Delegate sprite rendering to spriteRenderer
+        this.spriteRenderer.draw(ctx, missile);
     }
 }
