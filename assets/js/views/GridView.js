@@ -24,6 +24,7 @@ export class GridView {
         this.container = document.getElementById(containerId);
         this.model = model;
         this.debug.info('GridView initialisée');
+        this.calculateAndApplyCellDimensions();
         this.setupResizeListener();
     }
     
@@ -38,10 +39,81 @@ export class GridView {
             }
             
             this.resizeTimeout = setTimeout(() => {
-                this.debug.event('Viewport resized - recalculating cell positions');
+                this.debug.event('Viewport resized - recalculating dimensions and positions');
+                this.calculateAndApplyCellDimensions();
                 this.updateAllCellPositions();
             }, 150);
         });
+    }
+    
+    /**
+     * Calcule les dimensions optimales des cellules basées sur l'espace disponible
+     * @returns {{cellSize: number, cellGap: number}}
+     */
+    calculateOptimalCellSize() {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // 1. Dimensions réelles de l'info panel
+        const infoPanel = document.getElementById('info-panel');
+        const infoPanelRect = infoPanel ? infoPanel.getBoundingClientRect() : { width: 0 };
+        const infoPanelTotalWidth = infoPanelRect.width + 40; // largeur + marges (20px × 2)
+        
+        // 2. Marges de sécurité
+        const marginSafety = 40;
+        const containerPadding = 40; // padding: 20px × 2
+        
+        // 3. Espace maximum pour le container (AVEC padding)
+        const maxContainerWidth = viewportWidth - infoPanelTotalWidth - marginSafety;
+        const maxContainerHeight = viewportHeight - marginSafety;
+        
+        // 4. Espace INTERNE (SANS padding) - la grille doit rentrer ici
+        const internalWidth = maxContainerWidth - containerPadding;
+        const internalHeight = maxContainerHeight - containerPadding;
+        
+        // 5. Calcul cellSize
+        const cols = this.model.cols;
+        const rows = this.model.rows;
+        const gapRatio = 0.1; // gap = 10% de cellSize
+        
+        // Formule: internalSpace = (cells * cellSize) + ((cells - 1) * gap)
+        // Avec gap = cellSize * gapRatio
+        // → internalSpace = cellSize * (cells + (cells - 1) * gapRatio)
+        const cellSizeFromWidth = internalWidth / (cols + (cols - 1) * gapRatio);
+        const cellSizeFromHeight = internalHeight / (rows + (rows - 1) * gapRatio);
+        
+        // 6. Prendre le minimum + contraintes
+        let cellSize = Math.floor(Math.min(cellSizeFromWidth, cellSizeFromHeight));
+        
+        // Contraintes min/max pour lisibilité
+        cellSize = Math.max(40, Math.min(cellSize, 120));
+        
+        const cellGap = Math.floor(cellSize * gapRatio);
+        
+        this.debug.data('Dimensions calculées', {
+            viewport: { width: viewportWidth, height: viewportHeight },
+            infoPanelWidth: infoPanelTotalWidth,
+            maxContainer: { width: maxContainerWidth, height: maxContainerHeight },
+            internal: { width: internalWidth, height: internalHeight },
+            cellSize,
+            cellGap
+        });
+        
+        return { cellSize, cellGap };
+    }
+    
+    /**
+     * Calcule et applique les dimensions de cellules aux CSS variables
+     * @returns {void}
+     */
+    calculateAndApplyCellDimensions() {
+        const { cellSize, cellGap } = this.calculateOptimalCellSize();
+        
+        // Appliquer aux CSS variables
+        document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
+        document.documentElement.style.setProperty('--cell-gap', `${cellGap}px`);
+        
+        this.debug.success('CSS variables appliquées', { cellSize, cellGap });
     }
     
     /**
