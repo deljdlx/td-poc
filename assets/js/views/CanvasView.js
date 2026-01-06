@@ -1,5 +1,6 @@
 import { MissileRenderer } from '../renderers/MissileRenderer.js';
 import { TowerRenderer } from '../renderers/TowerRenderer.js';
+import { EnemyRenderer } from '../renderers/EnemyRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
 import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
 import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
@@ -13,10 +14,10 @@ import { DiamondSpriteRenderer } from '../renderers/sprites/DiamondSpriteRendere
 export class CanvasView {
     /** @type {HTMLCanvasElement} */
     canvas = null;
-    
+
     /** @type {CanvasRenderingContext2D} */
     ctx = null;
-    
+
     /** @type {CoordinateSystem} */
     coordSystem = null;
     
@@ -69,7 +70,11 @@ export class CanvasView {
         const towerSprite = new DiamondSpriteRenderer(1.5);
         this.renderers['tower'] = new TowerRenderer(towerSprite);
         
-        this.debug.success('Renderers configured', { missile: 'Star', tower: 'Diamond' });
+        // Enemies - circle sprite (red)
+        const enemySprite = new CircleSpriteRenderer(false);
+        this.renderers['enemy'] = new EnemyRenderer(enemySprite);
+        
+        this.debug.success('Renderers configured', { missile: 'Star', tower: 'Diamond', enemy: 'Circle' });
     }
     
     /**

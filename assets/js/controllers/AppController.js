@@ -4,6 +4,7 @@ import { CanvasView } from '../views/CanvasView.js';
 import { InfoView } from '../views/InfoView.js';
 import { Missile } from '../models/Missile.js';
 import { Tower } from '../models/Tower.js';
+import { Enemy } from '../models/Enemy.js';
 
 /**
  * Contrôleur principal de l'application
@@ -205,20 +206,61 @@ export class AppController {
         if (cell.hasTower()) {
             this.debug.event(`Tower clicked at [${row}, ${col}]`);
             
-            // Get target cell and shoot
-            const targetCell = this.model.getTargetCell();
-            if (targetCell) {
-                const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
-                cell.getTower().shoot(targetCenter.x, targetCenter.y);
+            // Find closest enemy and shoot
+            const closestEnemy = this.findClosestEnemy(cell.getTower());
+            if (closestEnemy) {
+                cell.getTower().shoot(closestEnemy.x, closestEnemy.y);
+                this.debug.success('Tower fired at enemy');
             } else {
-                this.debug.warning('No target cell defined');
+                this.debug.warning('No enemy to shoot at');
             }
         } else {
-            // Empty cell clicked - visual feedback only
-            this.debug.event(`Empty cell clicked [${row}, ${col}]`);
+            // Empty cell clicked - spawn enemy at this position
+            this.debug.event(`Empty cell clicked [${row}, ${col}] - spawning enemy`);
             const center = this.coordSystem.getElementCenter(cell.element);
-            this.canvasView.addFirework(center.x, center.y);
+            this.spawnEnemy(center.x, center.y);
         }
+    }
+    
+    /**
+     * Find closest enemy to a tower
+     * @param {Tower} tower
+     * @returns {Enemy|null}
+     */
+    findClosestEnemy(tower) {
+        const enemies = this.entityManager.getEntities().filter(e => e.getType() === 'enemy' && e.alive);
+        
+        if (enemies.length === 0) {
+            return null;
+        }
+        
+        let closest = null;
+        let minDistance = Infinity;
+        
+        enemies.forEach(enemy => {
+            const dx = enemy.x - tower.x;
+            const dy = enemy.y - tower.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = enemy;
+            }
+        });
+        
+        return closest;
+    }
+    
+    /**
+     * Spawn enemy at position
+     * @param {number} x
+     * @param {number} y
+     * @returns {void}
+     */
+    spawnEnemy(x, y) {
+        const enemy = new Enemy(x, y);
+        this.entityManager.addEntity(enemy);
+        this.debug.success('Enemy spawned', { x, y });
     }
     
     /**
