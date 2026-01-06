@@ -11,6 +11,9 @@ export class GridView {
     /** @type {Debug} */
     debug = null;
     
+    /** @type {number|null} */
+    resizeTimeout = null;
+    
     /**
      * @param {string} containerId
      * @param {GridModel} model
@@ -21,6 +24,24 @@ export class GridView {
         this.container = document.getElementById(containerId);
         this.model = model;
         this.debug.info('GridView initialisée');
+        this.setupResizeListener();
+    }
+    
+    /**
+     * Configure le listener de resize avec debounce
+     * @returns {void}
+     */
+    setupResizeListener() {
+        window.addEventListener('resize', () => {
+            if (this.resizeTimeout) {
+                clearTimeout(this.resizeTimeout);
+            }
+            
+            this.resizeTimeout = setTimeout(() => {
+                this.debug.event('Viewport resized - recalculating cell positions');
+                this.updateAllCellPositions();
+            }, 150);
+        });
     }
     
     /**
@@ -85,6 +106,30 @@ export class GridView {
                 cell.element.classList.add('target-cell');
             } else {
                 cell.element.classList.remove('target-cell');
+            }
+        }
+    }
+    
+    /**
+     * Recalcule et applique les positions de toutes les cellules
+     * Utilisé lors du resize du viewport
+     * @returns {void}
+     */
+    updateAllCellPositions() {
+        const root = document.documentElement;
+        const cellSize = parseInt(getComputedStyle(root).getPropertyValue('--cell-size'));
+        const cellGap = parseInt(getComputedStyle(root).getPropertyValue('--cell-gap'));
+        
+        for (let row = 0; row < this.model.rows; row++) {
+            for (let col = 0; col < this.model.cols; col++) {
+                const cell = this.model.getCell(row, col);
+                if (cell.element) {
+                    const left = col * (cellSize + cellGap);
+                    const top = row * (cellSize + cellGap);
+                    
+                    cell.element.style.left = `${left}px`;
+                    cell.element.style.top = `${top}px`;
+                }
             }
         }
     }
