@@ -6,6 +6,7 @@ import { Missile } from '../models/Missile.js';
 import { Tower } from '../models/Tower.js';
 import { Enemy } from '../models/Enemy.js';
 import { TowerDragHandler } from './TowerDragHandler.js';
+import { PathFactory } from '../models/PathFactory.js';
 
 /**
  * Contrôleur principal de l'application
@@ -83,6 +84,16 @@ export class AppController {
         
         // Rendu initial
         this.gridView.render();
+        
+        // Créer et ajouter le path périmètre
+        const perimeterPath = PathFactory.createPerimeter(
+            this.model,
+            this.coordSystem,
+            this.container
+        );
+        this.model.addPath(perimeterPath);
+        this.gridView.renderPaths();
+        this.debug.success('Path périmètre créé et affiché');
         
         // Définir une cellule cible aléatoire
         this.model.setRandomTarget();
@@ -182,8 +193,11 @@ export class AppController {
      * @returns {void}
      */
     render(deltaTime) {
-        // Update et render des effets autonomes
+        // Update et render des effets autonomes (efface le canvas)
         this.canvasView.updateAndRenderEffects(deltaTime);
+        
+        // Render paths (on canvas layer, after clear, before entities)
+        this.gridView.renderPaths();
         
         // Render game entities
         this.canvasView.renderEntities(this.entityManager.getEntities(), deltaTime);

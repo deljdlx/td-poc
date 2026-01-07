@@ -1,4 +1,5 @@
 import { CSSVariables } from '../utils/CSSVariables.js';
+import { PathRenderer } from './PathRenderer.js';
 
 /**
  * Vue DOM pour la grille
@@ -22,6 +23,15 @@ export class GridView {
     /** @type {number} */
     marginMobile = 10;
     
+    /** @type {PathRenderer} */
+    pathRenderer = null;
+    
+    /** @type {CanvasRenderingContext2D} */
+    canvasContext = null;
+    
+    /** @type {CoordinateSystem} */
+    coordSystem = null;
+    
     /**
      * @param {string} containerId
      * @param {GridModel} model
@@ -31,6 +41,9 @@ export class GridView {
         this.debug = diContainer.createDebug('GridView', true);
         this.container = document.getElementById(containerId);
         this.model = model;
+        this.pathRenderer = new PathRenderer(diContainer);
+        this.canvasContext = document.getElementById('canvas-layer').getContext('2d');
+        this.coordSystem = diContainer.get('coordinateSystem');
         this.debug.info('GridView initialisée');
         this.calculateAndApplyCellDimensions();
         this.setupResizeListener();
@@ -198,9 +211,13 @@ export class GridView {
                 const cell = this.model.getCell(row, col);
                 const cellElement = this.createCellElement(cell);
                 cell.element = cellElement;
+                cell.domElement = cellElement;
                 this.container.appendChild(cellElement);
             }
         }
+        
+        // Render paths after cells (on canvas layer)
+        this.renderPaths();
     }
     
     /**
@@ -279,5 +296,23 @@ export class GridView {
                 }
             }
         }
+    }
+    
+    /**
+     * Render all paths on the canvas layer
+     * @returns {void}
+     */
+    renderPaths() {
+        // Ne pas clear ici, c'est déjà fait par CanvasView.updateAndRenderEffects()
+        
+        // Render each path
+        const paths = this.model.getPaths();
+        
+        paths.forEach(path => {
+            this.pathRenderer.render(this.canvasContext, path, this.coordSystem, {
+                showArrows: true,
+                debug: false
+            });
+        });
     }
 }

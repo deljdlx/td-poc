@@ -16,6 +16,9 @@ export class GridModel {
     /** @type {Cell|null} */
     targetCell = null;
     
+    /** @type {Path[]} */
+    paths = [];
+    
     /** @type {Debug} */
     debug = null;
     
@@ -69,6 +72,36 @@ export class GridModel {
             }
         }
         return selected;
+    }
+    
+    /**
+     * @param {Path} path
+     * @returns {void}
+     */
+    addPath(path) {
+        this.paths.push(path);
+        this.debug.info(`Path ajouté (${this.paths.length} paths au total)`);
+    }
+    
+    /**
+     * @param {Path} path
+     * @returns {boolean}
+     */
+    removePath(path) {
+        const index = this.paths.indexOf(path);
+        if (index !== -1) {
+            this.paths.splice(index, 1);
+            this.debug.info(`Path supprimé (${this.paths.length} paths restants)`);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * @returns {Path[]}
+     */
+    getPaths() {
+        return this.paths;
     }
     
     /**
