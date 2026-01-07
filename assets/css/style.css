@@ -11,7 +11,14 @@
     --color-border: #334155;
     --color-text: #e2e8f0;
     --color-text-dim: #94a3b8;
-
+    
+    /* Grille */
+    --grid-cols: 8;
+    --grid-rows: 6;
+    --cell-size: 80px;
+    --cell-gap: 8px;
+    --cell-radius: 12px;
+    
     /* Animations */
     --transition-speed: 0.3s;
     --hover-scale: 1.05;
@@ -49,20 +56,172 @@ body, html {
 }
 
 /* ==========================================
+   LAYOUT STRUCTURE
+   ========================================== */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.game-header {
+    height: 60px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.game-header h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.game-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.sidebar-left,
+.sidebar-right {
+    width: 200px;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.sidebar-right {
+    border-right: none;
+    border-left: 1px solid var(--color-border);
+}
+
+.game-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-footer {
+    height: 40px;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--color-text-dim);
+}
+
+/* ==========================================
    GRID CONTAINER (interactif)
    ========================================== */
 #grid-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    /* Dimensions calculées : (cols * cell-size) + ((cols - 1) * gap) */
-    width: calc(var(--grid-cols) * var(--cell-size) + (var(--grid-cols) - 1) * var(--cell-gap) + 40px);
-    height: calc(var(--grid-rows) * var(--cell-size) + (var(--grid-rows) - 1) * var(--cell-gap) + 40px);
-    padding: 20px;
+    position: absolute;
     z-index: 1;
 }
 
+/* ==========================================
+   GRID CELL
+   ========================================== */
+.grid-cell {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--cell-radius);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    overflow: hidden;
+}
+
+/* Effet de brillance */
+.grid-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.grid-cell:hover::before {
+    left: 100%;
+}
+
+/* Hover state */
+.grid-cell:hover {
+    transform: scale(var(--hover-scale));
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Selected state */
+.grid-cell.selected {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border-color: var(--color-primary-dark);
+    color: white;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.grid-cell.selected:hover {
+    transform: scale(var(--hover-scale)) rotate(2deg);
+}
+
+/* Target cell state */
+.grid-cell.target-cell {
+    background: linear-gradient(135deg, #f59e0b, #dc2626);
+    border-color: #ea580c;
+    border-width: 3px;
+    color: white;
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
+    animation: target-pulse 1.5s ease-in-out infinite;
+}
+
+.grid-cell.target-cell::after {
+    content: '🎯';
+    position: absolute;
+    font-size: 32px;
+    opacity: 0.8;
+}
+
+/* Cell with tower state */
+.grid-cell.has-tower {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border-color: #2563eb;
+    border-width: 3px;
+    cursor: pointer;
+}
+
+.grid-cell.has-tower::after {
+    content: '🗼';
+    position: absolute;
+    font-size: 28px;
+    opacity: 0.9;
+}
+
+.grid-cell.has-tower:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+}
 
 /* Animation pulse pour la cellule cible */
 @keyframes target-pulse {
@@ -139,7 +298,7 @@ body, html {
         --grid-cols: 6;
         --grid-rows: 4;
     }
-
+    
     #info-panel {
         top: 10px;
         left: 10px;
