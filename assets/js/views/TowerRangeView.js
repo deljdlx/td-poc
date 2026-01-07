@@ -59,11 +59,11 @@ export class TowerRangeView {
             this.element.classList.add('visible');
         });
         
-        this.debug.debug('Tower range shown', { 
-            range: tower.range, 
-            rangePixels, 
-            position: { x: tower.x, y: tower.y }
-        });
+        // this.debug.debug('Tower range shown', { 
+        //     range: tower.range,
+        //     rangePixels,
+        //     position: { x: tower.x, y: tower.y }
+        // });
     }
     
     /**
@@ -72,6 +72,6 @@ export class TowerRangeView {
      */
     hide() {
         this.element.classList.remove('visible');
-        this.debug.debug('Tower range hidden');
+        // this.debug.debug('Tower range hidden');
     }
 }

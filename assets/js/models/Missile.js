@@ -81,18 +81,30 @@ export class Missile extends Entity {
     coordSystem;
     
     /**
+     * @type {number}
+     */
+    critChance;
+    
+    /**
+     * @type {number}
+     */
+    critMultiplier;
+    
+    /**
      * @param {number} x - Start X position
      * @param {number} y - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
      * @param {number} speed - Missile speed in pixels/second (default: 200)
-     * @param {Function} onArrival - Callback when missile reaches target (receives impactX, impactY, splashRadiusPixels, damage)
+     * @param {Function} onArrival - Callback when missile reaches target (receives impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier)
      * @param {number} maxLifeTime - Maximum lifetime in seconds (default: 3.0)
      * @param {number} splashRadius - Splash damage radius in CELLS (default: 0.5)
      * @param {number} damage - Damage amount (default: 25)
      * @param {Object} coordSystem - Coordinate system for conversions
+     * @param {number} critChance - Critical hit chance 0.0-1.0 (default: 0.0 = 0%)
+     * @param {number} critMultiplier - Critical damage multiplier (default: 1.5)
      */
-    constructor(x, y, targetX, targetY, speed = 200, onArrival = null, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null) {
+    constructor(x, y, targetX, targetY, speed = 200, onArrival = null, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null, critChance = 0.0, critMultiplier = 1.5) {
         super('missile', x, y);
         
         this.targetX = targetX;
@@ -118,6 +130,8 @@ export class Missile extends Entity {
         this.splashRadius = splashRadius; // In cells
         this.damage = damage;
         this.coordSystem = coordSystem;
+        this.critChance = critChance;
+        this.critMultiplier = critMultiplier;
     }
     
     /**
@@ -155,7 +169,7 @@ export class Missile extends Entity {
             if (this.onArrival) {
                 // Convert splash radius from cells to pixels for rendering
                 const splashRadiusPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.splashRadius) : this.splashRadius;
-                this.onArrival(this.targetX, this.targetY, splashRadiusPixels, this.damage);
+                this.onArrival(this.targetX, this.targetY, splashRadiusPixels, this.damage, this.critChance, this.critMultiplier);
             }
             this.kill();
         }

@@ -3,6 +3,8 @@ import { Debug } from './utils/Debug.js';
 import { CoordinateSystem } from './utils/CoordinateSystem.js';
 import { GameClock } from './utils/GameClock.js';
 import { EntityManager } from './models/EntityManager.js';
+import { PopupManager } from './utils/PopupManager.js';
+import { TowerStatsPopup } from './views/TowerStatsPopup.js';
 
 /**
  * Configuration et initialisation du conteneur DI
@@ -34,6 +36,16 @@ export function bootstrapDI() {
     // EntityManager (singleton)
     container.registerFactory('entityManager', (container) => {
         return new EntityManager(container);
+    });
+    
+    // PopupManager (singleton)
+    container.registerFactory('popupManager', (container) => {
+        return new PopupManager(container);
+    });
+    
+    // TowerStatsPopup (singleton)
+    container.registerFactory('towerStatsPopup', (container) => {
+        return new TowerStatsPopup(container);
     });
     
     // Autres services à ajouter au besoin...

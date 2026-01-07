@@ -47,6 +47,9 @@ export class AppController {
     /** @type {TowerRangeView} */
     towerRangeView = null;
     
+    /** @type {TowerStatsPopup} */
+    towerStatsPopup = null;
+    
     /**
      * @param {DIContainer} container
      */
@@ -66,6 +69,7 @@ export class AppController {
         this.coordSystem = this.container.get('coordinateSystem');
         this.gameClock = this.container.get('gameClock');
         this.entityManager = this.container.get('entityManager');
+        this.towerStatsPopup = this.container.get('towerStatsPopup');
         
         // Initialisation avec injection
         this.model = new GridModel(15, 10, this.container);
@@ -192,28 +196,31 @@ export class AppController {
     
     /**
      * Create missile from tower position to target
+     * @param {Tower} tower - Tower that fired
      * @param {number} x - Start X
      * @param {number} y - Start Y
      * @param {number} targetX - Target X
      * @param {number} targetY - Target Y
      * @returns {void}
      */
-    createMissileFromTower(x, y, targetX, targetY) {
+    createMissileFromTower(tower, x, y, targetX, targetY) {
         const missile = new Missile(
             x, y,
             targetX, targetY,
             300, // speed in pixels/sec (kept as is for now)
-            (impactX, impactY, splashRadiusPixels, damage) => {
+            (impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier) => {
                 // Visual effect - simple explosion for basic missile
                 this.canvasView.addSimpleExplosion(impactX, impactY);
                 
                 // Damage enemies in splash zone (splashRadiusPixels already converted)
-                this.applyMissileDamage(impactX, impactY, splashRadiusPixels, damage);
+                this.applyMissileDamage(tower, impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier);
             },
             3.0, // maxLifeTime
             0.5, // splashRadius in CELLS (0.5 cell radius)
-            25,  // damage
-            this.coordSystem // Pass coordSystem for conversion
+            tower.damage,  // Use tower's damage
+            this.coordSystem, // Pass coordSystem for conversion
+            tower.critChance, // Use tower's crit chance
+            tower.critMultiplier  // Use tower's crit multiplier
         );
         
         this.entityManager.addEntity(missile);
@@ -222,13 +229,16 @@ export class AppController {
     
     /**
      * Apply damage to enemies in splash zone
+     * @param {Tower} tower - Tower that fired the missile
      * @param {number} impactX - Impact X position
      * @param {number} impactY - Impact Y position
      * @param {number} splashRadius - Splash damage radius
      * @param {number} damage - Damage amount
+     * @param {number} critChance - Critical hit chance
+     * @param {number} critMultiplier - Critical damage multiplier
      * @returns {void}
      */
-    applyMissileDamage(impactX, impactY, splashRadius, damage) {
+    applyMissileDamage(tower, impactX, impactY, splashRadius, damage, critChance = 0.0, critMultiplier = 1.5) {
         // Visual effect for splash zone
         this.canvasView.addSplashEffect(impactX, impactY, splashRadius);
         
@@ -246,9 +256,27 @@ export class AppController {
             
             // Check if enemy is in splash zone
             if (distance <= splashRadius) {
-                enemy.takeDamage(damage);
+                // Calculate if critical hit
+                const isCritical = Math.random() < critChance;
+                const finalDamage = isCritical ? Math.floor(damage * critMultiplier) : damage;
+                
+                const wasAlive = enemy.alive;
+                enemy.takeDamage(finalDamage);
                 hitCount++;
-                this.debug.info(`Enemy ${enemy.id} hit for ${damage} damage (${enemy.health}/${enemy.maxHealth} HP remaining)`);
+                
+                // Track hit and damage
+                tower.trackHit(finalDamage, isCritical);
+                
+                // Track kill if enemy died
+                if (wasAlive && !enemy.alive) {
+                    tower.trackKill();
+                }
+                
+                if (isCritical) {
+                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${critMultiplier}x) - (${enemy.health}/${enemy.maxHealth} HP remaining)`);
+                } else {
+                    this.debug.info(`Enemy ${enemy.id} hit for ${finalDamage} damage (${enemy.health}/${enemy.maxHealth} HP remaining)`);
+                }
             }
         });
         
@@ -293,6 +321,7 @@ export class AppController {
     bindEvents() {
         const container = document.getElementById('grid-container');
         container.addEventListener('click', this.handleCellClick.bind(this));
+        container.addEventListener('contextmenu', this.handleCellClick.bind(this)); // Right-click
         
         // Grid hover detection for tower range display (on cells, not canvas)
         container.addEventListener('mousemove', this.handleCellHover.bind(this));
@@ -326,26 +355,10 @@ export class AppController {
             
             const tower = cell.getTower();
             
-            // Check cooldown first
-            if (!tower.canShoot()) {
-                this.debug.warning('Tower is on cooldown', { 
-                    cooldownRemaining: tower.currentCooldown.toFixed(2) + 's' 
-                });
-                return;
-            }
-            
-            // Find closest enemy in range and shoot
-            const closestEnemy = tower.getClosestEnemyInRange(this.entityManager);
-            if (closestEnemy) {
-                const success = tower.shoot(closestEnemy.x, closestEnemy.y);
-                if (success) {
-                    this.debug.success('Tower fired at enemy in range', { 
-                        distance: tower.getDistanceTo(closestEnemy).toFixed(2) 
-                    });
-                }
-            } else {
-                this.debug.warning('No enemy in range');
-            }
+            // Click on tower to show stats (auto-targeting handles shooting)
+            event.preventDefault();
+            this.debug.info('Opening tower stats popup');
+            this.towerStatsPopup.show(tower);
         } else {
             // Empty cell clicked
             this.debug.event(`Empty cell clicked [${row}, ${col}]`);
@@ -427,7 +440,7 @@ export class AppController {
         // Show range for this tower
         const tower = cell.getTower();
         this.towerRangeView.show(tower);
-        this.debug.debug('Showing tower range', { row, col, range: tower.range });
+        // this.debug.debug('Showing tower range', { row, col, range: tower.range });
     }
     
     /**

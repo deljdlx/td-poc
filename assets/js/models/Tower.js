@@ -51,6 +51,26 @@ export class Tower extends Entity {
     entityManager;
     
     /**
+     * @type {Object}
+     */
+    stats;
+    
+    /**
+     * @type {number}
+     */
+    damage;
+    
+    /**
+     * @type {number}
+     */
+    critChance;
+    
+    /**
+     * @type {number}
+     */
+    critMultiplier;
+    
+    /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {Function} onShoot - Callback to create missiles: (x, y, targetX, targetY) => void
      * @param {DIContainer} diContainer
@@ -74,6 +94,18 @@ export class Tower extends Entity {
         this.entityManager = entityManager;
         this.cooldown = 1.0; // 1 second between shots
         this.currentCooldown = 0.0; // Start ready to shoot
+        this.damage = 25; // Base damage
+        this.critChance = 0.0; // 0% crit chance
+        this.critMultiplier = 1.5; // 1.5x crit multiplier
+        
+        // Stats tracking
+        this.stats = {
+            shotsFired: 0,
+            hits: 0,
+            totalDamage: 0,
+            kills: 0,
+            criticalHits: 0
+        };
         
         debug.success('Tower created', { row: cell.row, col: cell.col, x: center.x, y: center.y });
     }
@@ -90,12 +122,37 @@ export class Tower extends Entity {
         }
         
         if (this.onShoot) {
-            this.onShoot(this.x, this.y, targetX, targetY);
+            this.onShoot(this, this.x, this.y, targetX, targetY);
         }
+        
+        // Track shot
+        this.stats.shotsFired++;
         
         // Reset cooldown
         this.currentCooldown = this.cooldown;
         return true;
+    }
+    
+    /**
+     * Track a successful hit
+     * @param {number} damage
+     * @param {boolean} isCrit
+     * @returns {void}
+     */
+    trackHit(damage, isCrit) {
+        this.stats.hits++;
+        this.stats.totalDamage += damage;
+        if (isCrit) {
+            this.stats.criticalHits++;
+        }
+    }
+    
+    /**
+     * Track a kill
+     * @returns {void}
+     */
+    trackKill() {
+        this.stats.kills++;
     }
     
     /**

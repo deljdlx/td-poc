@@ -100,6 +100,11 @@ export class DragDropManager {
             return;
         }
         
+        // Ignore right-click and shift+click (for tower stats popup)
+        if (event.button === 2 || event.shiftKey) {
+            return;
+        }
+        
         // Empêcher la sélection de texte
         event.preventDefault();
         
