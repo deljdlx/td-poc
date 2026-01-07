@@ -36,6 +36,16 @@ export class Tower extends Entity {
     coordSystem;
     
     /**
+     * @type {number}
+     */
+    cooldown;
+    
+    /**
+     * @type {number}
+     */
+    currentCooldown;
+    
+    /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {Function} onShoot - Callback to create missiles: (x, y, targetX, targetY) => void
      * @param {DIContainer} diContainer
@@ -55,6 +65,8 @@ export class Tower extends Entity {
         this.size = 8;
         this.range = 3.5; // Range in cells (logical unit)
         this.coordSystem = coordSystem;
+        this.cooldown = 1.0; // 1 second between shots
+        this.currentCooldown = 0.0; // Start ready to shoot
         
         debug.success('Tower created', { row: cell.row, col: cell.col, x: center.x, y: center.y });
     }
@@ -63,22 +75,45 @@ export class Tower extends Entity {
      * Shoot missile towards target position
      * @param {number} targetX
      * @param {number} targetY
-     * @returns {void}
+     * @returns {boolean} - True if shot was fired, false if on cooldown
      */
     shoot(targetX, targetY) {
+        if (!this.canShoot()) {
+            return false;
+        }
+        
         if (this.onShoot) {
             this.onShoot(this.x, this.y, targetX, targetY);
         }
+        
+        // Reset cooldown
+        this.currentCooldown = this.cooldown;
+        return true;
     }
     
     /**
-     * Update tower (no automatic behavior for now)
+     * Update tower - manage cooldown
      * @param {number} deltaTime
      * @returns {void}
      */
     update(deltaTime) {
-        // Towers are passive for now
-        // Future: cooldown management, auto-targeting, etc.
+        // Decrement cooldown
+        if (this.currentCooldown > 0) {
+            this.currentCooldown -= deltaTime;
+            if (this.currentCooldown < 0) {
+                this.currentCooldown = 0;
+            }
+        }
+        
+        // Future: auto-targeting here
+    }
+    
+    /**
+     * Check if tower can shoot (cooldown ready)
+     * @returns {boolean}
+     */
+    canShoot() {
+        return this.currentCooldown <= 0;
     }
     
     /**

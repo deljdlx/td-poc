@@ -333,12 +333,25 @@ export class AppController {
         if (cell.hasTower()) {
             this.debug.event(`Tower clicked at [${row}, ${col}]`);
             
-            // Find closest enemy in range and shoot
             const tower = cell.getTower();
+            
+            // Check cooldown first
+            if (!tower.canShoot()) {
+                this.debug.warning('Tower is on cooldown', { 
+                    cooldownRemaining: tower.currentCooldown.toFixed(2) + 's' 
+                });
+                return;
+            }
+            
+            // Find closest enemy in range and shoot
             const closestEnemy = tower.getClosestEnemyInRange(this.entityManager);
             if (closestEnemy) {
-                tower.shoot(closestEnemy.x, closestEnemy.y);
-                this.debug.success('Tower fired at enemy in range', { distance: tower.getDistanceTo(closestEnemy) });
+                const success = tower.shoot(closestEnemy.x, closestEnemy.y);
+                if (success) {
+                    this.debug.success('Tower fired at enemy in range', { 
+                        distance: tower.getDistanceTo(closestEnemy).toFixed(2) 
+                    });
+                }
             } else {
                 this.debug.warning('No enemy in range');
             }
