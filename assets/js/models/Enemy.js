@@ -11,6 +11,11 @@ export class Enemy extends Entity {
     color;
     
     /**
+     * @type {string}
+     */
+    enemyType;
+    
+    /**
      * @type {number}
      */
     size;
@@ -46,12 +51,18 @@ export class Enemy extends Entity {
     reachedEnd = false;
     
     /**
+     * @type {HTMLElement|null}
+     */
+    domElement = null;
+    
+    /**
      * @param {number} x - Position X
      * @param {number} y - Position Y
      */
     constructor(x, y) {
         super('enemy', x, y);
         
+        this.enemyType = 'basic';
         this.color = '#dc2626'; // Red for enemies
         this.size = 10;
         this.health = 100;
@@ -102,23 +113,33 @@ export class Enemy extends Entity {
         const currentElement = this.path.getElementAt(this.currentPathIndex);
         
         if (!currentElement) {
-            this.reachedEnd = true;
-            this.onReachEnd();
+            console.warn(`Enemy ${this.id}: currentElement is null at index ${this.currentPathIndex}/${this.path.getLength()}`);
+            // Retour au début du path
+            this.currentPathIndex = 0;
             return;
         }
         
         const nextElement = this.path.getNextElement(currentElement);
         
         if (!nextElement) {
-            this.reachedEnd = true;
-            this.onReachEnd();
+            console.log(`Enemy ${this.id}: Fin du path, retour au début`);
+            // Fin du path atteinte, retour au début (comportement en boucle)
+            this.currentPathIndex = 0;
             return;
         }
         
         // Get target position (use getBoundingClientRect for absolute viewport coords)
-        const rect = nextElement.cell.domElement.getBoundingClientRect();
+        if (!nextElement.cell || !nextElement.cell.element) {
+            console.error(`Enemy ${this.id}: nextElement.cell ou nextElement.cell.element est null!`, nextElement);
+            this.currentPathIndex = 0;
+            return;
+        }
+        
+        const rect = nextElement.cell.element.getBoundingClientRect();
         const targetX = rect.left + rect.width / 2;
         const targetY = rect.top + rect.height / 2;
+        
+        console.log(`Enemy ${this.id}: pos=(${this.x.toFixed(0)}, ${this.y.toFixed(0)}) -> target=(${targetX.toFixed(0)}, ${targetY.toFixed(0)}) index=${this.currentPathIndex}`);
         
         // Calculate direction
         const dx = targetX - this.x;
@@ -128,6 +149,10 @@ export class Enemy extends Entity {
         // Check if reached next waypoint
         if (distance < 2) {
             this.currentPathIndex++;
+            // Si on dépasse la fin, retour au début
+            if (this.currentPathIndex >= this.path.getLength()) {
+                this.currentPathIndex = 0;
+            }
             return;
         }
         
@@ -139,6 +164,10 @@ export class Enemy extends Entity {
             this.x = targetX;
             this.y = targetY;
             this.currentPathIndex++;
+            // Si on dépasse la fin, retour au début
+            if (this.currentPathIndex >= this.path.getLength()) {
+                this.currentPathIndex = 0;
+            }
         } else {
             // Move partial distance
             this.x += (dx / distance) * moveDistance;

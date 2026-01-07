@@ -4,6 +4,18 @@
  */
 export class Entity {
     /**
+     * @type {number}
+     * @static
+     * @private
+     */
+    static _nextId = 1;
+    
+    /**
+     * @type {number}
+     */
+    id;
+    
+    /**
      * @type {string}
      */
     type;
@@ -29,6 +41,7 @@ export class Entity {
      * @param {number} y - Y position
      */
     constructor(type, x, y) {
+        this.id = Entity._nextId++;
         this.type = type;
         this.x = x;
         this.y = y;

@@ -1,0 +1,100 @@
+/* ========================================
+   ENEMY STYLES - DOM rendering
+   ======================================== */
+
+:root {
+    /* Enemy colors */
+    --enemy-basic-color: #dc2626;
+    --enemy-fast-color: #f59e0b;
+    --enemy-tank-color: #7c3aed;
+    --enemy-boss-color: #ef4444;
+    
+    /* Enemy sizes */
+    --enemy-basic-size: 20px;
+    --enemy-fast-size: 16px;
+    --enemy-tank-size: 28px;
+    --enemy-boss-size: 40px;
+}
+
+/* Base enemy style */
+.enemy {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+    pointer-events: auto;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Enemy types */
+.enemy.basic {
+    width: var(--enemy-basic-size);
+    height: var(--enemy-basic-size);
+    background-color: var(--enemy-basic-color);
+}
+
+.enemy.fast {
+    width: var(--enemy-fast-size);
+    height: var(--enemy-fast-size);
+    background-color: var(--enemy-fast-color);
+}
+
+.enemy.tank {
+    width: var(--enemy-tank-size);
+    height: var(--enemy-tank-size);
+    background-color: var(--enemy-tank-color);
+}
+
+.enemy.boss {
+    width: var(--enemy-boss-size);
+    height: var(--enemy-boss-size);
+    background-color: var(--enemy-boss-color);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.6);
+}
+
+/* Health bar */
+.enemy-health-bar {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.enemy-health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #22c55e);
+    transition: width 0.2s ease-out;
+}
+
+/* Status effects */
+.enemy.slowed {
+    filter: hue-rotate(200deg);
+}
+
+.enemy.stunned {
+    animation: shake 0.3s infinite;
+}
+
+.enemy.burning {
+    box-shadow: 0 0 12px rgba(255, 69, 0, 0.8);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+    25% { transform: translate(-50%, -50%) rotate(-2deg); }
+    75% { transform: translate(-50%, -50%) rotate(2deg); }
+}
+
+/* Hover effect */
+.enemy:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}

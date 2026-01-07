@@ -104,10 +104,11 @@ export class WaveManager {
         }
         
         // Get spawn position (center of start cell)
-        const spawnPos = this.coordSystem.getElementCenter(startElement.cell.domElement);
+        const spawnPos = this.coordSystem.getElementCenter(startElement.cell.element);
         
         // Create enemy with config
         const enemy = new Enemy(spawnPos.x, spawnPos.y);
+        enemy.enemyType = config.type;
         enemy.health = config.health;
         enemy.maxHealth = config.health;
         enemy.speed = config.speed;

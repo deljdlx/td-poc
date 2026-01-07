@@ -1,6 +1,7 @@
 import { MissileRenderer } from '../renderers/MissileRenderer.js';
 import { TowerRenderer } from '../renderers/TowerRenderer.js';
 import { EnemyRenderer } from '../renderers/EnemyRenderer.js';
+import { DOMEnemyRenderer } from '../renderers/DOMEnemyRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
 import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
 import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
@@ -30,6 +31,9 @@ export class CanvasView {
     /** @type {Object<string, Object>} */
     renderers = {};
     
+    /** @type {DOMEnemyRenderer} */
+    domEnemyRenderer = null;
+    
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
@@ -40,6 +44,7 @@ export class CanvasView {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
         this.coordSystem = coordSystem;
+        this.domEnemyRenderer = new DOMEnemyRenderer(diContainer);
         this.setupCanvas();
         this.setupRenderers();
         this.debug.info('Canvas configuré', {
@@ -157,11 +162,20 @@ export class CanvasView {
      */
     renderEntities(entities, deltaTime = 0) {
         for (const entity of entities) {
-            const renderer = this.renderers[entity.getType()];
+            const type = entity.getType();
+            
+            // Enemies are rendered in DOM
+            if (type === 'enemy') {
+                this.domEnemyRenderer.render(entity);
+                continue;
+            }
+            
+            // Other entities rendered on canvas
+            const renderer = this.renderers[type];
             if (renderer) {
                 renderer.render(this.ctx, entity, deltaTime);
             } else {
-                this.debug.warning(`No renderer found for entity type: ${entity.getType()}`);
+                this.debug.warning(`No renderer found for entity type: ${type}`);
             }
         }
     }

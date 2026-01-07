@@ -1,5 +1,9 @@
 # Tower Defense Game - Instructions Copilot
 
+## Insctructions Générales
+Avant de coder, toujours me demander confirmation.
+
+
 ## 🎯 Objectif
 Créer un jeu de tower defense complet utilisant **DOM pur + Canvas** avec une architecture MVC et un style de code JavaScript moderne inspiré de PHP 8.
 

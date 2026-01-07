@@ -57,6 +57,17 @@ body, html {
     z-index: 5;
 }
 
+/* Enemy layer (fullscreen, z-index 6, pointer-events: none) */
+#enemy-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 6;
+}
+
 #canvas-layer {
     position: fixed;
     top: 0;
