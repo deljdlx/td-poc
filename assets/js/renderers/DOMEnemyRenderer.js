@@ -42,8 +42,9 @@ export class DOMEnemyRenderer {
             this.container.appendChild(element);
             enemy.domElement = element;
             
-            // Setup hit animation listener
+            // Setup event listeners
             this.setupHitListener(enemy, element);
+            this.setupDeathListener(enemy, element);
         }
         
         // Update position
@@ -82,6 +83,43 @@ export class DOMEnemyRenderer {
         });
         
         this.debug.info(`Hit listener setup for enemy ${enemy.id}`);
+    }
+    
+    /**
+     * Setup death animation listener
+     * @param {Enemy} enemy
+     * @param {HTMLElement} element
+     * @returns {void}
+     * @private
+     */
+    setupDeathListener(enemy, element) {
+        enemy.on('death', (data) => {
+            this.debug.info(`Enemy ${enemy.id} death animation triggered`);
+            
+            // Add dying class to trigger animation
+            element.classList.add('dying');
+            
+            // Listen for animation end to cleanup DOM
+            const onAnimationEnd = () => {
+                this.debug.info(`Enemy ${enemy.id} death animation completed, cleaning up DOM`);
+                element.remove();
+                this.enemyElements.delete(enemy.id);
+                element.removeEventListener('animationend', onAnimationEnd);
+            };
+            
+            element.addEventListener('animationend', onAnimationEnd);
+            
+            // Fallback cleanup in case animation doesn't fire
+            setTimeout(() => {
+                if (this.enemyElements.has(enemy.id)) {
+                    this.debug.warning(`Enemy ${enemy.id} cleanup fallback triggered`);
+                    element.remove();
+                    this.enemyElements.delete(enemy.id);
+                }
+            }, 600);
+        });
+        
+        this.debug.info(`Death listener setup for enemy ${enemy.id}`);
     }
     
     /**
