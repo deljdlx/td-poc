@@ -72,8 +72,9 @@ export class Enemy extends Entity {
         this.size = 10;
         this.health = 100;
         this.maxHealth = 100;
-        this.speed = 50; // pixels per second
+        this.speed = 1.0; // cells per second (logical speed)
         this.eventListeners = {};
+        this.coordSystem = null; // Will be set when added to path
     }
     
     /**
@@ -226,7 +227,9 @@ export class Enemy extends Entity {
         }
         
         // Move toward target
-        const moveDistance = this.speed * deltaTime;
+        // Convert logical speed (cells/sec) to pixels/sec
+        const speedPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.speed) : this.speed;
+        const moveDistance = speedPixels * deltaTime;
         
         if (moveDistance >= distance) {
             // Reach target this frame

@@ -139,7 +139,7 @@ export class AppController {
         // Créer une vague : 10 ennemis basiques, 1 par seconde
         const wave = new Wave(
             [
-                { type: 'basic', health: 100, speed: 50, count: 10 }
+                { type: 'basic', health: 100, speed: 1.0, count: 10 } // speed: 1 cell/second
             ],
             1.0, // 1 second between spawns
             perimeterPath
@@ -206,17 +206,18 @@ export class AppController {
         const missile = new Missile(
             x, y,
             targetX, targetY,
-            300, // speed
-            (impactX, impactY, splashRadius, damage) => {
+            300, // speed in pixels/sec (kept as is for now)
+            (impactX, impactY, splashRadiusPixels, damage) => {
                 // Visual effect - simple explosion for basic missile
                 this.canvasView.addSimpleExplosion(impactX, impactY);
                 
-                // Damage enemies in splash zone
-                this.applyMissileDamage(impactX, impactY, splashRadius, damage);
+                // Damage enemies in splash zone (splashRadiusPixels already converted)
+                this.applyMissileDamage(impactX, impactY, splashRadiusPixels, damage);
             },
             3.0, // maxLifeTime
-            25, // splashRadius (augmenté pour compenser le mouvement des ennemis)
-            25  // damage
+            0.5, // splashRadius in CELLS (0.5 cell radius)
+            25,  // damage
+            this.coordSystem // Pass coordSystem for conversion
         );
         
         this.entityManager.addEntity(missile);

@@ -55,4 +55,43 @@ export class CoordinateSystem {
             y: rect.top + rect.height / 2
         };
     }
+    
+    /**
+     * Get the size of a cell in pixels
+     * @returns {number}
+     */
+    getCellSize() {
+        if (!this.gridModel || !this.gridModel.cells || !this.gridModel.cells[0]) {
+            console.warn('Grid not available, returning default cell size');
+            return 50; // Fallback
+        }
+        
+        const firstCell = this.gridModel.cells[0][0];
+        if (!firstCell || !firstCell.element) {
+            console.warn('Cell element not available, returning default cell size');
+            return 50;
+        }
+        
+        const rect = firstCell.element.getBoundingClientRect();
+        return rect.width; // Assuming square cells
+    }
+    
+    /**
+     * Convert cells to pixels
+     * @param {number} cells - Number of cells
+     * @returns {number} - Pixels
+     */
+    cellsToPixels(cells) {
+        return cells * this.getCellSize();
+    }
+    
+    /**
+     * Convert pixels to cells
+     * @param {number} pixels - Number of pixels
+     * @returns {number} - Cells
+     */
+    pixelsToCells(pixels) {
+        const cellSize = this.getCellSize();
+        return cellSize > 0 ? pixels / cellSize : 0;
+    }
 }

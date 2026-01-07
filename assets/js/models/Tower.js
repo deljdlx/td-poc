@@ -26,6 +26,16 @@ export class Tower extends Entity {
     size;
     
     /**
+     * @type {number}
+     */
+    range;
+    
+    /**
+     * @type {Object}
+     */
+    coordSystem;
+    
+    /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {Function} onShoot - Callback to create missiles: (x, y, targetX, targetY) => void
      * @param {DIContainer} diContainer
@@ -43,6 +53,8 @@ export class Tower extends Entity {
         this.onShoot = onShoot;
         this.color = '#6366f1'; // Blue for towers
         this.size = 8;
+        this.range = 3.5; // Range in cells (logical unit)
+        this.coordSystem = coordSystem;
         
         debug.success('Tower created', { row: cell.row, col: cell.col, x: center.x, y: center.y });
     }
