@@ -57,22 +57,24 @@ export class CoordinateSystem {
     }
     
     /**
-     * Get the size of a cell in pixels
+     * Get the size of a cell in pixels by reading from DOM
      * @returns {number}
      */
     getCellSize() {
-        if (!this.gridModel || !this.gridModel.cells || !this.gridModel.cells[0]) {
-            console.warn('Grid not available, returning default cell size');
+        // Get cell directly from DOM
+        const gridContainer = document.getElementById('grid-container');
+        if (!gridContainer) {
+            console.warn('Grid container not found, returning default cell size');
             return 50; // Fallback
         }
         
-        const firstCell = this.gridModel.cells[0][0];
-        if (!firstCell || !firstCell.element) {
-            console.warn('Cell element not available, returning default cell size');
+        const firstCell = gridContainer.querySelector('.grid-cell');
+        if (!firstCell) {
+            console.warn('No grid cell found in DOM, returning default cell size');
             return 50;
         }
         
-        const rect = firstCell.element.getBoundingClientRect();
+        const rect = firstCell.getBoundingClientRect();
         return rect.width; // Assuming square cells
     }
     

@@ -2,6 +2,7 @@ import { GridModel } from '../models/GridModel.js';
 import { GridView } from '../views/GridView.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { InfoView } from '../views/InfoView.js';
+import { TowerRangeView } from '../views/TowerRangeView.js';
 import { Missile } from '../models/Missile.js';
 import { Tower } from '../models/Tower.js';
 import { Enemy } from '../models/Enemy.js';
@@ -47,6 +48,9 @@ export class AppController {
     /** @type {WaveManager} */
     waveManager = null;
     
+    /** @type {TowerRangeView} */
+    towerRangeView = null;
+    
     /**
      * @param {DIContainer} container
      */
@@ -72,6 +76,7 @@ export class AppController {
         this.gridView = new GridView('grid-container', this.model, this.container);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
         this.infoView = new InfoView(this.container);
+        this.towerRangeView = new TowerRangeView(this.container);
         
         // Initialiser le gestionnaire de drag and drop des tourelles
         this.towerDragHandler = new TowerDragHandler(
@@ -298,6 +303,10 @@ export class AppController {
         const container = document.getElementById('grid-container');
         container.addEventListener('click', this.handleCellClick.bind(this));
         
+        // Grid hover detection for tower range display (on cells, not canvas)
+        container.addEventListener('mousemove', this.handleCellHover.bind(this));
+        container.addEventListener('mouseleave', this.handleCellLeave.bind(this));
+        
         window.addEventListener('resize', this.handleResize.bind(this));
     }
     
@@ -324,13 +333,14 @@ export class AppController {
         if (cell.hasTower()) {
             this.debug.event(`Tower clicked at [${row}, ${col}]`);
             
-            // Find closest enemy and shoot
-            const closestEnemy = this.findClosestEnemy(cell.getTower());
+            // Find closest enemy in range and shoot
+            const tower = cell.getTower();
+            const closestEnemy = tower.getClosestEnemyInRange(this.entityManager);
             if (closestEnemy) {
-                cell.getTower().shoot(closestEnemy.x, closestEnemy.y);
-                this.debug.success('Tower fired at enemy');
+                tower.shoot(closestEnemy.x, closestEnemy.y);
+                this.debug.success('Tower fired at enemy in range', { distance: tower.getDistanceTo(closestEnemy) });
             } else {
-                this.debug.warning('No enemy to shoot at');
+                this.debug.warning('No enemy in range');
             }
         } else {
             // Empty cell clicked
@@ -385,6 +395,43 @@ export class AppController {
      */
     handleResize() {
         this.updateCanvas();
+    }
+    
+    /**
+     * Handle cell hover to show tower range
+     * @param {MouseEvent} event
+     * @returns {void}
+     */
+    handleCellHover(event) {
+        // Check if hovering over a cell with a tower
+        const target = event.target;
+        
+        if (!target.classList.contains('grid-cell')) {
+            this.towerRangeView.hide();
+            return;
+        }
+        
+        const row = parseInt(target.dataset.row);
+        const col = parseInt(target.dataset.col);
+        const cell = this.model.getCell(row, col);
+        
+        if (!cell || !cell.hasTower()) {
+            this.towerRangeView.hide();
+            return;
+        }
+        
+        // Show range for this tower
+        const tower = cell.getTower();
+        this.towerRangeView.show(tower);
+        this.debug.debug('Showing tower range', { row, col, range: tower.range });
+    }
+    
+    /**
+     * Handle cell mouse leave
+     * @returns {void}
+     */
+    handleCellLeave() {
+        this.towerRangeView.hide();
     }
     
     /**

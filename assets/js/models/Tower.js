@@ -80,4 +80,58 @@ export class Tower extends Entity {
         // Towers are passive for now
         // Future: cooldown management, auto-targeting, etc.
     }
+    
+    /**
+     * Get distance to another entity
+     * @param {Entity} entity
+     * @returns {number} - Distance in pixels
+     */
+    getDistanceTo(entity) {
+        const dx = entity.x - this.x;
+        const dy = entity.y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    /**
+     * Get all enemies within tower range
+     * @param {EntityManager} entityManager
+     * @returns {Array<Enemy>} - Enemies in range
+     */
+    getEnemiesInRange(entityManager) {
+        const rangePixels = this.coordSystem.cellsToPixels(this.range);
+        const enemies = entityManager.getEntities().filter(e => 
+            e.getType() === 'enemy' && e.alive
+        );
+        
+        return enemies.filter(enemy => {
+            const distance = this.getDistanceTo(enemy);
+            return distance <= rangePixels;
+        });
+    }
+    
+    /**
+     * Get closest enemy within tower range
+     * @param {EntityManager} entityManager
+     * @returns {Enemy|null} - Closest enemy or null if none in range
+     */
+    getClosestEnemyInRange(entityManager) {
+        const enemiesInRange = this.getEnemiesInRange(entityManager);
+        
+        if (enemiesInRange.length === 0) {
+            return null;
+        }
+        
+        let closest = enemiesInRange[0];
+        let minDistance = this.getDistanceTo(closest);
+        
+        for (let i = 1; i < enemiesInRange.length; i++) {
+            const distance = this.getDistanceTo(enemiesInRange[i]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = enemiesInRange[i];
+            }
+        }
+        
+        return closest;
+    }
 }
