@@ -46,6 +46,11 @@ export class Tower extends Entity {
     currentCooldown;
     
     /**
+     * @type {EntityManager}
+     */
+    entityManager;
+    
+    /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {Function} onShoot - Callback to create missiles: (x, y, targetX, targetY) => void
      * @param {DIContainer} diContainer
@@ -53,6 +58,7 @@ export class Tower extends Entity {
     constructor(cell, onShoot, diContainer) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
+        const entityManager = diContainer.get('entityManager');
         
         // Get cell center position
         const center = coordSystem.getElementCenter(cell.element);
@@ -65,6 +71,7 @@ export class Tower extends Entity {
         this.size = 8;
         this.range = 3.5; // Range in cells (logical unit)
         this.coordSystem = coordSystem;
+        this.entityManager = entityManager;
         this.cooldown = 1.0; // 1 second between shots
         this.currentCooldown = 0.0; // Start ready to shoot
         
@@ -92,7 +99,7 @@ export class Tower extends Entity {
     }
     
     /**
-     * Update tower - manage cooldown
+     * Update tower - manage cooldown and auto-targeting
      * @param {number} deltaTime
      * @returns {void}
      */
@@ -105,7 +112,13 @@ export class Tower extends Entity {
             }
         }
         
-        // Future: auto-targeting here
+        // Auto-targeting: shoot closest enemy in range when cooldown ready
+        if (this.canShoot()) {
+            const enemy = this.getClosestEnemyInRange(this.entityManager);
+            if (enemy) {
+                this.shoot(enemy.x, enemy.y);
+            }
+        }
     }
     
     /**
