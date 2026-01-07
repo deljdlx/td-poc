@@ -7,6 +7,8 @@ import { Tower } from '../models/Tower.js';
 import { Enemy } from '../models/Enemy.js';
 import { TowerDragHandler } from './TowerDragHandler.js';
 import { PathFactory } from '../models/PathFactory.js';
+import { Wave } from '../models/Wave.js';
+import { WaveManager } from './WaveManager.js';
 
 /**
  * Contrôleur principal de l'application
@@ -41,6 +43,9 @@ export class AppController {
     
     /** @type {TowerDragHandler} */
     towerDragHandler = null;
+    
+    /** @type {WaveManager} */
+    waveManager = null;
     
     /**
      * @param {DIContainer} container
@@ -95,6 +100,13 @@ export class AppController {
         this.gridView.renderPaths();
         this.debug.success('Path périmètre créé et affiché');
         
+        // Initialiser WaveManager
+        this.waveManager = new WaveManager(
+            this.entityManager,
+            this.coordSystem,
+            this.container
+        );
+        
         // Définir une cellule cible aléatoire
         this.model.setRandomTarget();
         this.gridView.updateCell(this.model.getTargetCell());
@@ -107,6 +119,34 @@ export class AppController {
         
         // Configurer et démarrer GameClock
         this.setupGameClock();
+        
+        // Démarrer une vague de test
+        this.startTestWave();
+    }
+    
+    /**
+     * Start a test wave
+     * @returns {void}
+     */
+    startTestWave() {
+        const perimeterPath = this.model.getPaths()[0];
+        
+        if (!perimeterPath) {
+            this.debug.error('No path available for wave');
+            return;
+        }
+        
+        // Créer une vague : 10 ennemis basiques, 1 par seconde
+        const wave = new Wave(
+            [
+                { type: 'basic', health: 100, speed: 50, count: 10 }
+            ],
+            1.0, // 1 second between spawns
+            perimeterPath
+        );
+        
+        this.waveManager.startWave(wave);
+        this.debug.success('Test wave started');
     }
     
     /**
@@ -183,6 +223,11 @@ export class AppController {
      * @returns {void}
      */
     updateGameplay(deltaTime) {
+        // Update wave spawning
+        if (this.waveManager) {
+            this.waveManager.update(deltaTime);
+        }
+        
         // Update all game entities (missiles, towers, enemies, etc.)
         this.entityManager.update(deltaTime);
     }
