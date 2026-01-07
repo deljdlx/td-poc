@@ -1,7 +1,6 @@
 import { GridModel } from '../models/GridModel.js';
 import { GridView } from '../views/GridView.js';
 import { CanvasView } from '../views/CanvasView.js';
-import { InfoView } from '../views/InfoView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
 import { Missile } from '../models/Missile.js';
 import { Tower } from '../models/Tower.js';
@@ -23,9 +22,6 @@ export class AppController {
     
     /** @type {CanvasView} */
     canvasView = null;
-    
-    /** @type {InfoView} */
-    infoView = null;
     
     /** @type {CoordinateSystem} */
     coordSystem = null;
@@ -75,7 +71,6 @@ export class AppController {
         this.model = new GridModel(15, 10, this.container);
         this.gridView = new GridView('grid-container', this.model, this.container);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
-        this.infoView = new InfoView(this.container);
         this.towerRangeView = new TowerRangeView(this.container);
         
         // Initialiser le gestionnaire de drag and drop des tourelles
@@ -456,13 +451,5 @@ export class AppController {
             cellCount: selectedCells.length
         });
         this.canvasView.drawConnections(selectedCells);
-    }
-    
-    /**
-     * @returns {void}
-     */
-    updateInfo() {
-        const count = this.model.getSelectedCells().length;
-        this.infoView.updateCount(count);
     }
 }

@@ -122,11 +122,9 @@ export class GridView {
         // Sidebars
         const sidebarLeft = document.querySelector('.sidebar-left');
         const sidebarRight = document.querySelector('.sidebar-right');
-        const infoPanel = document.querySelector('#info-panel');
         
         if (sidebarLeft) sidebarLeft.style.display = isMobile ? 'none' : '';
         if (sidebarRight) sidebarRight.style.display = isMobile ? 'none' : '';
-        if (infoPanel) infoPanel.style.display = isMobile ? 'none' : '';
         
         // Header/Footer dimensions
         const header = document.querySelector('.game-header');
