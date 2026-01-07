@@ -229,9 +229,6 @@ export class GridView {
         
         const div = document.createElement('div');
         div.className = 'grid-cell';
-        if (cell.isTarget) {
-            div.classList.add('target-cell');
-        }
         
         // Apply absolute positioning
         div.style.left = `${left}px`;
@@ -253,12 +250,6 @@ export class GridView {
                 cell.element.classList.add('selected');
             } else {
                 cell.element.classList.remove('selected');
-            }
-            
-            if (cell.isTarget) {
-                cell.element.classList.add('target-cell');
-            } else {
-                cell.element.classList.remove('target-cell');
             }
             
             if (cell.hasTower()) {

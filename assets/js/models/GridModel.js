@@ -13,9 +13,6 @@ export class GridModel {
     /** @type {Cell[][]} */
     cells = [];
     
-    /** @type {Cell|null} */
-    targetCell = null;
-    
     /** @type {Path[]} */
     paths = [];
     
@@ -154,7 +151,7 @@ export class GridModel {
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
                 const cell = this.cells[row][col];
-                if (!cell.hasTower() && !cell.isTarget && !cell.isOnPath) {
+                if (!cell.hasTower() && !cell.isOnPath) {
                     empty.push(cell);
                 }
             }

@@ -107,10 +107,6 @@ export class AppController {
             this.container
         );
         
-        // Définir une cellule cible aléatoire
-        this.model.setRandomTarget();
-        this.gridView.updateCell(this.model.getTargetCell());
-        
         // Placer des tours aléatoirement
         this.placeRandomTowers(5);
         

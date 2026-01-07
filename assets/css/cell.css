@@ -75,23 +75,6 @@
     transform: scale(var(--hover-scale)) rotate(2deg);
 }
 
-/* Target cell state */
-.grid-cell.target-cell {
-    background: linear-gradient(135deg, #f59e0b, #dc2626);
-    border-color: #ea580c;
-    border-width: 3px;
-    color: white;
-    box-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
-    animation: target-pulse 1.5s ease-in-out infinite;
-}
-
-.grid-cell.target-cell::after {
-    content: '🎯';
-    position: absolute;
-    font-size: 32px;
-    opacity: 0.8;
-}
-
 /* Cell with tower state */
 .grid-cell.has-tower {
     background: linear-gradient(135deg, #3b82f6, #1e40af);
