@@ -3,17 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POC - Grid DOM + Canvas Layer</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Tower Defense POC - ES6 Modules + MVC Architecture</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/cell.css">
 </head>
 <body>
-    <!-- Canvas Layer (non-interactif, overlay) -->
+    <!-- Canvas Layer (fullscreen, non-interactif, overlay) -->
     <canvas id="canvas-layer"></canvas>
     
-    <!-- DOM Grid (interactif) -->
-    <div id="grid-container"></div>
+    <!-- Layout Structure -->
+    <header class="game-header">
+        <h1>🗼 Tower Defense POC</h1>
+    </header>
     
-    <!-- Info Panel -->
+    <main class="game-main">
+        <aside class="sidebar-left">
+            <!-- Sidebar gauche -->
+        </aside>
+        
+        <div class="game-area">
+            <!-- Grid Container (DOM interactif) -->
+            <div id="grid-container"></div>
+        </div>
+        
+        <aside class="sidebar-right">
+            <!-- Sidebar droite -->
+        </aside>
+    </main>
+    
+    <footer class="game-footer">
+        <p>Tower Defense POC - ES6 Modules + MVC Architecture</p>
+    </footer>
+    
+    <!-- Info Panel (overlay) -->
     <div id="info-panel">
         <h2>Interactive Grid POC</h2>
         <p>Click on cells to toggle selection</p>
