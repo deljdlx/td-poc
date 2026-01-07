@@ -215,7 +215,7 @@ export class AppController {
                 this.applyMissileDamage(impactX, impactY, splashRadius, damage);
             },
             3.0, // maxLifeTime
-            10, // splashRadius (petite zone par défaut)
+            25, // splashRadius (augmenté pour compenser le mouvement des ennemis)
             25  // damage
         );
         
@@ -238,10 +238,14 @@ export class AppController {
         const enemies = this.entityManager.getEntitiesByType('enemy');
         let hitCount = 0;
         
+        this.debug.info(`Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius}px`);
+        
         enemies.forEach(enemy => {
             const dx = enemy.x - impactX;
             const dy = enemy.y - impactY;
             const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            this.debug.debug(`Enemy ${enemy.id} at (${enemy.x.toFixed(0)}, ${enemy.y.toFixed(0)}) - distance: ${distance.toFixed(1)}px`);
             
             // Check if enemy is in splash zone
             if (distance <= splashRadius) {

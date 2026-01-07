@@ -56,6 +56,11 @@ export class Enemy extends Entity {
     domElement = null;
     
     /**
+     * @type {Object<string, Array<Function>>}
+     */
+    eventListeners = {};
+    
+    /**
      * @param {number} x - Position X
      * @param {number} y - Position Y
      */
@@ -68,6 +73,49 @@ export class Enemy extends Entity {
         this.health = 100;
         this.maxHealth = 100;
         this.speed = 50; // pixels per second
+        this.eventListeners = {};
+    }
+    
+    /**
+     * Add event listener
+     * @param {string} eventName - Event name (e.g., 'hit', 'death', 'reachedEnd')
+     * @param {Function} callback - Callback function
+     * @returns {void}
+     */
+    on(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            this.eventListeners[eventName] = [];
+        }
+        this.eventListeners[eventName].push(callback);
+    }
+    
+    /**
+     * Remove event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    off(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
+    }
+    
+    /**
+     * Trigger event
+     * @param {string} eventName
+     * @param {*} data - Event data
+     * @returns {void}
+     * @private
+     */
+    emit(eventName, data) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName].forEach(callback => {
+            callback(data);
+        });
     }
     
     /**
@@ -76,7 +124,17 @@ export class Enemy extends Entity {
      * @returns {void}
      */
     takeDamage(amount) {
+        const previousHealth = this.health;
         this.health -= amount;
+        
+        // Trigger hit event
+        this.emit('hit', {
+            damage: amount,
+            previousHealth: previousHealth,
+            currentHealth: this.health,
+            enemy: this
+        });
+        
         if (this.health <= 0) {
             this.health = 0;
             this.kill();
@@ -89,6 +147,20 @@ export class Enemy extends Entity {
      */
     isDead() {
         return this.health <= 0 || !this.alive;
+    }
+    
+    /**
+     * Mark entity as dead for cleanup
+     * @returns {void}
+     */
+    kill() {
+        // Trigger death event before killing
+        this.emit('death', {
+            enemy: this,
+            position: { x: this.x, y: this.y }
+        });
+        
+        super.kill();
     }
     
     /**
@@ -138,9 +210,6 @@ export class Enemy extends Entity {
         const rect = nextElement.cell.element.getBoundingClientRect();
         const targetX = rect.left + rect.width / 2;
         const targetY = rect.top + rect.height / 2;
-        
-        console.log(`Enemy ${this.id}: pos=(${this.x.toFixed(0)}, ${this.y.toFixed(0)}) -> target=(${targetX.toFixed(0)}, ${targetY.toFixed(0)}) index=${this.currentPathIndex}`);
-        
         // Calculate direction
         const dx = targetX - this.x;
         const dy = targetY - this.y;
@@ -180,8 +249,14 @@ export class Enemy extends Entity {
      * @returns {void}
      */
     onReachEnd() {
-        // Enemy escaped - deal damage to player base, remove enemy
-        this.kill();
+        // Trigger reachedEnd event
+        this.emit('reachedEnd', {
+            enemy: this,
+            position: { x: this.x, y: this.y }
+        });
+        
+        // Enemy escaped - could deal damage to player base
+        // For now, we don't kill the enemy, it loops back
     }
 }
 

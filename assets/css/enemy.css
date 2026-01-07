@@ -88,6 +88,32 @@
     box-shadow: 0 0 12px rgba(255, 69, 0, 0.8);
 }
 
+/* Hit animation - flash blanc + secousse */
+.enemy.hit {
+    animation: hit-flash 0.3s ease-out !important;
+}
+
+@keyframes hit-flash {
+    0% {
+        filter: brightness(5) saturate(0) drop-shadow(0 0 10px white);
+        transform: translate(-50%, -50%) scale(1.3);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    }
+    30% {
+        filter: brightness(3) saturate(0.2);
+        transform: translate(-50%, -50%) scale(1.2) rotate(-5deg);
+    }
+    60% {
+        filter: brightness(2) saturate(0.5);
+        transform: translate(-50%, -50%) scale(1.15) rotate(5deg);
+    }
+    100% {
+        filter: brightness(1) saturate(1);
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        box-shadow: none;
+    }
+}
+
 @keyframes shake {
     0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
     25% { transform: translate(-50%, -50%) rotate(-2deg); }

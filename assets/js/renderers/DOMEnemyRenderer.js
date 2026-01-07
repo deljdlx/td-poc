@@ -41,6 +41,9 @@ export class DOMEnemyRenderer {
             this.enemyElements.set(enemy.id, element);
             this.container.appendChild(element);
             enemy.domElement = element;
+            
+            // Setup hit animation listener
+            this.setupHitListener(enemy, element);
         }
         
         // Update position
@@ -49,6 +52,36 @@ export class DOMEnemyRenderer {
         
         // Update health bar
         this.updateHealthBar(element, enemy);
+    }
+    
+    /**
+     * Setup hit animation listener
+     * @param {Enemy} enemy
+     * @param {HTMLElement} element
+     * @returns {void}
+     * @private
+     */
+    setupHitListener(enemy, element) {
+        enemy.on('hit', (data) => {
+            this.debug.info(`Enemy ${enemy.id} hit animation triggered`);
+            
+            // Remove old hit class if exists (in case of multiple hits)
+            element.classList.remove('hit');
+            
+            // Force reflow to restart animation
+            void element.offsetWidth;
+            
+            // Add hit class
+            element.classList.add('hit');
+            
+            // Remove class after animation
+            setTimeout(() => {
+                element.classList.remove('hit');
+                this.debug.debug(`Enemy ${enemy.id} hit animation completed`);
+            }, 300);
+        });
+        
+        this.debug.info(`Hit listener setup for enemy ${enemy.id}`);
     }
     
     /**
