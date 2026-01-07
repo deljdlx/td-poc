@@ -208,8 +208,8 @@ export class AppController {
             targetX, targetY,
             300, // speed
             (impactX, impactY, splashRadius, damage) => {
-                // Visual effect
-                this.canvasView.addFirework(impactX, impactY);
+                // Visual effect - simple explosion for basic missile
+                this.canvasView.addSimpleExplosion(impactX, impactY);
                 
                 // Damage enemies in splash zone
                 this.applyMissileDamage(impactX, impactY, splashRadius, damage);

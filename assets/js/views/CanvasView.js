@@ -3,6 +3,7 @@ import { TowerRenderer } from '../renderers/TowerRenderer.js';
 import { EnemyRenderer } from '../renderers/EnemyRenderer.js';
 import { DOMEnemyRenderer } from '../renderers/DOMEnemyRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
+import { SimpleExplosionEffect } from '../fx/SimpleExplosionEffect.js';
 import { SplashEffect } from '../fx/SplashEffect.js';
 import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
 import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
@@ -139,6 +140,19 @@ export class CanvasView {
         const splash = new SplashEffect(x, y, radius);
         this.effects.push(splash);
         this.debug.debug('Splash effect created', { x, y, radius });
+    }
+    
+    /**
+     * Add simple explosion effect
+     * @param {number} x
+     * @param {number} y
+     * @param {Object} config - Optional configuration
+     * @returns {void}
+     */
+    addSimpleExplosion(x, y, config = {}) {
+        const explosion = new SimpleExplosionEffect(x, y, config);
+        this.effects.push(explosion);
+        this.debug.debug('Simple explosion created', { x, y, config });
     }
     
     /**
