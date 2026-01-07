@@ -5,6 +5,7 @@ import { InfoView } from '../views/InfoView.js';
 import { Missile } from '../models/Missile.js';
 import { Tower } from '../models/Tower.js';
 import { Enemy } from '../models/Enemy.js';
+import { TowerDragHandler } from './TowerDragHandler.js';
 
 /**
  * Contrôleur principal de l'application
@@ -37,6 +38,9 @@ export class AppController {
     /** @type {EntityManager} */
     entityManager = null;
     
+    /** @type {TowerDragHandler} */
+    towerDragHandler = null;
+    
     /**
      * @param {DIContainer} container
      */
@@ -62,6 +66,15 @@ export class AppController {
         this.gridView = new GridView('grid-container', this.model, this.container);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
         this.infoView = new InfoView(this.container);
+        
+        // Initialiser le gestionnaire de drag and drop des tourelles
+        this.towerDragHandler = new TowerDragHandler(
+            this.model,
+            this.gridView,
+            this.coordSystem,
+            this.entityManager,
+            this.container
+        );
         
         this.debug.success('Application initialisée avec succès', {
             rows: this.model.rows,
@@ -122,6 +135,9 @@ export class AppController {
             cell.setTower(tower);
             this.entityManager.addEntity(tower);
             this.gridView.updateCell(cell);
+            
+            // Activer le drag and drop sur cette tourelle
+            this.towerDragHandler.enableTowerDrag(cell);
         });
         
         this.debug.success(`Placed ${count} towers randomly`);
