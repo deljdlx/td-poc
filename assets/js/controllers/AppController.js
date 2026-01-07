@@ -196,10 +196,7 @@ export class AppController {
         // Update et render des effets autonomes (efface le canvas)
         this.canvasView.updateAndRenderEffects(deltaTime);
         
-        // Render paths (on canvas layer, after clear, before entities)
-        this.gridView.renderPaths();
-        
-        // Render game entities
+        // Render game entities (paths sont statiques en DOM, pas besoin de redraw)
         this.canvasView.renderEntities(this.entityManager.getEntities(), deltaTime);
     }
     

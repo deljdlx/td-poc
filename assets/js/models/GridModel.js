@@ -80,6 +80,12 @@ export class GridModel {
      */
     addPath(path) {
         this.paths.push(path);
+        
+        // Marquer les cellules du path comme occupées
+        path.forEach(pathElement => {
+            pathElement.cell.setOnPath(true);
+        });
+        
         this.debug.info(`Path ajouté (${this.paths.length} paths au total)`);
     }
     
@@ -90,6 +96,11 @@ export class GridModel {
     removePath(path) {
         const index = this.paths.indexOf(path);
         if (index !== -1) {
+            // Démarquer les cellules
+            path.forEach(pathElement => {
+                pathElement.cell.setOnPath(false);
+            });
+            
             this.paths.splice(index, 1);
             this.debug.info(`Path supprimé (${this.paths.length} paths restants)`);
             return true;

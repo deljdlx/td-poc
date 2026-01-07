@@ -14,6 +14,9 @@ export class Cell {
     /** @type {boolean} */
     isTarget = false;
     
+    /** @type {boolean} */
+    isOnPath = false;
+    
     /** @type {HTMLElement|null} */
     element = null;
     
@@ -42,6 +45,15 @@ export class Cell {
      */
     setTarget(value) {
         this.isTarget = value;
+    }
+    
+    /**
+     * Mark cell as part of a path
+     * @param {boolean} value
+     * @returns {void}
+     */
+    setOnPath(value) {
+        this.isOnPath = value;
     }
     
     /**

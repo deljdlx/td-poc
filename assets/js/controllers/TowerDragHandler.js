@@ -7,10 +7,10 @@ import { DragDropManager } from '../utils/DragDropManager.js';
 export class TowerDragHandler {
     /** @type {GridModel} */
     model = null;
-    
+
     /** @type {GridView} */
     gridView = null;
-    
+
     /** @type {CoordinateSystem} */
     coordSystem = null;
     
@@ -130,6 +130,14 @@ export class TowerDragHandler {
         // Même cellule = annuler
         if (targetCell === sourceCell) {
             this.debug.info('Dropped on same cell, cancelling');
+            return false;
+        }
+        
+        // Cellule sur un path = invalide
+        if (targetCell.isOnPath) {
+            this.debug.warning('Cannot place tower on path', {
+                target: { row: targetCell.row, col: targetCell.col }
+            });
             return false;
         }
         

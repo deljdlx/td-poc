@@ -26,9 +26,6 @@ export class GridView {
     /** @type {PathRenderer} */
     pathRenderer = null;
     
-    /** @type {CanvasRenderingContext2D} */
-    canvasContext = null;
-    
     /** @type {CoordinateSystem} */
     coordSystem = null;
     
@@ -42,7 +39,6 @@ export class GridView {
         this.container = document.getElementById(containerId);
         this.model = model;
         this.pathRenderer = new PathRenderer(diContainer);
-        this.canvasContext = document.getElementById('canvas-layer').getContext('2d');
         this.coordSystem = diContainer.get('coordinateSystem');
         this.debug.info('GridView initialisée');
         this.calculateAndApplyCellDimensions();
@@ -299,19 +295,19 @@ export class GridView {
     }
     
     /**
-     * Render all paths on the canvas layer
+     * Render all paths to DOM (static, called once or when paths change)
      * @returns {void}
      */
     renderPaths() {
-        // Ne pas clear ici, c'est déjà fait par CanvasView.updateAndRenderEffects()
+        // Clear existing paths
+        this.pathRenderer.clear();
         
         // Render each path
         const paths = this.model.getPaths();
         
         paths.forEach(path => {
-            this.pathRenderer.render(this.canvasContext, path, this.coordSystem, {
-                showArrows: true,
-                debug: false
+            this.pathRenderer.render(path, this.coordSystem, {
+                showDirection: true
             });
         });
     }

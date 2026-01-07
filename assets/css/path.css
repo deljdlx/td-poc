@@ -41,3 +41,155 @@
     --path-debug-point-color: #FF00FF;
     --path-debug-point-size: 4;
 }
+
+/* ========================================
+   PATH SEGMENTS (DOM rendering)
+   ======================================== */
+
+.path-segment {
+    position: absolute;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+}
+
+.path-segment.normal {
+    background-color: var(--path-normal-color);
+    opacity: var(--path-normal-opacity);
+}
+
+.path-segment.spawn {
+    background-color: var(--path-spawn-color);
+    opacity: var(--path-spawn-opacity);
+    border-color: rgba(0, 255, 0, 0.5);
+}
+
+.path-segment.checkpoint {
+    background-color: var(--path-checkpoint-color);
+    opacity: var(--path-checkpoint-opacity);
+    border-style: dashed;
+    border-color: rgba(255, 215, 0, 0.6);
+}
+
+.path-segment.boss {
+    background-color: var(--path-boss-color);
+    opacity: var(--path-boss-opacity);
+    border-color: rgba(255, 0, 0, 0.7);
+    border-width: 3px;
+}
+
+.path-segment.slow {
+    background-color: var(--path-slow-color);
+    opacity: var(--path-slow-opacity);
+}
+
+.path-segment.fast {
+    background-color: var(--path-fast-color);
+    opacity: var(--path-fast-opacity);
+}
+
+/* Direction indicators (optional, can use sprites instead) */
+.path-segment::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 8px solid rgba(255, 255, 255, 0.6);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+.path-segment[data-direction="E"]::after {
+    transform: rotate(0deg);
+}
+
+.path-segment[data-direction="W"]::after {
+    transform: rotate(180deg);
+}
+
+.path-segment[data-direction="N"]::after {
+    transform: rotate(-90deg);
+}
+
+.path-segment[data-direction="S"]::after {
+    transform: rotate(90deg);
+}
+
+.path-segment[data-direction="NE"]::after {
+    transform: rotate(-45deg);
+}
+
+.path-segment[data-direction="SE"]::after {
+    transform: rotate(45deg);
+}
+
+.path-segment[data-direction="SW"]::after {
+    transform: rotate(135deg);
+}
+
+.path-segment[data-direction="NW"]::after {
+    transform: rotate(-135deg);
+}
+
+/* Path segments (DOM elements) */
+.path-segment {
+    position: absolute;
+    transform-origin: left center;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.path-segment.normal {
+    background-color: var(--path-normal-color);
+    opacity: var(--path-normal-opacity);
+}
+
+.path-segment.spawn {
+    background-color: var(--path-spawn-color);
+    opacity: var(--path-spawn-opacity);
+}
+
+.path-segment.checkpoint {
+    background-color: var(--path-checkpoint-color);
+    opacity: var(--path-checkpoint-opacity);
+    background-image: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 5px,
+        rgba(0, 0, 0, 0.2) 5px,
+        rgba(0, 0, 0, 0.2) 10px
+    );
+}
+
+.path-segment.boss {
+    background-color: var(--path-boss-color);
+    opacity: var(--path-boss-opacity);
+}
+
+.path-segment.slow {
+    background-color: var(--path-slow-color);
+    opacity: var(--path-slow-opacity);
+}
+
+.path-segment.fast {
+    background-color: var(--path-fast-color);
+    opacity: var(--path-fast-opacity);
+}
+
+/* Arrow markers */
+.path-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 6px solid var(--path-arrow-color);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transform-origin: left center;
+    pointer-events: none;
+}
