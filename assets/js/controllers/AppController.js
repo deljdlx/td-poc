@@ -58,7 +58,7 @@ export class AppController {
         this.entityManager = this.container.get('entityManager');
         
         // Initialisation avec injection
-        this.model = new GridModel(6, 8, this.container);
+        this.model = new GridModel(10, 15, this.container);
         this.gridView = new GridView('grid-container', this.model, this.container);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
         this.infoView = new InfoView(this.container);
@@ -250,7 +250,7 @@ export class AppController {
         
         return closest;
     }
-    
+
     /**
      * Spawn enemy at position
      * @param {number} x

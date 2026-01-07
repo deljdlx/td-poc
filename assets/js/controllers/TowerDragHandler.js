@@ -1,0 +1,219 @@
+import { DragDropManager } from '../utils/DragDropManager.js';
+
+/**
+ * Gestionnaire du drag and drop des tourelles
+ * Contient la logique métier spécifique aux tourelles
+ */
+export class TowerDragHandler {
+    /** @type {GridModel} */
+    model = null;
+    
+    /** @type {GridView} */
+    gridView = null;
+    
+    /** @type {CoordinateSystem} */
+    coordSystem = null;
+    
+    /** @type {EntityManager} */
+    entityManager = null;
+    
+    /** @type {Debug} */
+    debug = null;
+    
+    /** @type {DragDropManager} */
+    dragDropManager = null;
+    
+    /** @type {Cell|null} */
+    sourceCell = null;
+    
+    /**
+     * @param {GridModel} model
+     * @param {GridView} gridView
+     * @param {CoordinateSystem} coordSystem
+     * @param {EntityManager} entityManager
+     * @param {DIContainer} diContainer
+     */
+    constructor(model, gridView, coordSystem, entityManager, diContainer) {
+        this.model = model;
+        this.gridView = gridView;
+        this.coordSystem = coordSystem;
+        this.entityManager = entityManager;
+        this.debug = diContainer.createDebug('TowerDragHandler', true);
+        
+        // Initialiser le DragDropManager avec callbacks
+        this.dragDropManager = new DragDropManager({
+            onDragStart: this.handleDragStart.bind(this),
+            onDrag: this.handleDrag.bind(this),
+            onDragEnd: this.handleDragEnd.bind(this),
+            onCancel: this.handleCancel.bind(this)
+        });
+    }
+    
+    /**
+     * Active le drag sur une cellule contenant une tourelle
+     * @param {Cell} cell
+     * @returns {void}
+     */
+    enableTowerDrag(cell) {
+        if (!cell.hasTower()) {
+            this.debug.warning('Cannot enable drag on cell without tower', { row: cell.row, col: cell.col });
+            return;
+        }
+        
+        const dragData = {
+            cell: cell,
+            tower: cell.getTower()
+        };
+        
+        this.dragDropManager.enableDrag(cell.element, dragData);
+        this.debug.info('Tower drag enabled', { row: cell.row, col: cell.col });
+    }
+    
+    /**
+     * Désactive le drag sur une cellule
+     * @param {Cell} cell
+     * @returns {void}
+     */
+    disableTowerDrag(cell) {
+        this.dragDropManager.disableDrag(cell.element);
+    }
+    
+    /**
+     * Callback appelé au début du drag
+     * @param {HTMLElement} element
+     * @param {Object} data
+     * @param {Object} startPos
+     * @returns {void}
+     */
+    handleDragStart(element, data, startPos) {
+        this.sourceCell = data.cell;
+        
+        this.debug.event('Tower drag started', {
+            row: data.cell.row,
+            col: data.cell.col,
+            startPos
+        });
+    }
+    
+    /**
+     * Callback appelé pendant le drag
+     * @param {HTMLElement} element
+     * @param {Object} data
+     * @param {Object} currentPos
+     * @returns {void}
+     */
+    handleDrag(element, data, currentPos) {
+        // On pourrait ajouter un highlighting de la cellule cible ici
+        // Pour l'instant, rien à faire pendant le drag
+    }
+    
+    /**
+     * Callback appelé à la fin du drag
+     * Valide le drop et retourne true si valide, false sinon
+     * @param {HTMLElement} element
+     * @param {Object} data
+     * @param {Object} endPos
+     * @returns {boolean}
+     */
+    handleDragEnd(element, data, endPos) {
+        const tower = data.tower;
+        const sourceCell = data.cell;
+        
+        // Trouver la cellule cible sous la souris
+        const targetCell = this.findCellAtPosition(endPos.x, endPos.y);
+        
+        if (!targetCell) {
+            this.debug.warning('Drop outside grid');
+            return false;
+        }
+        
+        // Même cellule = annuler
+        if (targetCell === sourceCell) {
+            this.debug.info('Dropped on same cell, cancelling');
+            return false;
+        }
+        
+        // Cellule cible occupée = invalide
+        if (targetCell.hasTower()) {
+            this.debug.warning('Target cell already has a tower', {
+                target: { row: targetCell.row, col: targetCell.col }
+            });
+            return false;
+        }
+        
+        // Drop valide : déplacer la tourelle
+        this.moveTower(tower, sourceCell, targetCell);
+        return true;
+    }
+    
+    /**
+     * Callback appelé quand le drop est annulé
+     * @param {HTMLElement} element
+     * @param {Object} data
+     * @returns {void}
+     */
+    handleCancel(element, data) {
+        this.sourceCell = null;
+        this.debug.event('Tower drag cancelled');
+    }
+    
+    /**
+     * Trouve la cellule à une position donnée
+     * @param {number} x - Coordonnée X viewport
+     * @param {number} y - Coordonnée Y viewport
+     * @returns {Cell|null}
+     */
+    findCellAtPosition(x, y) {
+        // Chercher l'élément sous le curseur
+        const element = document.elementFromPoint(x, y);
+        
+        if (!element || !element.classList.contains('grid-cell')) {
+            return null;
+        }
+        
+        const row = parseInt(element.dataset.row);
+        const col = parseInt(element.dataset.col);
+        
+        return this.model.getCell(row, col);
+    }
+    
+    /**
+     * Déplace une tourelle d'une cellule à une autre
+     * @param {Tower} tower
+     * @param {Cell} sourceCell
+     * @param {Cell} targetCell
+     * @returns {void}
+     */
+    moveTower(tower, sourceCell, targetCell) {
+        // Retirer la tour de la cellule source
+        sourceCell.setTower(null);
+        this.gridView.updateCell(sourceCell);
+        
+        // Ajouter la tour à la cellule cible
+        targetCell.setTower(tower);
+        this.gridView.updateCell(targetCell);
+        
+        // Mettre à jour les coordonnées de la tour (pour le canvas)
+        const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
+        tower.x = targetCenter.x;
+        tower.y = targetCenter.y;
+        tower.cell = targetCell;
+        
+        // Réactiver le drag sur la nouvelle cellule
+        this.enableTowerDrag(targetCell);
+        
+        this.debug.success('Tower moved', {
+            from: { row: sourceCell.row, col: sourceCell.col },
+            to: { row: targetCell.row, col: targetCell.col },
+            newPos: { x: tower.x, y: tower.y }
+        });
+    }
+    
+    /**
+     * Détruit le handler et nettoie les ressources
+     * @returns {void}
+     */
+    destroy() {
+        this.dragDropManager.destroy();
+    }
+}

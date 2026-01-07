@@ -1,18 +1,26 @@
+import { CSSVariables } from '../utils/CSSVariables.js';
+
 /**
  * Vue DOM pour la grille
  */
 export class GridView {
     /** @type {HTMLElement} */
     container = null;
-    
+
     /** @type {GridModel} */
     model = null;
     
     /** @type {Debug} */
     debug = null;
-    
+
     /** @type {number|null} */
     resizeTimeout = null;
+
+    /** @type {number} */
+    marginDesktop = 20;
+
+    /** @type {number} */
+    marginMobile = 10;
     
     /**
      * @param {string} containerId
@@ -48,58 +56,89 @@ export class GridView {
     
     /**
      * Calcule les dimensions optimales des cellules basées sur l'espace disponible
+     * @param {number} margin - Marge à soustraire de l'espace disponible
      * @returns {{cellSize: number, cellGap: number}}
      */
-    calculateOptimalCellSize() {
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+    calculateOptimalCellSize(margin) {
+        // Mesurer le container et soustraire les marges (2x horizontal, 2x vertical)
+        const availableWidth = this.container.clientWidth - (margin * 2);
+        const availableHeight = this.container.clientHeight - (margin * 2);
+
+        // Lire le gap fixe depuis CSS
+        const cellGap = CSSVariables.getInt('--cell-gap');
         
-        // 1. Dimensions réelles de l'info panel
-        const infoPanel = document.getElementById('info-panel');
-        const infoPanelRect = infoPanel ? infoPanel.getBoundingClientRect() : { width: 0 };
-        const infoPanelTotalWidth = infoPanelRect.width + 40; // largeur + marges (20px × 2)
-        
-        // 2. Marges de sécurité
-        const marginSafety = 40;
-        const containerPadding = 40; // padding: 20px × 2
-        
-        // 3. Espace maximum pour le container (AVEC padding)
-        const maxContainerWidth = viewportWidth - infoPanelTotalWidth - marginSafety;
-        const maxContainerHeight = viewportHeight - marginSafety;
-        
-        // 4. Espace INTERNE (SANS padding) - la grille doit rentrer ici
-        const internalWidth = maxContainerWidth - containerPadding;
-        const internalHeight = maxContainerHeight - containerPadding;
-        
-        // 5. Calcul cellSize
+        // Paramètres grid
         const cols = this.model.cols;
         const rows = this.model.rows;
-        const gapRatio = 0.1; // gap = 10% de cellSize
         
-        // Formule: internalSpace = (cells * cellSize) + ((cells - 1) * gap)
-        // Avec gap = cellSize * gapRatio
-        // → internalSpace = cellSize * (cells + (cells - 1) * gapRatio)
-        const cellSizeFromWidth = internalWidth / (cols + (cols - 1) * gapRatio);
-        const cellSizeFromHeight = internalHeight / (rows + (rows - 1) * gapRatio);
+        // Formule avec gap fixe: gridSpace = (cells * cellSize) + ((cells - 1) * gap)
+        // → cellSize = (gridSpace - (cells - 1) * gap) / cells
+        const cellSizeFromWidth = (availableWidth - (cols - 1) * cellGap) / cols;
+        const cellSizeFromHeight = (availableHeight - (rows - 1) * cellGap) / rows;
         
-        // 6. Prendre le minimum + contraintes
+        // Prendre le minimum pour FIT dans les deux dimensions
         let cellSize = Math.floor(Math.min(cellSizeFromWidth, cellSizeFromHeight));
         
-        // Contraintes min/max pour lisibilité
-        cellSize = Math.max(40, Math.min(cellSize, 120));
+        // Contraintes min/max adaptées au viewport
+        const isMobile = window.innerWidth < 768;
+        const minSize = isMobile ? 20 : 40;
+        const maxSize = 120;
         
-        const cellGap = Math.floor(cellSize * gapRatio);
+        const beforeConstraint = cellSize;
+        cellSize = Math.max(minSize, Math.min(cellSize, maxSize));
         
-        this.debug.data('Dimensions calculées', {
-            viewport: { width: viewportWidth, height: viewportHeight },
-            infoPanelWidth: infoPanelTotalWidth,
-            maxContainer: { width: maxContainerWidth, height: maxContainerHeight },
-            internal: { width: internalWidth, height: internalHeight },
-            cellSize,
-            cellGap
+        this.debug.data('Cell dimensions calculated', {
+            containerSize: { width: availableWidth, height: availableHeight },
+            gridParams: { cols, rows },
+            calculation: {
+                fromWidth: cellSizeFromWidth.toFixed(2),
+                fromHeight: cellSizeFromHeight.toFixed(2),
+                beforeConstraint,
+                afterConstraint: cellSize
+            },
+            result: { cellSize, cellGap }
         });
         
         return { cellSize, cellGap };
+    }
+    
+    /**
+     * Gère le layout responsive (visibilité sidebars, dimensions header/footer)
+     * @returns {number} La marge active (mobile ou desktop)
+     */
+    handleResponsiveLayout() {
+        const viewportWidth = window.innerWidth;
+        const isMobile = viewportWidth < 768;
+        
+        // Sidebars
+        const sidebarLeft = document.querySelector('.sidebar-left');
+        const sidebarRight = document.querySelector('.sidebar-right');
+        const infoPanel = document.querySelector('#info-panel');
+        
+        if (sidebarLeft) sidebarLeft.style.display = isMobile ? 'none' : '';
+        if (sidebarRight) sidebarRight.style.display = isMobile ? 'none' : '';
+        if (infoPanel) infoPanel.style.display = isMobile ? 'none' : '';
+        
+        // Header/Footer dimensions
+        const header = document.querySelector('.game-header');
+        const footer = document.querySelector('.game-footer');
+        
+        if (header) {
+            header.style.height = isMobile ? '50px' : '60px';
+            const h1 = header.querySelector('h1');
+            if (h1) h1.style.fontSize = isMobile ? '18px' : '24px';
+        }
+        
+        if (footer) {
+            footer.style.height = isMobile ? '30px' : '40px';
+            footer.style.fontSize = isMobile ? '10px' : '12px';
+        }
+        
+        const activeMargin = isMobile ? this.marginMobile : this.marginDesktop;
+        
+        this.debug.info('Responsive layout applied', { isMobile, viewportWidth, activeMargin });
+        
+        return activeMargin;
     }
     
     /**
@@ -107,13 +146,45 @@ export class GridView {
      * @returns {void}
      */
     calculateAndApplyCellDimensions() {
-        const { cellSize, cellGap } = this.calculateOptimalCellSize();
+        // 1. Gérer le layout responsive et obtenir la marge active
+        const activeMargin = this.handleResponsiveLayout();
         
-        // Appliquer aux CSS variables
-        document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
-        document.documentElement.style.setProperty('--cell-gap', `${cellGap}px`);
+        // 2. Mesurer le parent et appliquer dimensions explicites au container
+        const gameArea = this.container.parentElement;
+        const availableWidth = gameArea.clientWidth;
+        const availableHeight = gameArea.clientHeight;
         
-        this.debug.success('CSS variables appliquées', { cellSize, cellGap });
+        // Appliquer dimensions au grid-container
+        this.container.style.width = `${availableWidth}px`;
+        this.container.style.height = `${availableHeight}px`;
+        
+        // 3. Calculer dimensions des cells (avec marges)
+        const { cellSize, cellGap } = this.calculateOptimalCellSize(activeMargin);
+        
+        // 4. Calculer largeur totale de la grid
+        const cols = this.model.cols;
+        const gridWidth = cols * cellSize + (cols - 1) * cellGap;
+        
+        // 5. Centrer horizontalement, aligner en haut verticalement
+        const remainingWidth = availableWidth - gridWidth - (activeMargin * 2);
+        
+        const offsetLeft = activeMargin + Math.floor(remainingWidth / 2);
+        const offsetTop = activeMargin;
+        
+        this.container.style.left = `${offsetLeft}px`;
+        this.container.style.top = `${offsetTop}px`;
+        
+        // 6. Appliquer cellSize aux CSS variables (cellGap reste configuré en CSS)
+        CSSVariables.set('--cell-size', `${cellSize}px`);
+        
+        this.debug.success('Dimensions appliquées', {
+            container: { width: availableWidth, height: availableHeight },
+            grid: { width: gridWidth },
+            offset: { left: offsetLeft, top: offsetTop },
+            margin: activeMargin,
+            cellSize,
+            cellGap
+        });
     }
     
     /**
@@ -138,9 +209,8 @@ export class GridView {
      */
     createCellElement(cell) {
         // Get CSS variables
-        const root = document.documentElement;
-        const cellSize = parseInt(getComputedStyle(root).getPropertyValue('--cell-size'));
-        const cellGap = parseInt(getComputedStyle(root).getPropertyValue('--cell-gap'));
+        const cellSize = CSSVariables.getInt('--cell-size');
+        const cellGap = CSSVariables.getInt('--cell-gap');
         
         // Calculate absolute position
         const left = cell.col * (cellSize + cellGap);
@@ -194,9 +264,8 @@ export class GridView {
      * @returns {void}
      */
     updateAllCellPositions() {
-        const root = document.documentElement;
-        const cellSize = parseInt(getComputedStyle(root).getPropertyValue('--cell-size'));
-        const cellGap = parseInt(getComputedStyle(root).getPropertyValue('--cell-gap'));
+        const cellSize = CSSVariables.getInt('--cell-size');
+        const cellGap = CSSVariables.getInt('--cell-gap');
         
         for (let row = 0; row < this.model.rows; row++) {
             for (let col = 0; col < this.model.cols; col++) {
