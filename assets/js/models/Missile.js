@@ -66,15 +66,27 @@ export class Missile extends Entity {
     maxLifeTime;
     
     /**
+     * @type {number}
+     */
+    splashRadius;
+    
+    /**
+     * @type {number}
+     */
+    damage;
+    
+    /**
      * @param {number} x - Start X position
      * @param {number} y - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
      * @param {number} speed - Missile speed in pixels/second (default: 200)
-     * @param {Function} onArrival - Callback when missile reaches target
+     * @param {Function} onArrival - Callback when missile reaches target (receives impactX, impactY, splashRadius)
      * @param {number} maxLifeTime - Maximum lifetime in seconds (default: 3.0)
+     * @param {number} splashRadius - Splash damage radius in pixels (default: 10)
+     * @param {number} damage - Damage amount (default: 25)
      */
-    constructor(x, y, targetX, targetY, speed = 200, onArrival = null, maxLifeTime = 3.0) {
+    constructor(x, y, targetX, targetY, speed = 200, onArrival = null, maxLifeTime = 3.0, splashRadius = 10, damage = 25) {
         super('missile', x, y);
         
         this.targetX = targetX;
@@ -97,6 +109,8 @@ export class Missile extends Entity {
         this.onArrival = onArrival;
         this.age = 0;
         this.maxLifeTime = maxLifeTime;
+        this.splashRadius = splashRadius;
+        this.damage = damage;
     }
     
     /**
@@ -132,7 +146,7 @@ export class Missile extends Entity {
         if (distanceToTarget < 5) {
             // Trigger arrival callback before death
             if (this.onArrival) {
-                this.onArrival(this.targetX, this.targetY);
+                this.onArrival(this.targetX, this.targetY, this.splashRadius, this.damage);
             }
             this.kill();
         }

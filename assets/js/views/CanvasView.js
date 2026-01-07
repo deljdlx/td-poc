@@ -3,6 +3,7 @@ import { TowerRenderer } from '../renderers/TowerRenderer.js';
 import { EnemyRenderer } from '../renderers/EnemyRenderer.js';
 import { DOMEnemyRenderer } from '../renderers/DOMEnemyRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
+import { SplashEffect } from '../fx/SplashEffect.js';
 import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
 import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
 import { SquareSpriteRenderer } from '../renderers/sprites/SquareSpriteRenderer.js';
@@ -125,6 +126,19 @@ export class CanvasView {
         const firework = new FireworkEffect(x, y, config);
         this.effects.push(firework);
         this.debug.debug('Feu d\'artifice créé', { x, y, config });
+    }
+    
+    /**
+     * Add splash zone visual effect
+     * @param {number} x - Center X
+     * @param {number} y - Center Y
+     * @param {number} radius - Splash radius
+     * @returns {void}
+     */
+    addSplashEffect(x, y, radius) {
+        const splash = new SplashEffect(x, y, radius);
+        this.effects.push(splash);
+        this.debug.debug('Splash effect created', { x, y, radius });
     }
     
     /**

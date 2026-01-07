@@ -207,14 +207,55 @@ export class AppController {
             x, y,
             targetX, targetY,
             300, // speed
-            (mx, my) => {
-                this.canvasView.addFirework(mx, my);
+            (impactX, impactY, splashRadius, damage) => {
+                // Visual effect
+                this.canvasView.addFirework(impactX, impactY);
+                
+                // Damage enemies in splash zone
+                this.applyMissileDamage(impactX, impactY, splashRadius, damage);
             },
-            3.0 // maxLifeTime
+            3.0, // maxLifeTime
+            10, // splashRadius (petite zone par défaut)
+            25  // damage
         );
         
         this.entityManager.addEntity(missile);
         this.debug.event('Tower fired missile');
+    }
+    
+    /**
+     * Apply damage to enemies in splash zone
+     * @param {number} impactX - Impact X position
+     * @param {number} impactY - Impact Y position
+     * @param {number} splashRadius - Splash damage radius
+     * @param {number} damage - Damage amount
+     * @returns {void}
+     */
+    applyMissileDamage(impactX, impactY, splashRadius, damage) {
+        // Visual effect for splash zone
+        this.canvasView.addSplashEffect(impactX, impactY, splashRadius);
+        
+        const enemies = this.entityManager.getEntitiesByType('enemy');
+        let hitCount = 0;
+        
+        enemies.forEach(enemy => {
+            const dx = enemy.x - impactX;
+            const dy = enemy.y - impactY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Check if enemy is in splash zone
+            if (distance <= splashRadius) {
+                enemy.takeDamage(damage);
+                hitCount++;
+                this.debug.info(`Enemy ${enemy.id} hit for ${damage} damage (${enemy.health}/${enemy.maxHealth} HP remaining)`);
+            }
+        });
+        
+        if (hitCount > 0) {
+            this.debug.success(`Missile hit ${hitCount} enemy(ies) in splash zone (radius: ${splashRadius}px)`);
+        } else {
+            this.debug.warning('Missile missed - no enemies in splash zone');
+        }
     }
     
     /**
