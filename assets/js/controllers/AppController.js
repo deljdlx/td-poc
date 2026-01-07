@@ -287,10 +287,9 @@ export class AppController {
                 this.debug.warning('No enemy to shoot at');
             }
         } else {
-            // Empty cell clicked - spawn enemy at this position
-            this.debug.event(`Empty cell clicked [${row}, ${col}] - spawning enemy`);
-            const center = this.coordSystem.getElementCenter(cell.element);
-            this.spawnEnemy(center.x, center.y);
+            // Empty cell clicked
+            this.debug.event(`Empty cell clicked [${row}, ${col}]`);
+            // Possibilité d'ajouter des événements personnalisés ici
         }
     }
     

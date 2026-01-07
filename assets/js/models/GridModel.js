@@ -146,7 +146,7 @@ export class GridModel {
     }
     
     /**
-     * Get all empty cells (no tower, not target)
+     * Get all empty cells (no tower, not target, not on path)
      * @returns {Cell[]}
      */
     getEmptyCells() {
@@ -154,7 +154,7 @@ export class GridModel {
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
                 const cell = this.cells[row][col];
-                if (!cell.hasTower() && !cell.isTarget) {
+                if (!cell.hasTower() && !cell.isTarget && !cell.isOnPath) {
                     empty.push(cell);
                 }
             }
