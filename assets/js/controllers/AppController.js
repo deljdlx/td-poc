@@ -16,16 +16,16 @@ import { WaveManager } from './WaveManager.js';
 export class AppController {
     /** @type {GridModel} */
     model = null;
-    
+
     /** @type {GridView} */
     gridView = null;
-    
+
     /** @type {CanvasView} */
     canvasView = null;
-    
+
     /** @type {CoordinateSystem} */
     coordSystem = null;
-    
+
     /** @type {Debug} */
     debug = null;
     
@@ -70,6 +70,7 @@ export class AppController {
         this.gameClock = this.container.get('gameClock');
         this.entityManager = this.container.get('entityManager');
         this.towerStatsPopup = this.container.get('towerStatsPopup');
+        const uiUpdateManager = this.container.get('uiUpdateManager');
         
         // Initialisation avec injection
         this.model = new GridModel(15, 10, this.container);
@@ -154,11 +155,17 @@ export class AppController {
      * @returns {void}
      */
     setupGameClock() {
+        const uiUpdateManager = this.container.get('uiUpdateManager');
+        
         // Update gameplay (fixed timestep)
         this.gameClock.setUpdateCallback(this.updateGameplay.bind(this));
         
-        // Render (variable timestep)
-        this.gameClock.setRenderCallback(this.render.bind(this));
+        // Render callback (includes UI updates)
+        this.gameClock.setRenderCallback((deltaTime) => {
+            this.render(deltaTime);
+            // Update UI components after render
+            uiUpdateManager.update(deltaTime);
+        });
         
         // Démarrer
         this.gameClock.start();

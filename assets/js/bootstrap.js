@@ -5,6 +5,7 @@ import { GameClock } from './utils/GameClock.js';
 import { EntityManager } from './models/EntityManager.js';
 import { PopupManager } from './utils/PopupManager.js';
 import { TowerStatsPopup } from './views/TowerStatsPopup.js';
+import { UIUpdateManager } from './utils/UIUpdateManager.js';
 
 /**
  * Configuration et initialisation du conteneur DI
@@ -36,6 +37,11 @@ export function bootstrapDI() {
     // EntityManager (singleton)
     container.registerFactory('entityManager', (container) => {
         return new EntityManager(container);
+    });
+    
+    // UIUpdateManager (singleton)
+    container.registerFactory('uiUpdateManager', (container) => {
+        return new UIUpdateManager(container);
     });
     
     // PopupManager (singleton)
