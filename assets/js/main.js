@@ -1,22 +1,21 @@
-import { container, bootstrapDI } from './bootstrap.js';
-import { AppController } from './controllers/AppController.js';
+import { Application } from './Application.js';
 
 /**
  * POC - Interactive Grid with Canvas Overlay
  * Point d'entrée de l'application
  */
 
-window.addEventListener('load', () => {
-    // Initialiser le DI container
-    bootstrapDI();
+window.addEventListener('load', async () => {
+    // Create singleton Application instance
+    const app = Application.getInstance();
     
-    // Créer l'application avec injection de dépendances
-    const app = new AppController(container);
-    app.init();
+    // Initialize and start
+    await app.init();
+    app.start();
     
-    // Debug: afficher les services enregistrés
-    const debug = container.createDebug('Bootstrap', true);
-    debug.success('Application démarrée avec DI', {
-        services: container.listServices()
-    });
+    // Expose globally for debugging (console access: app.pause(), app.restart(), etc.)
+    window.app = app;
+    
+    // Debug info
+    console.log('🎮 Application ready! Try: app.pause(), app.resume(), app.restart()');
 });
