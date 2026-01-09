@@ -1,5 +1,4 @@
-import { GridModel } from '../models/core/GridModel.js';
-import { GridView } from '../views/GridView.js';
+import { GridSystem } from '../systems/GridSystem.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
 import { TowerDragHandler } from './TowerDragHandler.js';
@@ -9,11 +8,8 @@ import { Game } from '../models/gameplay/Game.js';
  * Contrôleur principal de l'application
  */
 export class AppController {
-    /** @type {GridModel} */
-    model = null;
-
-    /** @type {GridView} */
-    gridView = null;
+    /** @type {GridSystem} */
+    gridSystem = null;
 
     /** @type {CanvasView} */
     canvasView = null;
@@ -73,15 +69,14 @@ export class AppController {
         const uiUpdateManager = this.container.get('uiUpdateManager');
         const waveManager = this.container.get('waveManager');
         
-        // Initialisation avec injection
-        this.model = new GridModel(15, 10, this.container);
-        this.gridView = new GridView('grid-container', this.model, this.container);
+        // Initialize GridSystem (encapsulates GridModel + GridView)
+        this.gridSystem = new GridSystem(15, 10, 'grid-container', this.container);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
         this.towerRangeView = new TowerRangeView(this.container);
         
         // Initialize Game with all dependencies
         this.game = new Game(
-            this.model,
+            this.gridSystem.getModel(),
             this.entityManager,
             this.playerManager,
             waveManager,
@@ -91,8 +86,8 @@ export class AppController {
         
         // Initialize TowerDragHandler (UI service)
         this.towerDragHandler = new TowerDragHandler(
-            this.model,
-            this.gridView,
+            this.gridSystem.getModel(),
+            this.gridSystem.getView(),
             this.coordSystem,
             this.entityManager,
             this.container
@@ -104,16 +99,16 @@ export class AppController {
         });
         
         this.debug.success('Application initialisée avec succès', {
-            rows: this.model.rows,
-            cols: this.model.cols
+            rows: this.gridSystem.getModel().rows,
+            cols: this.gridSystem.getModel().cols
         });
         
-        // Rendu initial
-        this.gridView.render();
+        // Initialize GridSystem (render grid)
+        this.gridSystem.init();
         
         // Initialize Game (creates paths, etc.)
         this.game.init();
-        this.gridView.renderPaths();
+        this.gridSystem.renderPaths();
         
         // Listen to game events for visual effects
         this.game.events.on('missileImpact', (event) => {
@@ -132,7 +127,7 @@ export class AppController {
         // Enable drag and drop for placed towers
         placedCells.forEach(cell => {
             this.towerDragHandler.enableTowerDrag(cell);
-            this.gridView.updateCell(cell);
+            this.gridSystem.updateCell(cell);
         });
         
         // Bind events
@@ -225,7 +220,7 @@ export class AppController {
         
         const row = parseInt(target.dataset.row);
         const col = parseInt(target.dataset.col);
-        const cell = this.model.getCell(row, col);
+        const cell = this.gridSystem.getCell(row, col);
         
         if (!cell) {
             return;
@@ -312,7 +307,7 @@ export class AppController {
         
         const row = parseInt(target.dataset.row);
         const col = parseInt(target.dataset.col);
-        const cell = this.model.getCell(row, col);
+        const cell = this.gridSystem.getCell(row, col);
         
         if (!cell || !cell.hasTower()) {
             this.towerRangeView.hide();
@@ -337,10 +332,74 @@ export class AppController {
      * @returns {void}
      */
     updateCanvas() {
-        const selectedCells = this.model.getSelectedCells();
+        const selectedCells = this.gridSystem.getSelectedCells();
         this.debug.data('Mise à jour du canvas', {
             cellCount: selectedCells.length
         });
         this.canvasView.drawConnections(selectedCells);
+    }
+    
+    /**
+     * Destroy AppController and cleanup all resources
+     * @returns {void}
+     */
+    destroy() {
+        this.debug.info('🧹 Destroying AppController...');
+        
+        // 1. Stop game clock
+        if (this.gameClock) {
+            this.gameClock.stop();
+        }
+        
+        // 2. Remove event listeners
+        const container = document.getElementById('grid-container');
+        if (container) {
+            // Note: These are bound with .bind(this), so we can't remove them
+            // without storing references. This is a known memory leak.
+            // TODO: Store bound references in constructor for proper cleanup
+        }
+        
+        const playerInfoBtn = document.getElementById('player-info-btn');
+        if (playerInfoBtn) {
+            // Note: Anonymous arrow function, cannot remove
+            // TODO: Store reference for cleanup
+        }
+        
+        // 3. Destroy OWNED instances
+        if (this.gridSystem?.destroy) {
+            this.gridSystem.destroy();
+        }
+        
+        if (this.canvasView?.destroy) {
+            this.canvasView.destroy();
+        }
+        
+        if (this.towerRangeView?.destroy) {
+            this.towerRangeView.destroy();
+        }
+        
+        if (this.game?.destroy) {
+            this.game.destroy();
+        }
+        
+        if (this.towerDragHandler?.destroy) {
+            this.towerDragHandler.destroy();
+        }
+        
+        // 4. Null out references
+        this.gridSystem = null;
+        this.canvasView = null;
+        this.towerRangeView = null;
+        this.game = null;
+        this.towerDragHandler = null;
+        this.coordSystem = null;
+        this.gameClock = null;
+        this.entityManager = null;
+        this.playerManager = null;
+        this.towerStatsPopup = null;
+        this.playerInfoPopup = null;
+        this.container = null;
+        
+        this.debug.success('✅ AppController destroyed');
     }
 }

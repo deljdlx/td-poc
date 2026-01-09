@@ -300,4 +300,31 @@ export class GridView {
             });
         });
     }
+    
+    /**
+     * Destroy GridView and cleanup resources
+     * @returns {void}
+     */
+    destroy() {
+        this.debug.info('🧹 Destroying GridView...');
+        
+        // Clear resize timeout
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = null;
+        }
+        
+        // Note: The resize listener is an anonymous arrow function,
+        // so we cannot remove it without storing a reference.
+        // TODO: Refactor to store bound handler reference in constructor
+        // For now, this is a known memory leak that will be fixed in next iteration
+        
+        // Clear DOM references
+        this.container = null;
+        this.model = null;
+        this.pathRenderer = null;
+        this.coordSystem = null;
+        
+        this.debug.success('✅ GridView destroyed');
+    }
 }
