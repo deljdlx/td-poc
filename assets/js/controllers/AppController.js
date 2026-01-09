@@ -1,12 +1,12 @@
-import { GridModel } from '../models/GridModel.js';
+import { GridModel } from '../models/core/GridModel.js';
 import { GridView } from '../views/GridView.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
-import { Missile } from '../models/Missile.js';
-import { Tower } from '../models/Tower.js';
-import { Enemy } from '../models/Enemy.js';
+import { Missile } from '../models/gameplay/Missile.js';
+import { Tower } from '../models/gameplay/Tower.js';
+import { Enemy } from '../models/gameplay/Enemy.js';
 import { TowerDragHandler } from './TowerDragHandler.js';
-import { Game } from '../models/Game.js';
+import { Game } from '../models/gameplay/Game.js';
 
 /**
  * Contrôleur principal de l'application

@@ -1,5 +1,5 @@
 import { Wallet } from './Wallet.js';
-import { PlayerDamagedEvent } from '../utils/events/PlayerEvent.js';
+import { PlayerDamagedEvent } from '../../utils/events/PlayerEvent.js';
 
 /**
  * Player - Represents a player in the game

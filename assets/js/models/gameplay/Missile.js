@@ -1,4 +1,4 @@
-import { Entity } from './Entity.js';
+import { Entity } from '../core/Entity.js';
 
 /**
  * Missile - Projectile entity that travels from source to target

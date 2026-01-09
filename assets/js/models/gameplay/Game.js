@@ -1,8 +1,8 @@
 import { GameState } from './GameState.js';
 import { Tower } from './Tower.js';
 import { Wave } from './Wave.js';
-import { PathFactory } from './PathFactory.js';
-import { GameStateChangedEvent, GameOverEvent } from '../utils/events/GameEvent.js';
+import { PathFactory } from '../core/PathFactory.js';
+import { GameStateChangedEvent, GameOverEvent } from '../../utils/events/GameEvent.js';
 
 /**
  * Game - Core game logic and state management

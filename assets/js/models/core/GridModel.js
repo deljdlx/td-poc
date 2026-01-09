@@ -1,4 +1,4 @@
-import { Cell } from './Cell.js';
+import { Cell } from '../gameplay/Cell.js';
 
 /**
  * Modèle de la grille

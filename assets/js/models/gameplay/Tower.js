@@ -1,5 +1,5 @@
-import { Entity } from './Entity.js';
-import { TowerFiredEvent } from '../utils/events/TowerEvent.js';
+import { Entity } from '../core/Entity.js';
+import { TowerFiredEvent } from '../../utils/events/TowerEvent.js';
 
 /**
  * Tower - Defensive tower entity that shoots missiles at targets

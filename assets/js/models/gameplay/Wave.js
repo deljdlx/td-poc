@@ -1,4 +1,4 @@
-import { WaveStartedEvent, WaveCompletedEvent } from '../utils/events/WaveEvent.js';
+import { WaveStartedEvent, WaveCompletedEvent } from '../../utils/events/WaveEvent.js';
 
 /**
  * Wave configuration - defines a wave of enemies

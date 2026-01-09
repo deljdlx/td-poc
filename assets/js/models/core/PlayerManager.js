@@ -1,4 +1,4 @@
-import { Player } from './Player.js';
+import { Player } from '../gameplay/Player.js';
 
 /**
  * PlayerManager - Manages players in the game

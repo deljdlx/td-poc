@@ -1,5 +1,5 @@
-import { Entity } from './Entity.js';
-import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../utils/events/EnemyEvent.js';
+import { Entity } from '../core/Entity.js';
+import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../utils/events/EnemyEvent.js';
 
 /**
  * Enemy - Enemy entity that follows paths

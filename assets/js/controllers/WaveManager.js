@@ -1,4 +1,4 @@
-import { Enemy } from '../models/Enemy.js';
+import { Enemy } from '../models/gameplay/Enemy.js';
 import { WaveStartedEvent, WaveCompletedEvent } from '../utils/events/WaveEvent.js';
 
 /**
