@@ -36,7 +36,7 @@ export class PlayerManager {
      * @returns {Player}
      */
     createPlayer(id, name, color = '#6366f1') {
-        const player = new Player(id, name, color);
+        const player = new Player(id, name, color, this.debug);
         this.players.push(player);
         
         // First player created becomes active
@@ -47,6 +47,7 @@ export class PlayerManager {
         this.debug.success('Player created', { 
             id: player.id, 
             name: player.name,
+            money: player.wallet.get('money'),
             isActive: this.activePlayerId === player.id
         });
         

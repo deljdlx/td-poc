@@ -1,3 +1,5 @@
+import { Wallet } from './Wallet.js';
+
 /**
  * Player - Represents a player in the game
  */
@@ -18,9 +20,9 @@ export class Player {
     color;
     
     /**
-     * @type {number}
+     * @type {Wallet}
      */
-    gold = 1000;
+    wallet;
     
     /**
      * @type {number}
@@ -51,11 +53,16 @@ export class Player {
      * @param {string} id - Unique player identifier
      * @param {string} name - Player name
      * @param {string} color - Player color (for visual distinction)
+     * @param {Debug} [debug=null] - Optional debug instance for wallet
      */
-    constructor(id, name, color = '#6366f1') {
+    constructor(id, name, color = '#6366f1', debug = null) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.wallet = new Wallet(debug);
+        
+        // Initialize with starting resources
+        this.wallet.set('money', 1000);
     }
     
     /**

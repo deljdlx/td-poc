@@ -73,6 +73,7 @@ export class AppController {
         this.gameClock = this.container.get('gameClock');
         this.entityManager = this.container.get('entityManager');
         this.towerStatsPopup = this.container.get('towerStatsPopup');
+        this.playerInfoPopup = this.container.get('playerInfoPopup');
         this.playerManager = this.container.get('playerManager');
         const uiUpdateManager = this.container.get('uiUpdateManager');
         
@@ -353,6 +354,14 @@ export class AppController {
         // Grid hover detection for tower range display (on cells, not canvas)
         container.addEventListener('mousemove', this.handleCellHover.bind(this));
         container.addEventListener('mouseleave', this.handleCellLeave.bind(this));
+        
+        // Player info button
+        const playerInfoBtn = document.getElementById('player-info-btn');
+        if (playerInfoBtn) {
+            playerInfoBtn.addEventListener('click', () => {
+                this.playerInfoPopup.show();
+            });
+        }
         
         window.addEventListener('resize', this.handleResize.bind(this));
     }

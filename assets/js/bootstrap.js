@@ -5,6 +5,7 @@ import { GameClock } from './utils/GameClock.js';
 import { EntityManager } from './models/EntityManager.js';
 import { PopupManager } from './utils/PopupManager.js';
 import { TowerStatsPopup } from './views/TowerStatsPopup.js';
+import { PlayerInfoPopup } from './views/PlayerInfoPopup.js';
 import { UIUpdateManager } from './utils/UIUpdateManager.js';
 import { PlayerManager } from './models/PlayerManager.js';
 
@@ -61,6 +62,11 @@ export function bootstrapDI() {
     // TowerStatsPopup (singleton)
     container.registerFactory('towerStatsPopup', (container) => {
         return new TowerStatsPopup(container);
+    });
+    
+    // PlayerInfoPopup (singleton)
+    container.registerFactory('playerInfoPopup', (container) => {
+        return new PlayerInfoPopup(container);
     });
     
     // Autres services à ajouter au besoin...
