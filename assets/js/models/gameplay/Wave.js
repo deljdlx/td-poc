@@ -1,4 +1,5 @@
 import { WaveStartedEvent, WaveCompletedEvent } from '../../utils/events/WaveEvent.js';
+import { EventBus } from '../../utils/EventBus.js';
 
 /**
  * Wave configuration - defines a wave of enemies
@@ -16,8 +17,8 @@ export class Wave {
     /** @type {Path} */
     path = null;
     
-    /** @type {Object<string, Array<Function>>} */
-    eventListeners = {};
+    /** @type {Object} EventBus handler */
+    events;
 
     /**
      * @param {Array<Object>} enemyConfigs - Array of {type, health, speed, count}
@@ -27,7 +28,7 @@ export class Wave {
     constructor(enemyConfigs, spawnDelay, path) {
         this.spawnDelay = spawnDelay;
         this.path = path;
-        this.eventListeners = {};
+        this.events = EventBus.createHandler(this);
 
         // Flatten enemy configs into individual enemies
         enemyConfigs.forEach(config => {
@@ -88,45 +89,4 @@ export class Wave {
         this.spawnedCount = 0;
     }
     
-    /**
-     * Add event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    on(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            this.eventListeners[eventName] = [];
-        }
-        this.eventListeners[eventName].push(callback);
-    }
-    
-    /**
-     * Remove event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    off(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
-    }
-    
-    /**
-     * Trigger event
-     * @param {string} eventName
-     * @param {*} data - Event data
-     * @returns {void}
-     * @private
-     */
-    emit(eventName, data) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName].forEach(callback => {
-            callback(data);
-        });
-    }
 }

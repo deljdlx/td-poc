@@ -1,5 +1,6 @@
 import { Wallet } from './Wallet.js';
 import { PlayerDamagedEvent } from '../../utils/events/PlayerEvent.js';
+import { EventBus } from '../../utils/EventBus.js';
 
 /**
  * Player - Represents a player in the game
@@ -51,9 +52,9 @@ export class Player {
     };
     
     /**
-     * @type {Object<string, Array<Function>>}
+     * @type {Object} EventBus handler
      */
-    eventListeners = {};
+    events;
     
     /**
      * @param {string} id - Unique player identifier
@@ -65,7 +66,7 @@ export class Player {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.eventListeners = {};
+        this.events = EventBus.createHandler(this);
         this.wallet = new Wallet(this, debug);
         
         // Initialize with starting resources
@@ -132,48 +133,7 @@ export class Player {
         
         // Emit damaged event
         const event = new PlayerDamagedEvent(this, livesLost, this.lives);
-        this.emit('damaged', event);
+        this.events.emit('damaged', event);
     }
     
-    /**
-     * Add event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    on(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            this.eventListeners[eventName] = [];
-        }
-        this.eventListeners[eventName].push(callback);
-    }
-    
-    /**
-     * Remove event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    off(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
-    }
-    
-    /**
-     * Trigger event
-     * @param {string} eventName
-     * @param {*} data - Event data
-     * @returns {void}
-     * @private
-     */
-    emit(eventName, data) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName].forEach(callback => {
-            callback(data);
-        });
-    }
 }

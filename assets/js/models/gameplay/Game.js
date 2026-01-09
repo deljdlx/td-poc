@@ -2,7 +2,9 @@ import { GameState } from './GameState.js';
 import { Tower } from './Tower.js';
 import { Wave } from './Wave.js';
 import { PathFactory } from '../core/PathFactory.js';
+import { Missile } from './Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../utils/events/GameEvent.js';
+import { EventBus } from '../../utils/EventBus.js';
 
 /**
  * Game - Core game logic and state management
@@ -60,9 +62,9 @@ export class Game {
     debug;
     
     /**
-     * @type {Object<string, Array<Function>>}
+     * @type {Object} - Event handler from EventBus
      */
-    eventListeners = {};
+    events;
     
     /**
      * @type {Object}
@@ -73,6 +75,11 @@ export class Game {
         waveEnemyIncrement: 2,
         towerCost: {
             money: 500
+        },
+        missile: {
+            speed: 300,        // pixels/sec
+            lifetime: 3.0,     // seconds
+            splashRadius: 0.5  // cells
         }
     };
     
@@ -92,7 +99,7 @@ export class Game {
         this.coordSystem = coordSystem;
         this.container = container;
         this.debug = container.createDebug('Game', true);
-        this.eventListeners = {};
+        this.events = EventBus.createHandler(this);
     }
     
     /**
@@ -130,7 +137,7 @@ export class Game {
         
         // Emit state changed event
         const event = new GameStateChangedEvent(this, oldState, this.state);
-        this.emit('stateChanged', event);
+        this.events.emit('stateChanged', event);
         
         this.debug.success('🎮 Game started!');
         
@@ -151,7 +158,7 @@ export class Game {
         this.state = GameState.PAUSED;
         
         const event = new GameStateChangedEvent(this, oldState, this.state);
-        this.emit('stateChanged', event);
+        this.events.emit('stateChanged', event);
         
         this.debug.info('⏸️ Game paused');
     }
@@ -169,7 +176,7 @@ export class Game {
         this.state = GameState.RUNNING;
         
         const event = new GameStateChangedEvent(this, oldState, this.state);
-        this.emit('stateChanged', event);
+        this.events.emit('stateChanged', event);
         
         this.debug.info('▶️ Game resumed');
     }
@@ -185,11 +192,11 @@ export class Game {
         
         // Emit state changed
         const stateEvent = new GameStateChangedEvent(this, oldState, this.state);
-        this.emit('stateChanged', stateEvent);
+        this.events.emit('stateChanged', stateEvent);
         
         // Emit game over
         const gameOverEvent = new GameOverEvent(this, reason, this.globalScore);
-        this.emit('over', gameOverEvent);
+        this.events.emit('over', gameOverEvent);
         
         this.debug.error('💀 GAME OVER', { reason, finalScore: this.globalScore });
     }
@@ -434,6 +441,105 @@ export class Game {
     }
     
     /**
+     * Create and fire missile from tower to target
+     * @param {Tower} tower - Firing tower
+     * @param {number} startX - Start X position
+     * @param {number} startY - Start Y position
+     * @param {number} targetX - Target X position
+     * @param {number} targetY - Target Y position
+     * @returns {Missile}
+     */
+    createMissile(tower, startX, startY, targetX, targetY) {
+        const missile = new Missile(
+            startX, startY,
+            targetX, targetY,
+            this.config.missile.speed,
+            (impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier) => {
+                // Emit visual FX event (AppController listens)
+                this.events.emit('missileImpact', { 
+                    x: impactX, 
+                    y: impactY, 
+                    splashRadius: splashRadiusPixels 
+                });
+                
+                // Apply damage (pure game logic)
+                this.applyDamage(tower, impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier);
+            },
+            this.config.missile.lifetime,
+            this.config.missile.splashRadius,
+            tower.damage,
+            this.coordSystem,
+            tower.critChance,
+            tower.critMultiplier
+        );
+        
+        this.entityManager.addEntity(missile);
+        this.debug.event('🚀 Missile created', { 
+            towerId: tower.id,
+            target: { x: targetX.toFixed(0), y: targetY.toFixed(0) }
+        });
+        
+        return missile;
+    }
+    
+    /**
+     * Apply damage to enemies in splash zone
+     * @param {Tower} tower - Tower that fired
+     * @param {number} impactX - Impact X position
+     * @param {number} impactY - Impact Y position
+     * @param {number} splashRadius - Splash radius in pixels
+     * @param {number} damage - Base damage
+     * @param {number} critChance - Critical hit chance (0-1)
+     * @param {number} critMultiplier - Critical damage multiplier
+     * @returns {void}
+     * @private
+     */
+    applyDamage(tower, impactX, impactY, splashRadius, damage, critChance = 0.0, critMultiplier = 1.5) {
+        const enemies = this.entityManager.getEntitiesByType('enemy');
+        let hitCount = 0;
+        
+        this.debug.info(`💥 Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius}px`);
+        
+        enemies.forEach(enemy => {
+            const dx = enemy.x - impactX;
+            const dy = enemy.y - impactY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Check if enemy is in splash zone
+            if (distance <= splashRadius) {
+                // Calculate critical hit
+                const isCritical = Math.random() < critChance;
+                const finalDamage = isCritical ? Math.floor(damage * critMultiplier) : damage;
+                
+                const wasAlive = enemy.alive;
+                enemy.takeDamage(finalDamage);
+                hitCount++;
+                
+                // Track hit and damage
+                tower.trackHit(finalDamage, isCritical);
+                
+                // Track kill if enemy died
+                if (wasAlive && !enemy.alive) {
+                    tower.trackKill();
+                    this.handleEnemyKilled(enemy, tower);
+                }
+                
+                if (isCritical) {
+                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${critMultiplier}x) - HP: ${enemy.health}/${enemy.maxHealth}`);
+                } else {
+                    this.debug.debug(`Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.health}/${enemy.maxHealth}`);
+                }
+            }
+        });
+        
+        if (hitCount > 0) {
+            this.debug.success(`🎯 Missile hit ${hitCount} enemy(ies) in splash zone (radius: ${splashRadius}px)`);
+        } else {
+            this.debug.warning('❌ Missile missed - no enemies in splash zone');
+        }
+    }
+    
+    /**
      * Update game logic
      * @param {number} deltaTime - in seconds
      * @returns {void}
@@ -488,47 +594,5 @@ export class Game {
                 stats: p.stats
             }))
         };
-    }
-    
-    /**
-     * Add event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    on(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            this.eventListeners[eventName] = [];
-        }
-        this.eventListeners[eventName].push(callback);
-    }
-    
-    /**
-     * Remove event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    off(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
-    }
-    
-    /**
-     * Trigger event
-     * @param {string} eventName
-     * @param {*} data - Event data
-     * @returns {void}
-     * @private
-     */
-    emit(eventName, data) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName].forEach(callback => {
-            callback(data);
-        });
     }
 }

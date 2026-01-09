@@ -2,9 +2,6 @@ import { GridModel } from '../models/core/GridModel.js';
 import { GridView } from '../views/GridView.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
-import { Missile } from '../models/gameplay/Missile.js';
-import { Tower } from '../models/gameplay/Tower.js';
-import { Enemy } from '../models/gameplay/Enemy.js';
 import { TowerDragHandler } from './TowerDragHandler.js';
 import { Game } from '../models/gameplay/Game.js';
 
@@ -118,8 +115,19 @@ export class AppController {
         this.game.init();
         this.gridView.renderPaths();
         
+        // Listen to game events for visual effects
+        this.game.events.on('missileImpact', (event) => {
+            this.canvasView.addSimpleExplosion(event.x, event.y);
+            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
+        });
+        
+        // Tower shoot callback - delegate to Game
+        const onTowerShoot = (tower, x, y, targetX, targetY) => {
+            this.game.createMissile(tower, x, y, targetX, targetY);
+        };
+        
         // Placer des tours aléatoirement pour le test
-        const placedCells = this.game.placeRandomTowers(5, this.createMissileFromTower.bind(this));
+        const placedCells = this.game.placeRandomTowers(5, onTowerShoot);
         
         // Enable drag and drop for placed towers
         placedCells.forEach(cell => {
@@ -156,113 +164,6 @@ export class AppController {
         
         // Démarrer
         this.gameClock.start();
-    }
-    
-    /**
-     * Enable drag and drop for placed towers
-     * @param {Cell} cell
-     * @returns {void}
-     * @private
-     */
-    enableTowerDragForCell(cell) {
-        this.towerDragHandler.enableTowerDrag(cell);
-        this.gridView.updateCell(cell);
-    }
-    
-    /**
-     * Create missile from tower position to target
-     * @param {Tower} tower - Tower that fired
-     * @param {number} x - Start X
-     * @param {number} y - Start Y
-     * @param {number} targetX - Target X
-     * @param {number} targetY - Target Y
-     * @returns {void}
-     */
-    createMissileFromTower(tower, x, y, targetX, targetY) {
-        const missile = new Missile(
-            x, y,
-            targetX, targetY,
-            300, // speed in pixels/sec (kept as is for now)
-            (impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier) => {
-                // Visual effect - simple explosion for basic missile
-                this.canvasView.addSimpleExplosion(impactX, impactY);
-                
-                // Damage enemies in splash zone (splashRadiusPixels already converted)
-                this.applyMissileDamage(tower, impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier);
-            },
-            3.0, // maxLifeTime
-            0.5, // splashRadius in CELLS (0.5 cell radius)
-            tower.damage,  // Use tower's damage
-            this.coordSystem, // Pass coordSystem for conversion
-            tower.critChance, // Use tower's crit chance
-            tower.critMultiplier  // Use tower's crit multiplier
-        );
-        
-        this.entityManager.addEntity(missile);
-        this.debug.event('Tower fired missile');
-    }
-    
-    /**
-     * Apply damage to enemies in splash zone
-     * @param {Tower} tower - Tower that fired the missile
-     * @param {number} impactX - Impact X position
-     * @param {number} impactY - Impact Y position
-     * @param {number} splashRadius - Splash damage radius
-     * @param {number} damage - Damage amount
-     * @param {number} critChance - Critical hit chance
-     * @param {number} critMultiplier - Critical damage multiplier
-     * @returns {void}
-     */
-    applyMissileDamage(tower, impactX, impactY, splashRadius, damage, critChance = 0.0, critMultiplier = 1.5) {
-        // Visual effect for splash zone
-        this.canvasView.addSplashEffect(impactX, impactY, splashRadius);
-        
-        const enemies = this.entityManager.getEntitiesByType('enemy');
-        let hitCount = 0;
-        
-        this.debug.info(`Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius}px`);
-        
-        enemies.forEach(enemy => {
-            const dx = enemy.x - impactX;
-            const dy = enemy.y - impactY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            this.debug.debug(`Enemy ${enemy.id} at (${enemy.x.toFixed(0)}, ${enemy.y.toFixed(0)}) - distance: ${distance.toFixed(1)}px`);
-            
-            // Check if enemy is in splash zone
-            if (distance <= splashRadius) {
-                // Calculate if critical hit
-                const isCritical = Math.random() < critChance;
-                const finalDamage = isCritical ? Math.floor(damage * critMultiplier) : damage;
-                
-                const wasAlive = enemy.alive;
-                enemy.takeDamage(finalDamage);
-                hitCount++;
-                
-                // Track hit and damage
-                tower.trackHit(finalDamage, isCritical);
-                
-                // Track kill if enemy died
-                if (wasAlive && !enemy.alive) {
-                    tower.trackKill();
-                    
-                    // Delegate reward handling to Game
-                    this.game.handleEnemyKilled(enemy, tower);
-                }
-                
-                if (isCritical) {
-                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${critMultiplier}x) - (${enemy.health}/${enemy.maxHealth} HP remaining)`);
-                } else {
-                    this.debug.info(`Enemy ${enemy.id} hit for ${finalDamage} damage (${enemy.health}/${enemy.maxHealth} HP remaining)`);
-                }
-            }
-        });
-        
-        if (hitCount > 0) {
-            this.debug.success(`Missile hit ${hitCount} enemy(ies) in splash zone (radius: ${splashRadius}px)`);
-        } else {
-            this.debug.warning('Missile missed - no enemies in splash zone');
-        }
     }
     
     /**

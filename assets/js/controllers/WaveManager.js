@@ -52,7 +52,7 @@ export class WaveManager {
         
         // Emit wave started event
         const event = new WaveStartedEvent(wave, waveNumber, wave.getTotalCount());
-        wave.emit('started', event);
+        wave.events.emit('started', event);
         
         this.debug.success('Wave started', {
             totalEnemies: wave.getTotalCount(),
@@ -147,7 +147,7 @@ export class WaveManager {
         
         // Emit wave completed event
         const event = new WaveCompletedEvent(this.activeWave, waveNumber, totalSpawned);
-        this.activeWave.emit('completed', event);
+        this.activeWave.events.emit('completed', event);
         
         this.debug.success('Wave spawn complete', {
             totalSpawned,

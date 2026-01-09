@@ -3,6 +3,7 @@
  * Handles overlay, animations, and lifecycle
  */
 import { PopupOpenedEvent, PopupClosedEvent } from './events/UIEvent.js';
+import { EventBus } from './EventBus.js';
 
 export class PopupManager {
     /**
@@ -31,9 +32,9 @@ export class PopupManager {
     currentPopupType = null;
     
     /**
-     * @type {Object<string, Array<Function>>}
+     * @type {Object} EventBus handler
      */
-    eventListeners = {};
+    events;
     
     /**
      * @type {Debug}
@@ -45,7 +46,7 @@ export class PopupManager {
      */
     constructor(diContainer) {
         this.debug = diContainer.createDebug('PopupManager', true);
-        this.eventListeners = {};
+        this.events = EventBus.createHandler(this);
         this.currentPopupType = null;
     }
     
@@ -195,7 +196,7 @@ export class PopupManager {
             // Store popup type and emit event
             this.currentPopupType = popupType;
             const event = new PopupOpenedEvent(this, popupType);
-            this.emit('opened', event);
+            this.events.emit('opened', event);
         });
         
         this.debug.success('Popup shown', { title, size, popupType });
@@ -220,7 +221,7 @@ export class PopupManager {
             
             // Emit closed event
             const event = new PopupClosedEvent(this, closingPopupType);
-            this.emit('closed', event);
+            this.events.emit('closed', event);
             
             this.currentPopupType = null;
             
@@ -242,45 +243,4 @@ export class PopupManager {
         return this.isOpen;
     }
     
-    /**
-     * Add event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    on(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            this.eventListeners[eventName] = [];
-        }
-        this.eventListeners[eventName].push(callback);
-    }
-    
-    /**
-     * Remove event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    off(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
-    }
-    
-    /**
-     * Trigger event
-     * @param {string} eventName
-     * @param {*} data - Event data
-     * @returns {void}
-     * @private
-     */
-    emit(eventName, data) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName].forEach(callback => {
-            callback(data);
-        });
-    }
 }

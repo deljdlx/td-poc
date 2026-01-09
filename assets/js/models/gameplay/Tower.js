@@ -1,5 +1,6 @@
 import { Entity } from '../core/Entity.js';
 import { TowerFiredEvent } from '../../utils/events/TowerEvent.js';
+import { EventBus } from '../../utils/EventBus.js';
 
 /**
  * Tower - Defensive tower entity that shoots missiles at targets
@@ -77,9 +78,9 @@ export class Tower extends Entity {
     playerId;
     
     /**
-     * @type {Object<string, Array<Function>>}
+     * @type {Object} EventBus handler
      */
-    eventListeners = {};
+    events;
     
     /**
      * @param {Cell} cell - Grid cell where tower is placed
@@ -110,7 +111,7 @@ export class Tower extends Entity {
         this.damage = 25; // Base damage
         this.critChance = 0.0; // 0% crit chance
         this.critMultiplier = 1.5; // 1.5x crit multiplier
-        this.eventListeners = {};
+        this.events = EventBus.createHandler(this);
         
         // Stats tracking
         this.stats = {
@@ -187,7 +188,7 @@ export class Tower extends Entity {
         
         // Emit typed event
         const event = new TowerFiredEvent(this, target, null); // missile is null for now
-        this.emit('fired', event);
+        this.events.emit('fired', event);
         
         // Reset cooldown
         this.currentCooldown = this.cooldown;

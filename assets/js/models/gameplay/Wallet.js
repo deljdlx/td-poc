@@ -63,7 +63,7 @@ export class Wallet {
         // Emit resource changed event
         if (this.player) {
             const event = new PlayerResourceChangedEvent(this.player, type, amount, newAmount);
-            this.player.emit('resourceChanged', event);
+            this.player.events.emit('resourceChanged', event);
         }
         
         if (this.debug) {
@@ -104,7 +104,7 @@ export class Wallet {
                 // Emit resource changed event
         if (this.player) {
             const event = new PlayerResourceChangedEvent(this.player, type, -amount, newAmount);
-            this.player.emit('resourceChanged', event);
+            this.player.events.emit('resourceChanged', event);
         }
                 if (this.debug) {
             this.debug.info(`Spent ${amount} ${type}`, { 

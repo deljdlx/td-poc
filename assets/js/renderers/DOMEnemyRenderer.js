@@ -63,7 +63,7 @@ export class DOMEnemyRenderer {
      * @private
      */
     setupHitListener(enemy, element) {
-        enemy.on('hit', (event) => {
+        enemy.events.on('hit', (event) => {
             this.debug.info(`Enemy ${enemy.id} hit animation triggered`, {
                 damage: event.damage,
                 health: event.currentHealth
@@ -96,7 +96,7 @@ export class DOMEnemyRenderer {
      * @private
      */
     setupDeathListener(enemy, element) {
-        enemy.on('death', (event) => {
+        enemy.events.on('death', (event) => {
             this.debug.info(`Enemy ${enemy.id} death animation triggered`, {
                 position: event.position
             });

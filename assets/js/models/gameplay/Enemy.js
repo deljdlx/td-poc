@@ -1,5 +1,6 @@
 import { Entity } from '../core/Entity.js';
 import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../utils/events/EnemyEvent.js';
+import { EventBus } from '../../utils/EventBus.js';
 
 /**
  * Enemy - Enemy entity that follows paths
@@ -62,9 +63,9 @@ export class Enemy extends Entity {
     domElement = null;
     
     /**
-     * @type {Object<string, Array<Function>>}
+     * @type {Object} EventBus handler
      */
-    eventListeners = {};
+    events;
     
     /**
      * @param {number} x - Position X
@@ -80,50 +81,8 @@ export class Enemy extends Entity {
         this.maxHealth = 100;
         this.speed = 1.0; // cells per second (logical speed)
         this.goldReward = 100; // Gold awarded when killed (configurable)
-        this.eventListeners = {};
+        this.events = EventBus.createHandler(this);
         this.coordSystem = null; // Will be set when added to path
-    }
-    
-    /**
-     * Add event listener
-     * @param {string} eventName - Event name (e.g., 'hit', 'death', 'reachedEnd')
-     * @param {Function} callback - Callback function
-     * @returns {void}
-     */
-    on(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            this.eventListeners[eventName] = [];
-        }
-        this.eventListeners[eventName].push(callback);
-    }
-    
-    /**
-     * Remove event listener
-     * @param {string} eventName
-     * @param {Function} callback
-     * @returns {void}
-     */
-    off(eventName, callback) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
-    }
-    
-    /**
-     * Trigger event
-     * @param {string} eventName
-     * @param {*} data - Event data
-     * @returns {void}
-     * @private
-     */
-    emit(eventName, data) {
-        if (!this.eventListeners[eventName]) {
-            return;
-        }
-        this.eventListeners[eventName].forEach(callback => {
-            callback(data);
-        });
     }
     
     /**
@@ -137,7 +96,7 @@ export class Enemy extends Entity {
         
         // Trigger hit event with typed Event
         const event = new EnemyHitEvent(this, amount, previousHealth, this.health);
-        this.emit('hit', event);
+        this.events.emit('hit', event);
         
         if (this.health <= 0) {
             this.health = 0;
@@ -160,7 +119,7 @@ export class Enemy extends Entity {
     kill() {
         // Trigger death event before killing with typed Event
         const event = new EnemyDeathEvent(this, { x: this.x, y: this.y });
-        this.emit('death', event);
+        this.events.emit('death', event);
         
         super.kill();
     }
@@ -255,7 +214,7 @@ export class Enemy extends Entity {
     onReachEnd() {
         // Trigger reachedEnd event with typed Event
         const event = new EnemyReachedEndEvent(this, { x: this.x, y: this.y });
-        this.emit('reachedEnd', event);
+        this.events.emit('reachedEnd', event);
         
         // Enemy escaped - could deal damage to player base
         // For now, we don't kill the enemy, it loops back
