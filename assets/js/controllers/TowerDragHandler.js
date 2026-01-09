@@ -26,6 +26,9 @@ export class TowerDragHandler {
     /** @type {Cell|null} */
     sourceCell = null;
     
+    /** @type {Function|null} */
+    onTowerMoved = null;
+    
     /**
      * @param {GridModel} model
      * @param {GridView} gridView
@@ -47,6 +50,15 @@ export class TowerDragHandler {
             onDragEnd: this.handleDragEnd.bind(this),
             onCancel: this.handleCancel.bind(this)
         });
+    }
+    
+    /**
+     * Set callback for tower movement (business logic)
+     * @param {Function} callback - Called with (tower, fromCell, toCell)
+     * @returns {void}
+     */
+    setMoveCallback(callback) {
+        this.onTowerMoved = callback;
     }
     
     /**
@@ -149,9 +161,18 @@ export class TowerDragHandler {
             return false;
         }
         
-        // Drop valide : déplacer la tourelle
-        this.moveTower(tower, sourceCell, targetCell);
-        return true;
+        // Drop valide : déléguer au Game pour validation et logique métier
+        if (this.onTowerMoved) {
+            const success = this.onTowerMoved(tower, sourceCell, targetCell);
+            if (success) {
+                this.updateTowerUI(tower, sourceCell, targetCell);
+            }
+            return success;
+        } else {
+            // Fallback si pas de callback (rétrocompatibilité)
+            this.moveTower(tower, sourceCell, targetCell);
+            return true;
+        }
     }
     
     /**
@@ -186,11 +207,44 @@ export class TowerDragHandler {
     }
     
     /**
-     * Déplace une tourelle d'une cellule à une autre
+     * Update UI after tower movement (called by Game logic)
      * @param {Tower} tower
      * @param {Cell} sourceCell
      * @param {Cell} targetCell
      * @returns {void}
+     */
+    updateTowerUI(tower, sourceCell, targetCell) {
+        // Retirer la tour de la cellule source
+        sourceCell.setTower(null);
+        this.gridView.updateCell(sourceCell);
+        
+        // Ajouter la tour à la cellule cible
+        targetCell.setTower(tower);
+        this.gridView.updateCell(targetCell);
+        
+        // Mettre à jour les coordonnées de la tour (pour le canvas)
+        const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
+        tower.x = targetCenter.x;
+        tower.y = targetCenter.y;
+        tower.cell = targetCell;
+        
+        // Réactiver le drag sur la nouvelle cellule
+        this.enableTowerDrag(targetCell);
+        
+        this.debug.success('Tower UI updated', {
+            from: { row: sourceCell.row, col: sourceCell.col },
+            to: { row: targetCell.row, col: targetCell.col },
+            newPos: { x: tower.x, y: tower.y }
+        });
+    }
+    
+    /**
+     * Déplace une tourelle d'une cellule à une autre (legacy method)
+     * @param {Tower} tower
+     * @param {Cell} sourceCell
+     * @param {Cell} targetCell
+     * @returns {void}
+     * @deprecated Use updateTowerUI instead and delegate logic to Game
      */
     moveTower(tower, sourceCell, targetCell) {
         // Retirer la tour de la cellule source

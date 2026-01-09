@@ -2,6 +2,8 @@
  * PopupManager - Generic popup/modal system
  * Handles overlay, animations, and lifecycle
  */
+import { PopupOpenedEvent, PopupClosedEvent } from './events/UIEvent.js';
+
 export class PopupManager {
     /**
      * @type {HTMLElement|null}
@@ -24,6 +26,16 @@ export class PopupManager {
     onCloseCallback = null;
     
     /**
+     * @type {string|null}
+     */
+    currentPopupType = null;
+    
+    /**
+     * @type {Object<string, Array<Function>>}
+     */
+    eventListeners = {};
+    
+    /**
      * @type {Debug}
      */
     debug;
@@ -33,6 +45,8 @@ export class PopupManager {
      */
     constructor(diContainer) {
         this.debug = diContainer.createDebug('PopupManager', true);
+        this.eventListeners = {};
+        this.currentPopupType = null;
     }
     
     /**
@@ -104,7 +118,8 @@ export class PopupManager {
             closable = true,
             onClose = null,
             customClass = '',
-            buttons = []
+            buttons = [],
+            popupType = 'generic'
         } = options;
         
         this.onCloseCallback = onClose;
@@ -176,9 +191,14 @@ export class PopupManager {
         requestAnimationFrame(() => {
             this.overlay.classList.add('popup-visible');
             this.isOpen = true;
+            
+            // Store popup type and emit event
+            this.currentPopupType = popupType;
+            const event = new PopupOpenedEvent(this, popupType);
+            this.emit('opened', event);
         });
         
-        this.debug.success('Popup shown', { title, size });
+        this.debug.success('Popup shown', { title, size, popupType });
     }
     
     /**
@@ -188,6 +208,8 @@ export class PopupManager {
     hide() {
         if (!this.isOpen) return;
         
+        const closingPopupType = this.currentPopupType;
+        
         this.overlay.classList.remove('popup-visible');
         
         // Wait for animation to complete
@@ -195,6 +217,12 @@ export class PopupManager {
             this.overlay.style.display = 'none';
             this.container.innerHTML = '';
             this.isOpen = false;
+            
+            // Emit closed event
+            const event = new PopupClosedEvent(this, closingPopupType);
+            this.emit('closed', event);
+            
+            this.currentPopupType = null;
             
             // Call onClose callback
             if (this.onCloseCallback) {
@@ -212,5 +240,47 @@ export class PopupManager {
      */
     isPopupOpen() {
         return this.isOpen;
+    }
+    
+    /**
+     * Add event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    on(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            this.eventListeners[eventName] = [];
+        }
+        this.eventListeners[eventName].push(callback);
+    }
+    
+    /**
+     * Remove event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    off(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
+    }
+    
+    /**
+     * Trigger event
+     * @param {string} eventName
+     * @param {*} data - Event data
+     * @returns {void}
+     * @private
+     */
+    emit(eventName, data) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName].forEach(callback => {
+            callback(data);
+        });
     }
 }

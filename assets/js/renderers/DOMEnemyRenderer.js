@@ -63,8 +63,11 @@ export class DOMEnemyRenderer {
      * @private
      */
     setupHitListener(enemy, element) {
-        enemy.on('hit', (data) => {
-            this.debug.info(`Enemy ${enemy.id} hit animation triggered`);
+        enemy.on('hit', (event) => {
+            this.debug.info(`Enemy ${enemy.id} hit animation triggered`, {
+                damage: event.damage,
+                health: event.currentHealth
+            });
             
             // Remove old hit class if exists (in case of multiple hits)
             element.classList.remove('hit');
@@ -93,8 +96,10 @@ export class DOMEnemyRenderer {
      * @private
      */
     setupDeathListener(enemy, element) {
-        enemy.on('death', (data) => {
-            this.debug.info(`Enemy ${enemy.id} death animation triggered`);
+        enemy.on('death', (event) => {
+            this.debug.info(`Enemy ${enemy.id} death animation triggered`, {
+                position: event.position
+            });
             
             // Add dying class to trigger animation
             element.classList.add('dying');

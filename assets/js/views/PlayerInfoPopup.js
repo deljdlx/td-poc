@@ -64,6 +64,7 @@ export class PlayerInfoPopup {
             size: 'medium',
             closable: true,
             customClass: 'player-info-popup',
+            popupType: 'player-info',
             buttons: [
                 {
                     label: 'Close',

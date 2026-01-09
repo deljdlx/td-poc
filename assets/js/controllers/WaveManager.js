@@ -1,4 +1,5 @@
 import { Enemy } from '../models/Enemy.js';
+import { WaveStartedEvent, WaveCompletedEvent } from '../utils/events/WaveEvent.js';
 
 /**
  * WaveManager - Handles enemy wave spawning
@@ -36,9 +37,10 @@ export class WaveManager {
     /**
      * Start a wave
      * @param {Wave} wave
+     * @param {number} [waveNumber=1] - Wave number for tracking
      * @returns {void}
      */
-    startWave(wave) {
+    startWave(wave, waveNumber = 1) {
         if (this.isSpawning) {
             this.debug.warning('Wave already in progress');
             return;
@@ -48,9 +50,14 @@ export class WaveManager {
         this.spawnTimer = 0;
         this.isSpawning = true;
         
+        // Emit wave started event
+        const event = new WaveStartedEvent(wave, waveNumber, wave.getTotalCount());
+        wave.emit('started', event);
+        
         this.debug.success('Wave started', {
             totalEnemies: wave.getTotalCount(),
-            spawnDelay: wave.spawnDelay
+            spawnDelay: wave.spawnDelay,
+            waveNumber
         });
     }
     
@@ -128,11 +135,23 @@ export class WaveManager {
     
     /**
      * Called when all enemies have been spawned
+     * @param {number} [waveNumber=1] - Wave number
      * @returns {void}
      */
-    onWaveComplete() {
+    onWaveComplete(waveNumber = 1) {
+        if (!this.activeWave) {
+            return;
+        }
+        
+        const totalSpawned = this.activeWave.getTotalCount();
+        
+        // Emit wave completed event
+        const event = new WaveCompletedEvent(this.activeWave, waveNumber, totalSpawned);
+        this.activeWave.emit('completed', event);
+        
         this.debug.success('Wave spawn complete', {
-            totalSpawned: this.activeWave.getTotalCount()
+            totalSpawned,
+            waveNumber
         });
         
         this.isSpawning = false;

@@ -1,4 +1,5 @@
 import { Entity } from './Entity.js';
+import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../utils/events/EnemyEvent.js';
 
 /**
  * Enemy - Enemy entity that follows paths
@@ -134,13 +135,9 @@ export class Enemy extends Entity {
         const previousHealth = this.health;
         this.health -= amount;
         
-        // Trigger hit event
-        this.emit('hit', {
-            damage: amount,
-            previousHealth: previousHealth,
-            currentHealth: this.health,
-            enemy: this
-        });
+        // Trigger hit event with typed Event
+        const event = new EnemyHitEvent(this, amount, previousHealth, this.health);
+        this.emit('hit', event);
         
         if (this.health <= 0) {
             this.health = 0;
@@ -161,11 +158,9 @@ export class Enemy extends Entity {
      * @returns {void}
      */
     kill() {
-        // Trigger death event before killing
-        this.emit('death', {
-            enemy: this,
-            position: { x: this.x, y: this.y }
-        });
+        // Trigger death event before killing with typed Event
+        const event = new EnemyDeathEvent(this, { x: this.x, y: this.y });
+        this.emit('death', event);
         
         super.kill();
     }
@@ -258,11 +253,9 @@ export class Enemy extends Entity {
      * @returns {void}
      */
     onReachEnd() {
-        // Trigger reachedEnd event
-        this.emit('reachedEnd', {
-            enemy: this,
-            position: { x: this.x, y: this.y }
-        });
+        // Trigger reachedEnd event with typed Event
+        const event = new EnemyReachedEndEvent(this, { x: this.x, y: this.y });
+        this.emit('reachedEnd', event);
         
         // Enemy escaped - could deal damage to player base
         // For now, we don't kill the enemy, it loops back

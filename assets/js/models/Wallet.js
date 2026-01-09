@@ -1,4 +1,5 @@
 import { ResourceRegistry } from './Resource.js';
+import { PlayerResourceChangedEvent } from '../utils/events/PlayerEvent.js';
 
 /**
  * Wallet - Manages player's resource inventory
@@ -16,9 +17,16 @@ export class Wallet {
     debug = null;
     
     /**
+     * @type {Object|null} - Player who owns this wallet
+     */
+    player = null;
+    
+    /**
+     * @param {Object} [player=null] - Player instance
      * @param {Debug} [debug=null] - Optional debug instance
      */
-    constructor(debug = null) {
+    constructor(player = null, debug = null) {
+        this.player = player;
         this.debug = debug;
     }
     
@@ -51,6 +59,12 @@ export class Wallet {
         }
         
         this.resources.set(type, newAmount);
+        
+        // Emit resource changed event
+        if (this.player) {
+            const event = new PlayerResourceChangedEvent(this.player, type, amount, newAmount);
+            this.player.emit('resourceChanged', event);
+        }
         
         if (this.debug) {
             this.debug.info(`Added ${amount} ${type}`, { 
@@ -87,8 +101,12 @@ export class Wallet {
         const current = this.get(type);
         const newAmount = current - amount;
         this.resources.set(type, newAmount);
-        
-        if (this.debug) {
+                // Emit resource changed event
+        if (this.player) {
+            const event = new PlayerResourceChangedEvent(this.player, type, -amount, newAmount);
+            this.player.emit('resourceChanged', event);
+        }
+                if (this.debug) {
             this.debug.info(`Spent ${amount} ${type}`, { 
                 current, 
                 remaining: newAmount 

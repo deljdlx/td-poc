@@ -1,4 +1,5 @@
 import { Entity } from './Entity.js';
+import { TowerFiredEvent } from '../utils/events/TowerEvent.js';
 
 /**
  * Tower - Defensive tower entity that shoots missiles at targets
@@ -76,6 +77,11 @@ export class Tower extends Entity {
     playerId;
     
     /**
+     * @type {Object<string, Array<Function>>}
+     */
+    eventListeners = {};
+    
+    /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {string} playerId - ID of the player who owns this tower
      * @param {Function} onShoot - Callback to create missiles: (tower, x, y, targetX, targetY) => void
@@ -104,6 +110,7 @@ export class Tower extends Entity {
         this.damage = 25; // Base damage
         this.critChance = 0.0; // 0% crit chance
         this.critMultiplier = 1.5; // 1.5x crit multiplier
+        this.eventListeners = {};
         
         // Stats tracking
         this.stats = {
@@ -118,12 +125,55 @@ export class Tower extends Entity {
     }
     
     /**
+     * Add event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    on(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            this.eventListeners[eventName] = [];
+        }
+        this.eventListeners[eventName].push(callback);
+    }
+    
+    /**
+     * Remove event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    off(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
+    }
+    
+    /**
+     * Trigger event
+     * @param {string} eventName
+     * @param {*} data - Event data
+     * @returns {void}
+     * @private
+     */
+    emit(eventName, data) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName].forEach(callback => {
+            callback(data);
+        });
+    }
+    
+    /**
      * Shoot missile towards target position
      * @param {number} targetX
      * @param {number} targetY
+     * @param {Enemy} [target=null] - Target enemy (optional)
      * @returns {boolean} - True if shot was fired, false if on cooldown
      */
-    shoot(targetX, targetY) {
+    shoot(targetX, targetY, target = null) {
         if (!this.canShoot()) {
             return false;
         }
@@ -134,6 +184,10 @@ export class Tower extends Entity {
         
         // Track shot
         this.stats.shotsFired++;
+        
+        // Emit typed event
+        const event = new TowerFiredEvent(this, target, null); // missile is null for now
+        this.emit('fired', event);
         
         // Reset cooldown
         this.currentCooldown = this.cooldown;
@@ -180,7 +234,7 @@ export class Tower extends Entity {
         if (this.canShoot()) {
             const enemy = this.getClosestEnemyInRange(this.entityManager);
             if (enemy) {
-                this.shoot(enemy.x, enemy.y);
+                this.shoot(enemy.x, enemy.y, enemy);
             }
         }
     }

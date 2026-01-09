@@ -8,6 +8,9 @@ import { TowerStatsPopup } from './views/TowerStatsPopup.js';
 import { PlayerInfoPopup } from './views/PlayerInfoPopup.js';
 import { UIUpdateManager } from './utils/UIUpdateManager.js';
 import { PlayerManager } from './models/PlayerManager.js';
+import { Game } from './models/Game.js';
+import { WaveManager } from './controllers/WaveManager.js';
+import { TowerDragHandler } from './controllers/TowerDragHandler.js';
 
 /**
  * Configuration et initialisation du conteneur DI
@@ -67,6 +70,24 @@ export function bootstrapDI() {
     // PlayerInfoPopup (singleton)
     container.registerFactory('playerInfoPopup', (container) => {
         return new PlayerInfoPopup(container);
+    });
+    
+    // WaveManager (singleton)
+    container.registerFactory('waveManager', (container) => {
+        const entityManager = container.get('entityManager');
+        const coordSystem = container.get('coordinateSystem');
+        return new WaveManager(entityManager, coordSystem, container);
+    });
+    
+    // TowerDragHandler (singleton) - Will be initialized with gridModel by AppController
+    container.registerFactory('towerDragHandler', (container) => {
+        return null; // Lazy initialization by AppController after gridModel creation
+    });
+    
+    // Game (singleton) - Core game logic
+    container.registerFactory('game', (container) => {
+        // gridModel will be set by AppController after creation
+        return null; // Lazy initialization by AppController
     });
     
     // Autres services à ajouter au besoin...

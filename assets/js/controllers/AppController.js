@@ -6,9 +6,7 @@ import { Missile } from '../models/Missile.js';
 import { Tower } from '../models/Tower.js';
 import { Enemy } from '../models/Enemy.js';
 import { TowerDragHandler } from './TowerDragHandler.js';
-import { PathFactory } from '../models/PathFactory.js';
-import { Wave } from '../models/Wave.js';
-import { WaveManager } from './WaveManager.js';
+import { Game } from '../models/Game.js';
 
 /**
  * Contrôleur principal de l'application
@@ -44,8 +42,8 @@ export class AppController {
     /** @type {TowerDragHandler} */
     towerDragHandler = null;
     
-    /** @type {WaveManager} */
-    waveManager = null;
+    /** @type {Game} */
+    game = null;
     
     /** @type {TowerRangeView} */
     towerRangeView = null;
@@ -76,6 +74,7 @@ export class AppController {
         this.playerInfoPopup = this.container.get('playerInfoPopup');
         this.playerManager = this.container.get('playerManager');
         const uiUpdateManager = this.container.get('uiUpdateManager');
+        const waveManager = this.container.get('waveManager');
         
         // Initialisation avec injection
         this.model = new GridModel(15, 10, this.container);
@@ -83,7 +82,17 @@ export class AppController {
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
         this.towerRangeView = new TowerRangeView(this.container);
         
-        // Initialiser le gestionnaire de drag and drop des tourelles
+        // Initialize Game with all dependencies
+        this.game = new Game(
+            this.model,
+            this.entityManager,
+            this.playerManager,
+            waveManager,
+            this.coordSystem,
+            this.container
+        );
+        
+        // Initialize TowerDragHandler (UI service)
         this.towerDragHandler = new TowerDragHandler(
             this.model,
             this.gridView,
@@ -91,6 +100,11 @@ export class AppController {
             this.entityManager,
             this.container
         );
+        
+        // Connect TowerDragHandler to Game (delegation pattern)
+        this.towerDragHandler.setMoveCallback((tower, fromCell, toCell) => {
+            return this.game.moveTower(tower, fromCell, toCell);
+        });
         
         this.debug.success('Application initialisée avec succès', {
             rows: this.model.rows,
@@ -100,25 +114,18 @@ export class AppController {
         // Rendu initial
         this.gridView.render();
         
-        // Créer et ajouter le path périmètre
-        const perimeterPath = PathFactory.createPerimeter(
-            this.model,
-            this.coordSystem,
-            this.container
-        );
-        this.model.addPath(perimeterPath);
+        // Initialize Game (creates paths, etc.)
+        this.game.init();
         this.gridView.renderPaths();
-        this.debug.success('Path périmètre créé et affiché');
         
-        // Initialiser WaveManager
-        this.waveManager = new WaveManager(
-            this.entityManager,
-            this.coordSystem,
-            this.container
-        );
+        // Placer des tours aléatoirement pour le test
+        const placedCells = this.game.placeRandomTowers(5, this.createMissileFromTower.bind(this));
         
-        // Placer des tours aléatoirement
-        this.placeRandomTowers(5);
+        // Enable drag and drop for placed towers
+        placedCells.forEach(cell => {
+            this.towerDragHandler.enableTowerDrag(cell);
+            this.gridView.updateCell(cell);
+        });
         
         // Bind events
         this.bindEvents();
@@ -126,35 +133,10 @@ export class AppController {
         // Configurer et démarrer GameClock
         this.setupGameClock();
         
-        // Démarrer une vague de test
-        this.startTestWave();
+        // Start the game (will start first wave)
+        this.game.start();
     }
-    
-    /**
-     * Start a test wave
-     * @returns {void}
-     */
-    startTestWave() {
-        const perimeterPath = this.model.getPaths()[0];
-        
-        if (!perimeterPath) {
-            this.debug.error('No path available for wave');
-            return;
-        }
-        
-        // Créer une vague : 10 ennemis basiques, 1 par seconde
-        const wave = new Wave(
-            [
-                { type: 'basic', health: 100, speed: 1.0, count: 10 } // speed: 1 cell/second
-            ],
-            1.0, // 1 second between spawns
-            perimeterPath
-        );
-        
-        this.waveManager.startWave(wave);
-        this.debug.success('Test wave started');
-    }
-    
+
     /**
      * Configure la GameClock
      * @returns {void}
@@ -177,49 +159,14 @@ export class AppController {
     }
     
     /**
-     * Place N towers randomly on empty cells
-     * @param {number} count - Number of towers to place
+     * Enable drag and drop for placed towers
+     * @param {Cell} cell
      * @returns {void}
+     * @private
      */
-    placeRandomTowers(count) {
-        const emptyCells = this.model.getEmptyCells();
-        
-        if (emptyCells.length < count) {
-            this.debug.warning(`Not enough empty cells for ${count} towers, placing ${emptyCells.length}`);
-            count = emptyCells.length;
-        }
-        
-        // Shuffle and take first N cells
-        const shuffled = emptyCells.sort(() => Math.random() - 0.5);
-        const selectedCells = shuffled.slice(0, count);
-        
-        const activePlayer = this.playerManager.getActivePlayer();
-        if (!activePlayer) {
-            this.debug.error('Cannot place towers - no active player');
-            return;
-        }
-        
-        selectedCells.forEach(cell => {
-            const tower = new Tower(
-                cell, 
-                activePlayer.id, 
-                this.createMissileFromTower.bind(this), 
-                this.container
-            );
-            cell.setTower(tower);
-            this.entityManager.addEntity(tower);
-            this.gridView.updateCell(cell);
-            
-            // Register tower with player
-            activePlayer.addTower(tower);
-            
-            // Activer le drag and drop sur cette tourelle
-            this.towerDragHandler.enableTowerDrag(cell);
-        });
-        
-        this.debug.success(`Placed ${count} towers for ${activePlayer.name}`, {
-            totalTowers: activePlayer.towers.length
-        });
+    enableTowerDragForCell(cell) {
+        this.towerDragHandler.enableTowerDrag(cell);
+        this.gridView.updateCell(cell);
     }
     
     /**
@@ -299,14 +246,8 @@ export class AppController {
                 if (wasAlive && !enemy.alive) {
                     tower.trackKill();
                     
-                    // Award gold to tower owner
-                    const owner = this.playerManager.players.find(p => p.id === tower.playerId);
-                    if (owner) {
-                        owner.wallet.add('money', enemy.goldReward);
-                        owner.stats.enemiesKilled++;
-                        owner.score += enemy.goldReward; // Award score points too
-                        this.debug.success(`💰 ${owner.name} earned ${enemy.goldReward} gold (Total: ${owner.wallet.get('money')})`);
-                    }
+                    // Delegate reward handling to Game
+                    this.game.handleEnemyKilled(enemy, tower);
                 }
                 
                 if (isCritical) {
@@ -330,13 +271,8 @@ export class AppController {
      * @returns {void}
      */
     updateGameplay(deltaTime) {
-        // Update wave spawning
-        if (this.waveManager) {
-            this.waveManager.update(deltaTime);
-        }
-        
-        // Update all game entities (missiles, towers, enemies, etc.)
-        this.entityManager.update(deltaTime);
+        // Delegate to Game
+        this.game.update(deltaTime);
     }
     
     /**

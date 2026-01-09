@@ -51,6 +51,7 @@ export class TowerStatsPopup {
             size: 'medium',
             closable: true,
             customClass: 'tower-stats-popup',
+            popupType: 'tower-stats',
             buttons: [
                 {
                     label: 'Close',

@@ -1,4 +1,5 @@
 import { Wallet } from './Wallet.js';
+import { PlayerDamagedEvent } from '../utils/events/PlayerEvent.js';
 
 /**
  * Player - Represents a player in the game
@@ -50,6 +51,11 @@ export class Player {
     };
     
     /**
+     * @type {Object<string, Array<Function>>}
+     */
+    eventListeners = {};
+    
+    /**
      * @param {string} id - Unique player identifier
      * @param {string} name - Player name
      * @param {string} color - Player color (for visual distinction)
@@ -59,7 +65,8 @@ export class Player {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.wallet = new Wallet(debug);
+        this.eventListeners = {};
+        this.wallet = new Wallet(this, debug);
         
         // Initialize with starting resources
         this.wallet.set('money', 1000);
@@ -112,5 +119,61 @@ export class Player {
      */
     isAlive() {
         return this.lives > 0;
+    }
+    
+    /**
+     * Player takes damage (loses lives)
+     * @param {number} livesLost
+     * @returns {void}
+     */
+    takeDamage(livesLost = 1) {
+        const previousLives = this.lives;
+        this.lives = Math.max(0, this.lives - livesLost);
+        
+        // Emit damaged event
+        const event = new PlayerDamagedEvent(this, livesLost, this.lives);
+        this.emit('damaged', event);
+    }
+    
+    /**
+     * Add event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    on(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            this.eventListeners[eventName] = [];
+        }
+        this.eventListeners[eventName].push(callback);
+    }
+    
+    /**
+     * Remove event listener
+     * @param {string} eventName
+     * @param {Function} callback
+     * @returns {void}
+     */
+    off(eventName, callback) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
+    }
+    
+    /**
+     * Trigger event
+     * @param {string} eventName
+     * @param {*} data - Event data
+     * @returns {void}
+     * @private
+     */
+    emit(eventName, data) {
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+        this.eventListeners[eventName].forEach(callback => {
+            callback(data);
+        });
     }
 }
