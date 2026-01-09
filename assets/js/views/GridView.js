@@ -246,12 +246,6 @@ export class GridView {
      */
     updateCell(cell) {
         if (cell.element) {
-            if (cell.selected) {
-                cell.element.classList.add('selected');
-            } else {
-                cell.element.classList.remove('selected');
-            }
-            
             if (cell.hasTower()) {
                 cell.element.classList.add('has-tower');
             } else {

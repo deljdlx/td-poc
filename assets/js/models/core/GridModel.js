@@ -57,21 +57,6 @@ export class GridModel {
     }
     
     /**
-     * @returns {Cell[]}
-     */
-    getSelectedCells() {
-        const selected = [];
-        for (let row = 0; row < this.rows; row++) {
-            for (let col = 0; col < this.cols; col++) {
-                if (this.cells[row][col].selected) {
-                    selected.push(this.cells[row][col]);
-                }
-            }
-        }
-        return selected;
-    }
-    
-    /**
      * @param {Path} path
      * @returns {void}
      */

@@ -203,8 +203,6 @@ export class AppController {
                 this.playerInfoPopup.show();
             });
         }
-        
-        window.addEventListener('resize', this.handleResize.bind(this));
     }
     
     /**
@@ -244,54 +242,6 @@ export class AppController {
     }
     
     /**
-     * Find closest enemy to a tower
-     * @param {Tower} tower
-     * @returns {Enemy|null}
-     */
-    findClosestEnemy(tower) {
-        const enemies = this.entityManager.getEntities().filter(e => e.getType() === 'enemy' && e.alive);
-        
-        if (enemies.length === 0) {
-            return null;
-        }
-        
-        let closest = null;
-        let minDistance = Infinity;
-        
-        enemies.forEach(enemy => {
-            const dx = enemy.x - tower.x;
-            const dy = enemy.y - tower.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                closest = enemy;
-            }
-        });
-        
-        return closest;
-    }
-
-    /**
-     * Spawn enemy at position
-     * @param {number} x
-     * @param {number} y
-     * @returns {void}
-     */
-    spawnEnemy(x, y) {
-        const enemy = new Enemy(x, y);
-        this.entityManager.addEntity(enemy);
-        this.debug.success('Enemy spawned', { x, y });
-    }
-    
-    /**
-     * @returns {void}
-     */
-    handleResize() {
-        this.updateCanvas();
-    }
-    
-    /**
      * Handle cell hover to show tower range
      * @param {MouseEvent} event
      * @returns {void}
@@ -317,7 +267,6 @@ export class AppController {
         // Show range for this tower
         const tower = cell.getTower();
         this.towerRangeView.show(tower);
-        // this.debug.debug('Showing tower range', { row, col, range: tower.range });
     }
     
     /**
@@ -326,17 +275,6 @@ export class AppController {
      */
     handleCellLeave() {
         this.towerRangeView.hide();
-    }
-    
-    /**
-     * @returns {void}
-     */
-    updateCanvas() {
-        const selectedCells = this.gridSystem.getSelectedCells();
-        this.debug.data('Mise à jour du canvas', {
-            cellCount: selectedCells.length
-        });
-        this.canvasView.drawConnections(selectedCells);
     }
     
     /**

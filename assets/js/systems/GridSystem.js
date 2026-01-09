@@ -101,14 +101,6 @@ export class GridSystem {
     }
     
     /**
-     * Get selected cells
-     * @returns {Array<Cell>}
-     */
-    getSelectedCells() {
-        return this.model.getSelectedCells();
-    }
-    
-    /**
      * Destroy grid system and cleanup all resources
      * @returns {void}
      */

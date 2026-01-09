@@ -9,9 +9,6 @@ export class Cell {
     col = 0;
     
     /** @type {boolean} */
-    selected = false;
-    
-    /** @type {boolean} */
     isTarget = false;
     
     /** @type {boolean} */
@@ -30,13 +27,6 @@ export class Cell {
     constructor(row, col) {
         this.row = row;
         this.col = col;
-    }
-    
-    /**
-     * @returns {void}
-     */
-    toggle() {
-        this.selected = !this.selected;
     }
     
     /**
