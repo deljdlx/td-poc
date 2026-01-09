@@ -36,6 +36,11 @@ export class Enemy extends Entity {
     speed;
     
     /**
+     * @type {number}
+     */
+    goldReward = 100;
+    
+    /**
      * @type {Path|null}
      */
     path = null;
@@ -73,6 +78,7 @@ export class Enemy extends Entity {
         this.health = 100;
         this.maxHealth = 100;
         this.speed = 1.0; // cells per second (logical speed)
+        this.goldReward = 100; // Gold awarded when killed (configurable)
         this.eventListeners = {};
         this.coordSystem = null; // Will be set when added to path
     }

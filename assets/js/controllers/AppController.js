@@ -298,6 +298,15 @@ export class AppController {
                 // Track kill if enemy died
                 if (wasAlive && !enemy.alive) {
                     tower.trackKill();
+                    
+                    // Award gold to tower owner
+                    const owner = this.playerManager.players.find(p => p.id === tower.playerId);
+                    if (owner) {
+                        owner.wallet.add('money', enemy.goldReward);
+                        owner.stats.enemiesKilled++;
+                        owner.score += enemy.goldReward; // Award score points too
+                        this.debug.success(`💰 ${owner.name} earned ${enemy.goldReward} gold (Total: ${owner.wallet.get('money')})`);
+                    }
                 }
                 
                 if (isCritical) {
