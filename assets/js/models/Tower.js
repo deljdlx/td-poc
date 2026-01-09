@@ -71,11 +71,17 @@ export class Tower extends Entity {
     critMultiplier;
     
     /**
+     * @type {string}
+     */
+    playerId;
+    
+    /**
      * @param {Cell} cell - Grid cell where tower is placed
-     * @param {Function} onShoot - Callback to create missiles: (x, y, targetX, targetY) => void
+     * @param {string} playerId - ID of the player who owns this tower
+     * @param {Function} onShoot - Callback to create missiles: (tower, x, y, targetX, targetY) => void
      * @param {DIContainer} diContainer
      */
-    constructor(cell, onShoot, diContainer) {
+    constructor(cell, playerId, onShoot, diContainer) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
         const entityManager = diContainer.get('entityManager');
@@ -86,8 +92,9 @@ export class Tower extends Entity {
         super('tower', center.x, center.y);
         
         this.cell = cell;
+        this.playerId = playerId;
         this.onShoot = onShoot;
-        this.color = '#6366f1'; // Blue for towers
+        this.color = '#6366f1'; // Blue for towers (will be player color later)
         this.size = 8;
         this.range = 3.5; // Range in cells (logical unit)
         this.coordSystem = coordSystem;

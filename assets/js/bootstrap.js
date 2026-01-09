@@ -6,6 +6,7 @@ import { EntityManager } from './models/EntityManager.js';
 import { PopupManager } from './utils/PopupManager.js';
 import { TowerStatsPopup } from './views/TowerStatsPopup.js';
 import { UIUpdateManager } from './utils/UIUpdateManager.js';
+import { PlayerManager } from './models/PlayerManager.js';
 
 /**
  * Configuration et initialisation du conteneur DI
@@ -37,6 +38,14 @@ export function bootstrapDI() {
     // EntityManager (singleton)
     container.registerFactory('entityManager', (container) => {
         return new EntityManager(container);
+    });
+    
+    // PlayerManager (singleton)
+    container.registerFactory('playerManager', (container) => {
+        const playerManager = new PlayerManager(container);
+        // Create default player for single-player mode
+        playerManager.createPlayer('player1', 'Player 1', '#6366f1');
+        return playerManager;
     });
     
     // UIUpdateManager (singleton)

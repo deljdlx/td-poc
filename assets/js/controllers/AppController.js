@@ -38,6 +38,9 @@ export class AppController {
     /** @type {EntityManager} */
     entityManager = null;
     
+    /** @type {PlayerManager} */
+    playerManager = null;
+    
     /** @type {TowerDragHandler} */
     towerDragHandler = null;
     
@@ -70,6 +73,7 @@ export class AppController {
         this.gameClock = this.container.get('gameClock');
         this.entityManager = this.container.get('entityManager');
         this.towerStatsPopup = this.container.get('towerStatsPopup');
+        this.playerManager = this.container.get('playerManager');
         const uiUpdateManager = this.container.get('uiUpdateManager');
         
         // Initialisation avec injection
@@ -188,17 +192,33 @@ export class AppController {
         const shuffled = emptyCells.sort(() => Math.random() - 0.5);
         const selectedCells = shuffled.slice(0, count);
         
+        const activePlayer = this.playerManager.getActivePlayer();
+        if (!activePlayer) {
+            this.debug.error('Cannot place towers - no active player');
+            return;
+        }
+        
         selectedCells.forEach(cell => {
-            const tower = new Tower(cell, this.createMissileFromTower.bind(this), this.container);
+            const tower = new Tower(
+                cell, 
+                activePlayer.id, 
+                this.createMissileFromTower.bind(this), 
+                this.container
+            );
             cell.setTower(tower);
             this.entityManager.addEntity(tower);
             this.gridView.updateCell(cell);
+            
+            // Register tower with player
+            activePlayer.addTower(tower);
             
             // Activer le drag and drop sur cette tourelle
             this.towerDragHandler.enableTowerDrag(cell);
         });
         
-        this.debug.success(`Placed ${count} towers randomly`);
+        this.debug.success(`Placed ${count} towers for ${activePlayer.name}`, {
+            totalTowers: activePlayer.towers.length
+        });
     }
     
     /**

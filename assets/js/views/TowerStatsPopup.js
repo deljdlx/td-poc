@@ -232,9 +232,10 @@ export class TowerStatsPopup {
                 <div class="stats-section">
                     <h3 class="stats-section-title">
                         <span class="stats-icon">📍</span>
-                        Location
+                        Info
                     </h3>
                     <div class="stats-info">
+                        Owner: <strong>${tower.playerId}</strong><br>
                         Position: <strong>Row ${tower.cell.row}, Column ${tower.cell.col}</strong>
                     </div>
                 </div>
