@@ -1,6 +1,6 @@
 import { DIContainer } from './utils/DIContainer.js';
 import { Debug } from './utils/Debug.js';
-import { CoordinateSystem } from './utils/CoordinateSystem.js';
+import { CoordinateSystem } from './services/engine/CoordinateSystem.js';
 import { GameClock } from './utils/GameClock.js';
 import { EntityManager } from './models/core/EntityManager.js';
 import { PopupManager } from './ux/PopupManager.js';
