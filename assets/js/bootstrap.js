@@ -3,7 +3,7 @@ import { Debug } from './utils/Debug.js';
 import { CoordinateSystem } from './utils/CoordinateSystem.js';
 import { GameClock } from './utils/GameClock.js';
 import { EntityManager } from './models/core/EntityManager.js';
-import { PopupManager } from './utils/PopupManager.js';
+import { PopupManager } from './ux/PopupManager.js';
 import { TowerStatsPopup } from './views/TowerStatsPopup.js';
 import { PlayerInfoPopup } from './views/PlayerInfoPopup.js';
 import { UIUpdateManager } from './utils/UIUpdateManager.js';
