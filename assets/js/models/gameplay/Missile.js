@@ -1,4 +1,5 @@
 import { Entity } from '../core/Entity.js';
+import { MissileAttributes } from '../core/MissileAttributes.js';
 
 /**
  * Missile - Projectile entity that travels from source to target
@@ -71,7 +72,7 @@ export class Missile extends Entity {
     maxLifeTime;
     
     /**
-     * @type {Object} - Gameplay attributes (munition stats)
+     * @type {MissileAttributes} - Gameplay attributes (munition stats)
      */
     attributes;
     
@@ -119,10 +120,7 @@ export class Missile extends Entity {
         this.maxLifeTime = maxLifeTime;
         
         // Gameplay attributes (munition stats)
-        this.attributes = {
-            damage: damage,
-            splashRadius: splashRadius
-        };
+        this.attributes = new MissileAttributes(damage, splashRadius);
         
         this.coordSystem = coordSystem;
     }
