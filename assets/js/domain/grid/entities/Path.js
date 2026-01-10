@@ -1,14 +1,11 @@
-import { PathElement } from '../../domain/grid/entities/PathElement.js';
+import { PathAttributes } from '../value-objects/PathAttributes.js';
 
 /**
- * Représente un chemin composé d'une séquence de PathElement
+ * Entity - Chemin composé d'une séquence de PathElement
  */
 export class Path {
-    /** @type {PathElement[]} */
-    elements = [];
-    
-    /** @type {boolean} - true si le chemin forme une boucle (départ === arrivée) */
-    isClosed = false;
+    /** @type {PathAttributes} */
+    attributes = null;
     
     /** @type {Debug} */
     debug = null;
@@ -19,8 +16,7 @@ export class Path {
      * @param {DIContainer} diContainer
      */
     constructor(elements, isClosed, diContainer) {
-        this.elements = elements;
-        this.isClosed = isClosed;
+        this.attributes = new PathAttributes(elements, isClosed);
         this.debug = diContainer.createDebug('Path', true);
         
         this.debug.info('Path created', {
@@ -29,6 +25,16 @@ export class Path {
             start: elements[0]?.cell.getLabel(),
             end: elements[elements.length - 1]?.cell.getLabel()
         });
+    }
+    
+    /** @returns {PathElement[]} */
+    get elements() {
+        return this.attributes.elements;
+    }
+    
+    /** @returns {boolean} */
+    get isClosed() {
+        return this.attributes.isClosed;
     }
     
     /**

@@ -1,4 +1,4 @@
-import { Path } from '../gameplay/Path.js';
+import { Path } from '../../domain/grid/entities/Path.js';
 import { PathElement } from '../../domain/grid/entities/PathElement.js';
 
 /**
