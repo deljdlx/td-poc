@@ -4,7 +4,7 @@ import { Wave } from './Wave.js';
 import { PathFactory } from '../core/PathFactory.js';
 import { Missile } from '../../domain/combat/entities/Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../events/GameEvent.js';
-import { EventBus } from '../../utils/EventBus.js';
+import { EventBus } from '../../services/core/EventBus.js';
 
 /**
  * Game - Core game logic and state management

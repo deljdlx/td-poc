@@ -1,13 +1,10 @@
-import { Entity } from '../../../models/core/Entity.js';
-import { TowerAttributes } from '../value-objects/TowerAttributes.js';
-import { TowerFiredEvent } from '../../../events/TowerEvent.js';
-import { EventBus } from '../../../services/core/EventBus.js';
+import { Entity } from '../core/Entity.js';
+import { TowerFiredEvent } from '../../events/TowerEvent.js';
+import { EventBus } from '../../services/core/EventBus.js';
 
 /**
  * Tower - Defensive tower entity that shoots missiles at targets
  * Placed on grid cells, shoots on demand (click)
- * 
- * Domain Entity (Combat Bounded Context)
  */
 export class Tower extends Entity {
     /**
@@ -31,7 +28,7 @@ export class Tower extends Entity {
     size;
     
     /**
-     * @type {TowerAttributes} - Gameplay attributes (tower stats)
+     * @type {Object} - Gameplay attributes (tower stats)
      */
     attributes;
     
@@ -92,7 +89,12 @@ export class Tower extends Entity {
         this.events = EventBus.createHandler(this);
         
         // Gameplay attributes (tower stats)
-        this.attributes = new TowerAttributes(3.5, 1.0, 0.0, 1.5);
+        this.attributes = {
+            range: 3.5,          // Range in cells (logical unit)
+            cooldown: 1.0,       // 1 second between shots
+            critChance: 0.0,     // 0% crit chance
+            critMultiplier: 1.5  // 1.5x crit multiplier
+        };
         
         // Stats tracking
         this.stats = {

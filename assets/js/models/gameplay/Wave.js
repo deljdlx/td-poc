@@ -1,5 +1,5 @@
 import { WaveStartedEvent, WaveCompletedEvent } from '../../events/WaveEvent.js';
-import { EventBus } from '../../utils/EventBus.js';
+import { EventBus } from '../../services/core/EventBus.js';
 
 /**
  * Wave configuration - defines a wave of enemies

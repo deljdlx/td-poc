@@ -3,7 +3,7 @@
  * Handles overlay, animations, and lifecycle
  */
 import { PopupOpenedEvent, PopupClosedEvent } from '../events/UIEvent.js';
-import { EventBus } from '../utils/EventBus.js';
+import { EventBus } from '../services/core/EventBus.js';
 
 export class PopupManager {
     /**
