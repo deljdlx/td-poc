@@ -60,11 +60,6 @@ export class Tower extends Entity {
     /**
      * @type {number}
      */
-    damage;
-    
-    /**
-     * @type {number}
-     */
     critChance;
     
     /**
@@ -108,7 +103,6 @@ export class Tower extends Entity {
         this.entityManager = entityManager;
         this.cooldown = 1.0; // 1 second between shots
         this.currentCooldown = 0.0; // Start ready to shoot
-        this.damage = 25; // Base damage
         this.critChance = 0.0; // 0% crit chance
         this.critMultiplier = 1.5; // 1.5x crit multiplier
         this.events = EventBus.createHandler(this);
@@ -121,7 +115,7 @@ export class Tower extends Entity {
             kills: 0,
             criticalHits: 0
         };
-        
+
         debug.success('Tower created', { row: cell.row, col: cell.col, x: center.x, y: center.y });
     }
     

@@ -500,27 +500,25 @@ export class Game {
      */
     createMissile(tower, startX, startY, targetX, targetY) {
         const missile = new Missile(
+            tower,
             startX, startY,
             targetX, targetY,
             this.config.missile.speed,
-            (impactX, impactY) => {
+            (missile, impactX, impactY, splashRadiusPixels) => {
                 // Emit visual FX event
-                const splashRadiusPixels = this.config.missile.splashRadius * this.coordSystem.getCellSize();
                 this.events.emit('missileImpact', { 
                     x: impactX, 
                     y: impactY, 
                     splashRadius: splashRadiusPixels 
                 });
                 
-                // Apply damage (gets stats from tower directly)
-                this.applyDamage(tower, impactX, impactY);
+                // Apply damage (missile knows tower + damage)
+                this.applyDamage(missile, impactX, impactY);
             },
             this.config.missile.lifetime,
             this.config.missile.splashRadius,
-            tower.damage,
-            this.coordSystem,
-            tower.critChance,
-            tower.critMultiplier
+            this.config.missile.damage, // Damage from config (munition type)
+            this.coordSystem
         );
         
         this.entityManager.addEntity(missile);
@@ -534,13 +532,16 @@ export class Game {
     
     /**
      * Apply damage to enemies in splash zone
-     * @param {Tower} tower - Tower that fired (contains damage, crit stats)
+     * @param {Missile} missile - Missile that exploded (contains tower + damage)
      * @param {number} impactX - Impact X position
      * @param {number} impactY - Impact Y position
      * @returns {void}
      * @private
      */
-    applyDamage(tower, impactX, impactY) {
+    applyDamage(missile, impactX, impactY) {
+        const tower = missile.tower;
+        const baseDamage = missile.damage;
+        
         // Calculate splash radius from config
         const splashRadius = this.config.missile.splashRadius * this.coordSystem.getCellSize();
         
@@ -556,9 +557,9 @@ export class Game {
             
             // Check if enemy is in splash zone
             if (distance <= splashRadius) {
-                // Calculate critical hit using tower stats
+                // Calculate critical hit using tower stats (tireur)
                 const isCritical = Math.random() < tower.critChance;
-                const finalDamage = isCritical ? Math.floor(tower.damage * tower.critMultiplier) : tower.damage;
+                const finalDamage = isCritical ? Math.floor(baseDamage * tower.critMultiplier) : baseDamage;
                 
                 const wasAlive = enemy.alive;
                 enemy.takeDamage(finalDamage, tower); // Pass tower as attacker
