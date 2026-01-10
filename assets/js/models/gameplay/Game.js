@@ -503,16 +503,17 @@ export class Game {
             startX, startY,
             targetX, targetY,
             this.config.missile.speed,
-            (impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier) => {
-                // Emit visual FX event (AppController listens)
+            (impactX, impactY) => {
+                // Emit visual FX event
+                const splashRadiusPixels = this.config.missile.splashRadius * this.coordSystem.getCellSize();
                 this.events.emit('missileImpact', { 
                     x: impactX, 
                     y: impactY, 
                     splashRadius: splashRadiusPixels 
                 });
                 
-                // Apply damage (pure game logic)
-                this.applyDamage(tower, impactX, impactY, splashRadiusPixels, damage, critChance, critMultiplier);
+                // Apply damage (gets stats from tower directly)
+                this.applyDamage(tower, impactX, impactY);
             },
             this.config.missile.lifetime,
             this.config.missile.splashRadius,
@@ -533,21 +534,20 @@ export class Game {
     
     /**
      * Apply damage to enemies in splash zone
-     * @param {Tower} tower - Tower that fired
+     * @param {Tower} tower - Tower that fired (contains damage, crit stats)
      * @param {number} impactX - Impact X position
      * @param {number} impactY - Impact Y position
-     * @param {number} splashRadius - Splash radius in pixels
-     * @param {number} damage - Base damage
-     * @param {number} critChance - Critical hit chance (0-1)
-     * @param {number} critMultiplier - Critical damage multiplier
      * @returns {void}
      * @private
      */
-    applyDamage(tower, impactX, impactY, splashRadius, damage, critChance = 0.0, critMultiplier = 1.5) {
+    applyDamage(tower, impactX, impactY) {
+        // Calculate splash radius from config
+        const splashRadius = this.config.missile.splashRadius * this.coordSystem.getCellSize();
+        
         const enemies = this.entityManager.getEntitiesByType('enemy');
         let hitCount = 0;
         
-        this.debug.info(`💥 Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius}px`);
+        this.debug.info(`💥 Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius.toFixed(0)}px`);
         
         enemies.forEach(enemy => {
             const dx = enemy.x - impactX;
@@ -556,9 +556,9 @@ export class Game {
             
             // Check if enemy is in splash zone
             if (distance <= splashRadius) {
-                // Calculate critical hit
-                const isCritical = Math.random() < critChance;
-                const finalDamage = isCritical ? Math.floor(damage * critMultiplier) : damage;
+                // Calculate critical hit using tower stats
+                const isCritical = Math.random() < tower.critChance;
+                const finalDamage = isCritical ? Math.floor(tower.damage * tower.critMultiplier) : tower.damage;
                 
                 const wasAlive = enemy.alive;
                 enemy.takeDamage(finalDamage, tower); // Pass tower as attacker
@@ -574,7 +574,7 @@ export class Game {
                 }
                 
                 if (isCritical) {
-                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${critMultiplier}x) - HP: ${enemy.health}/${enemy.maxHealth}`);
+                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.critMultiplier}x) - HP: ${enemy.health}/${enemy.maxHealth}`);
                 } else {
                     this.debug.debug(`Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.health}/${enemy.maxHealth}`);
                 }
