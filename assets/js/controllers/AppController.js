@@ -1,4 +1,4 @@
-import { GridSystem } from '../systems/GridSystem.js';
+import { GridSystem } from '../services/grid/GridSystem.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
 import { TowerDragHandler } from '../ux/TowerDragHandler.js';
