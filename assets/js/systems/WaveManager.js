@@ -1,4 +1,4 @@
-import { Enemy } from '../models/gameplay/Enemy.js';
+import { Enemy } from '../domain/combat/entities/Enemy.js';
 import { WaveStartedEvent, WaveCompletedEvent } from '../events/WaveEvent.js';
 import { EnemySpawnedEvent } from '../events/EnemyEvent.js';
 

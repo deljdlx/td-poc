@@ -1,10 +1,13 @@
-import { Entity } from '../core/Entity.js';
-import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../events/EnemyEvent.js';
-import { EventBus } from '../../utils/EventBus.js';
+import { Entity } from '../../../models/core/Entity.js';
+import { EnemyAttributes } from '../value-objects/EnemyAttributes.js';
+import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../../events/EnemyEvent.js';
+import { EventBus } from '../../../utils/EventBus.js';
 
 /**
  * Enemy - Enemy entity that follows paths
  * Represents hostile units that towers shoot at
+ * 
+ * Domain Entity (Combat Bounded Context)
  */
 export class Enemy extends Entity {
     /**
@@ -23,24 +26,9 @@ export class Enemy extends Entity {
     size;
     
     /**
-     * @type {number}
+     * @type {EnemyAttributes}
      */
-    health;
-    
-    /**
-     * @type {number}
-     */
-    maxHealth;
-    
-    /**
-     * @type {number}
-     */
-    speed;
-    
-    /**
-     * @type {number}
-     */
-    goldReward = 100;
+    attributes;
     
     /**
      * @type {Tower|null} - Tower that killed this enemy (set when taking damage)
@@ -82,12 +70,65 @@ export class Enemy extends Entity {
         this.enemyType = 'basic';
         this.color = '#dc2626'; // Red for enemies
         this.size = 10;
-        this.health = 100;
-        this.maxHealth = 100;
-        this.speed = 1.0; // cells per second (logical speed)
-        this.goldReward = 100; // Gold awarded when killed (configurable)
+        this.attributes = new EnemyAttributes(100, 100, 1.0, 100);
         this.events = EventBus.createHandler(this);
         this.coordSystem = null; // Will be set when added to path
+    }
+    
+    /**
+     * Get current health (proxy to attributes)
+     * @returns {number}
+     */
+    get health() {
+        return this.attributes.health;
+    }
+    
+    /**
+     * Set current health (proxy to attributes)
+     * @param {number} value
+     */
+    set health(value) {
+        this.attributes.setHealth(value);
+    }
+    
+    /**
+     * Get max health (proxy to attributes)
+     * @returns {number}
+     */
+    get maxHealth() {
+        return this.attributes.maxHealth;
+    }
+    
+    /**
+     * Set max health (proxy to attributes)
+     * @param {number} value
+     */
+    set maxHealth(value) {
+        this.attributes._base.maxHealth = value;
+    }
+    
+    /**
+     * Get speed (proxy to attributes)
+     * @returns {number}
+     */
+    get speed() {
+        return this.attributes.speed;
+    }
+    
+    /**
+     * Set speed (proxy to attributes)
+     * @param {number} value
+     */
+    set speed(value) {
+        this.attributes._base.speed = value;
+    }
+    
+    /**
+     * Get gold reward (proxy to attributes)
+     * @returns {number}
+     */
+    get goldReward() {
+        return this.attributes.goldReward;
     }
     
     /**
@@ -98,7 +139,7 @@ export class Enemy extends Entity {
      */
     takeDamage(amount, attacker = null) {
         const previousHealth = this.health;
-        this.health -= amount;
+        this.attributes.setHealth(this.health - amount);
         
         // Store killer if this attack will kill
         if (this.health <= 0 && attacker) {
@@ -110,7 +151,7 @@ export class Enemy extends Entity {
         this.events.emit('hit', event);
         
         if (this.health <= 0) {
-            this.health = 0;
+            this.attributes.setHealth(0);
             this.kill();
         }
     }
@@ -231,4 +272,3 @@ export class Enemy extends Entity {
         // For now, we don't kill the enemy, it loops back
     }
 }
-
