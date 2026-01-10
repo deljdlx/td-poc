@@ -1,5 +1,7 @@
+import { PathElementAttributes } from '../value-objects/PathElementAttributes.js';
+
 /**
- * Élément d'un chemin (Path)
+ * Entity - Élément d'un chemin (Path)
  * Wrapper autour d'une Cell avec métadonnées spécifiques au path
  */
 export class PathElement {
@@ -9,17 +11,8 @@ export class PathElement {
     /** @type {number} */
     index = 0;
     
-    /** @type {string|null} - Direction vers le prochain ('N', 'S', 'E', 'W', 'NE', 'NW', 'SE', 'SW') */
-    direction = null;
-    
-    /** @type {number} - Distance en pixels vers le prochain PathElement */
-    distanceToNext = 0;
-    
-    /** @type {number} - Multiplicateur de vitesse (1.0 = normal) */
-    speedModifier = 1.0;
-    
-    /** @type {string} - Type de zone */
-    specialZone = 'normal';
+    /** @type {PathElementAttributes} */
+    attributes = null;
     
     /**
      * @param {Cell} cell - Cellule de la grille
@@ -28,6 +21,27 @@ export class PathElement {
     constructor(cell, index) {
         this.cell = cell;
         this.index = index;
+        this.attributes = new PathElementAttributes(null, 0, 1.0, 'normal');
+    }
+    
+    /** @returns {string|null} */
+    get direction() {
+        return this.attributes.direction;
+    }
+    
+    /** @returns {number} */
+    get distanceToNext() {
+        return this.attributes.distanceToNext;
+    }
+    
+    /** @returns {number} */
+    get speedModifier() {
+        return this.attributes.speedModifier;
+    }
+    
+    /** @returns {string} */
+    get specialZone() {
+        return this.attributes.specialZone;
     }
     
     /**
@@ -38,8 +52,7 @@ export class PathElement {
      */
     calculateMetadata(nextElement, coordSystem) {
         if (!nextElement) {
-            this.direction = null;
-            this.distanceToNext = 0;
+            this.attributes.updateMetadata(null, 0);
             return;
         }
         
@@ -48,22 +61,23 @@ export class PathElement {
         const deltaCol = nextElement.cell.col - this.cell.col;
         
         // Calculer direction
+        let direction = null;
         if (deltaRow === 0 && deltaCol > 0) {
-            this.direction = 'E';
+            direction = 'E';
         } else if (deltaRow === 0 && deltaCol < 0) {
-            this.direction = 'W';
+            direction = 'W';
         } else if (deltaRow > 0 && deltaCol === 0) {
-            this.direction = 'S';
+            direction = 'S';
         } else if (deltaRow < 0 && deltaCol === 0) {
-            this.direction = 'N';
+            direction = 'N';
         } else if (deltaRow < 0 && deltaCol > 0) {
-            this.direction = 'NE';
+            direction = 'NE';
         } else if (deltaRow < 0 && deltaCol < 0) {
-            this.direction = 'NW';
+            direction = 'NW';
         } else if (deltaRow > 0 && deltaCol > 0) {
-            this.direction = 'SE';
+            direction = 'SE';
         } else if (deltaRow > 0 && deltaCol < 0) {
-            this.direction = 'SW';
+            direction = 'SW';
         }
         
         // Calculer distance en pixels (centre à centre)
@@ -73,7 +87,9 @@ export class PathElement {
         const dx = nextCenter.x - currentCenter.x;
         const dy = nextCenter.y - currentCenter.y;
         
-        this.distanceToNext = Math.sqrt(dx * dx + dy * dy);
+        const distanceToNext = Math.sqrt(dx * dx + dy * dy);
+        
+        this.attributes.updateMetadata(direction, distanceToNext);
     }
     
     /**
@@ -91,7 +107,7 @@ export class PathElement {
      * @returns {void}
      */
     setSpeedModifier(modifier) {
-        this.speedModifier = modifier;
+        this.attributes._base.speedModifier = modifier;
     }
     
     /**
@@ -100,6 +116,6 @@ export class PathElement {
      * @returns {void}
      */
     setSpecialZone(zoneType) {
-        this.specialZone = zoneType;
+        this.attributes._base.specialZone = zoneType;
     }
 }

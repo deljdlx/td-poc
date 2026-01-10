@@ -1,4 +1,4 @@
-import { PathElement } from './PathElement.js';
+import { PathElement } from '../../domain/grid/entities/PathElement.js';
 
 /**
  * Représente un chemin composé d'une séquence de PathElement

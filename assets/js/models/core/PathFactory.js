@@ -1,5 +1,5 @@
 import { Path } from '../gameplay/Path.js';
-import { PathElement } from '../gameplay/PathElement.js';
+import { PathElement } from '../../domain/grid/entities/PathElement.js';
 
 /**
  * Factory pour créer différents types de chemins (Path)
