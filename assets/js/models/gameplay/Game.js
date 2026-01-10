@@ -89,14 +89,16 @@ export class Game {
      * @param {PlayerManager} playerManager
      * @param {WaveManager} waveManager
      * @param {CoordinateSystem} coordSystem
+     * @param {CanvasView} canvasView
      * @param {DIContainer} container
      */
-    constructor(gridModel, entityManager, playerManager, waveManager, coordSystem, container) {
+    constructor(gridModel, entityManager, playerManager, waveManager, coordSystem, canvasView, container) {
         this.gridModel = gridModel;
         this.entityManager = entityManager;
         this.playerManager = playerManager;
         this.waveManager = waveManager;
         this.coordSystem = coordSystem;
+        this.canvasView = canvasView;
         this.container = container;
         this.debug = container.createDebug('Game', true);
         this.events = EventBus.createHandler(this);
@@ -121,8 +123,47 @@ export class Game {
         this.gridModel.addPath(perimeterPath);
         this.debug.success('Perimeter path created');
         
+        // Setup game event listeners for business logic
+        this.setupGameEventListeners();
+        
         this.state = GameState.READY;
         this.debug.success('Game initialized - Ready to start');
+    }
+    
+    /**
+     * Setup game event listeners for business logic (rewards, scoring, game over)
+     * AND visual effects (explosions, animations)
+     * @returns {void}
+     */
+    setupGameEventListeners() {
+        this.debug.info('🎯 Setting up Game event listeners (business logic + visual effects)');
+        
+        // Missile impact → Business logic already handled in handleMissileImpact
+        // But we add visual effects here
+        this.events.on('missileImpact', (event) => {
+            this.canvasView.addSimpleExplosion(event.x, event.y);
+            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
+        });
+        
+        // Listen to enemy spawned events to setup per-enemy listeners
+        this.events.on('enemySpawned', (event) => {
+            const enemy = event.enemy;
+            
+            // Enemy death → Already handled in handleMissileImpact for business logic
+            // This is a backup for other death causes (future: poison, traps, etc.)
+            enemy.events.on('death', (deathEvent) => {
+                this.debug.info(`Enemy ${enemy.id} death event received`);
+                // Visual effects handled by DOMEnemyRenderer
+                // Business logic (gold, score) handled in handleEnemyKilled
+            });
+            
+            // Enemy reached end → Game over logic
+            enemy.events.on('reachedEnd', (endEvent) => {
+                this.handleEnemyReachedEnd(enemy);
+            });
+        });
+        
+        this.debug.success('✅ Game event listeners configured');
     }
     
     /**
