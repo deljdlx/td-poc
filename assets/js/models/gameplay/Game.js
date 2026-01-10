@@ -138,8 +138,7 @@ export class Game {
     setupGameEventListeners() {
         this.debug.info('🎯 Setting up Game event listeners (business logic + visual effects)');
         
-        // Missile impact → Business logic already handled in handleMissileImpact
-        // But we add visual effects here
+        // Missile impact → Visual effects
         this.events.on('missileImpact', (event) => {
             this.canvasView.addSimpleExplosion(event.x, event.y);
             this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
@@ -149,12 +148,18 @@ export class Game {
         this.events.on('enemySpawned', (event) => {
             const enemy = event.enemy;
             
-            // Enemy death → Already handled in handleMissileImpact for business logic
-            // This is a backup for other death causes (future: poison, traps, etc.)
+            // Enemy death → Handle rewards (gold, score) and visual effects
             enemy.events.on('death', (deathEvent) => {
-                this.debug.info(`Enemy ${enemy.id} death event received`);
+                this.debug.event(`💀 Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`);
+                
+                // Business logic: award gold and update stats
+                if (deathEvent.killer) {
+                    this.handleEnemyKilled(enemy, deathEvent.killer);
+                } else {
+                    this.debug.info(`Enemy ${enemy.id} died from non-combat cause`);
+                }
+                
                 // Visual effects handled by DOMEnemyRenderer
-                // Business logic (gold, score) handled in handleEnemyKilled
             });
             
             // Enemy reached end → Game over logic
@@ -556,16 +561,16 @@ export class Game {
                 const finalDamage = isCritical ? Math.floor(damage * critMultiplier) : damage;
                 
                 const wasAlive = enemy.alive;
-                enemy.takeDamage(finalDamage);
+                enemy.takeDamage(finalDamage, tower); // Pass tower as attacker
                 hitCount++;
                 
                 // Track hit and damage
                 tower.trackHit(finalDamage, isCritical);
                 
-                // Track kill if enemy died
+                // Track kill if enemy died (business logic handled by event listener)
                 if (wasAlive && !enemy.alive) {
                     tower.trackKill();
-                    this.handleEnemyKilled(enemy, tower);
+                    // handleEnemyKilled will be called by death event listener
                 }
                 
                 if (isCritical) {

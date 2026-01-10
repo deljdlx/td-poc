@@ -43,6 +43,11 @@ export class Enemy extends Entity {
     goldReward = 100;
     
     /**
+     * @type {Tower|null} - Tower that killed this enemy (set when taking damage)
+     */
+    killer = null;
+    
+    /**
      * @type {Path|null}
      */
     path = null;
@@ -88,11 +93,17 @@ export class Enemy extends Entity {
     /**
      * Take damage from missile
      * @param {number} amount
+     * @param {Tower|null} attacker - Tower that dealt damage (optional)
      * @returns {void}
      */
-    takeDamage(amount) {
+    takeDamage(amount, attacker = null) {
         const previousHealth = this.health;
         this.health -= amount;
+        
+        // Store killer if this attack will kill
+        if (this.health <= 0 && attacker) {
+            this.killer = attacker;
+        }
         
         // Trigger hit event with typed Event
         const event = new EnemyHitEvent(this, amount, previousHealth, this.health);
@@ -118,7 +129,7 @@ export class Enemy extends Entity {
      */
     kill() {
         // Trigger death event before killing with typed Event
-        const event = new EnemyDeathEvent(this, { x: this.x, y: this.y });
+        const event = new EnemyDeathEvent(this, { x: this.x, y: this.y }, this.killer);
         this.events.emit('death', event);
         
         super.kill();
