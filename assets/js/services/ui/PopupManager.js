@@ -2,8 +2,8 @@
  * PopupManager - Generic popup/modal system
  * Handles overlay, animations, and lifecycle
  */
-import { PopupOpenedEvent, PopupClosedEvent } from '../events/UIEvent.js';
-import { EventBus } from '../services/core/EventBus.js';
+import { PopupOpenedEvent, PopupClosedEvent } from '../../events/UIEvent.js';
+import { EventBus } from '../core/EventBus.js';
 
 export class PopupManager {
     /**
