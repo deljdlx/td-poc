@@ -10,7 +10,7 @@ import { UIUpdateManager } from './utils/UIUpdateManager.js';
 import { PlayerManager } from './models/core/PlayerManager.js';
 import { Game } from './models/gameplay/Game.js';
 import { WaveManager } from './controllers/WaveManager.js';
-import { TowerDragHandler } from './controllers/TowerDragHandler.js';
+import { TowerDragHandler } from './ux/TowerDragHandler.js';
 
 /**
  * Configuration et initialisation du conteneur DI

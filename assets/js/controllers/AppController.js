@@ -1,7 +1,7 @@
 import { GridSystem } from '../systems/GridSystem.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
-import { TowerDragHandler } from './TowerDragHandler.js';
+import { TowerDragHandler } from '../ux/TowerDragHandler.js';
 import { Game } from '../models/gameplay/Game.js';
 
 /**
