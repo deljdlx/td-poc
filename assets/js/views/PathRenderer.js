@@ -1,4 +1,4 @@
-import { CSSVariables } from '../utils/CSSVariables.js';
+import { CSSVariables } from '../services/ui/CSSVariables.js';
 
 /**
  * Renderer pour dessiner les paths en DOM/CSS

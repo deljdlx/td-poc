@@ -1,4 +1,4 @@
-import { CSSVariables } from '../utils/CSSVariables.js';
+import { CSSVariables } from '../services/ui/CSSVariables.js';
 import { PathRenderer } from './PathRenderer.js';
 
 /**
