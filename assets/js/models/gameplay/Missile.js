@@ -71,14 +71,9 @@ export class Missile extends Entity {
     maxLifeTime;
     
     /**
-     * @type {number}
+     * @type {Object} - Gameplay attributes (munition stats)
      */
-    splashRadius;
-    
-    /**
-     * @type {number}
-     */
-    damage;
+    attributes;
     
     /**
      * @type {Object}
@@ -122,8 +117,13 @@ export class Missile extends Entity {
         this.onArrival = onArrival;
         this.age = 0;
         this.maxLifeTime = maxLifeTime;
-        this.splashRadius = splashRadius; // In cells
-        this.damage = damage;
+        
+        // Gameplay attributes (munition stats)
+        this.attributes = {
+            damage: damage,
+            splashRadius: splashRadius
+        };
+        
         this.coordSystem = coordSystem;
     }
     
@@ -161,7 +161,7 @@ export class Missile extends Entity {
             // Trigger arrival callback before death
             if (this.onArrival) {
                 // Convert splash radius from cells to pixels for rendering
-                const splashRadiusPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.splashRadius) : this.splashRadius;
+                const splashRadiusPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.attributes.splashRadius) : this.attributes.splashRadius;
                 this.onArrival(this, this.targetX, this.targetY, splashRadiusPixels);
             }
             this.kill();

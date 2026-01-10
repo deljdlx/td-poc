@@ -138,10 +138,14 @@ export class Game {
     setupGameEventListeners() {
         this.debug.info('🎯 Setting up Game event listeners (business logic + visual effects)');
         
-        // Missile impact → Visual effects
+        // Missile impact → Visual effects + Combat logic
         this.events.on('missileImpact', (event) => {
+            // Visual effects
             this.canvasView.addSimpleExplosion(event.x, event.y);
             this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
+            
+            // Combat logic: apply splash damage
+            this.applyDamage(event.missile, event.x, event.y);
         });
         
         // Listen to enemy spawned events to setup per-enemy listeners
@@ -505,15 +509,13 @@ export class Game {
             targetX, targetY,
             this.config.missile.speed,
             (missile, impactX, impactY, splashRadiusPixels) => {
-                // Emit visual FX event
-                this.events.emit('missileImpact', { 
+                // Emit impact event (visual FX + combat handled by listener)
+                this.events.emit('missileImpact', {
+                    missile,
                     x: impactX, 
                     y: impactY, 
                     splashRadius: splashRadiusPixels 
                 });
-                
-                // Apply damage (missile knows tower + damage)
-                this.applyDamage(missile, impactX, impactY);
             },
             this.config.missile.lifetime,
             this.config.missile.splashRadius,
@@ -540,14 +542,14 @@ export class Game {
      */
     applyDamage(missile, impactX, impactY) {
         const tower = missile.tower;
-        const baseDamage = missile.damage;
+        const baseDamage = missile.attributes.damage;
         
         // Calculate splash radius from config
         const splashRadius = this.config.missile.splashRadius * this.coordSystem.getCellSize();
         
         const enemies = this.entityManager.getEntitiesByType('enemy');
         let hitCount = 0;
-        
+
         this.debug.info(`💥 Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius.toFixed(0)}px`);
         
         enemies.forEach(enemy => {
