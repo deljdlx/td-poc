@@ -1,4 +1,4 @@
-import { DragDropManager } from '../utils/DragDropManager.js';
+import { DragDropManager } from '../services/ui/DragDropManager.js';
 
 /**
  * Gestionnaire du drag and drop des tourelles
