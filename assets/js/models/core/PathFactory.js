@@ -1,5 +1,5 @@
-import { Path } from '../../domain/grid/entities/Path.js';
-import { PathElement } from '../../domain/grid/entities/PathElement.js';
+import { Path } from '../../domain/map/entities/Path.js';
+import { PathElement } from '../../domain/map/entities/PathElement.js';
 
 /**
  * Factory pour créer différents types de chemins (Path)
