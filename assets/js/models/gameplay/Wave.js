@@ -1,4 +1,4 @@
-import { WaveStartedEvent, WaveCompletedEvent } from '../../utils/events/WaveEvent.js';
+import { WaveStartedEvent, WaveCompletedEvent } from '../../events/WaveEvent.js';
 import { EventBus } from '../../utils/EventBus.js';
 
 /**

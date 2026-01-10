@@ -9,7 +9,7 @@ import { PlayerInfoPopup } from './views/PlayerInfoPopup.js';
 import { UIUpdateManager } from './utils/UIUpdateManager.js';
 import { PlayerManager } from './models/core/PlayerManager.js';
 import { Game } from './models/gameplay/Game.js';
-import { WaveManager } from './controllers/WaveManager.js';
+import { WaveManager } from './systems/WaveManager.js';
 import { TowerDragHandler } from './ux/TowerDragHandler.js';
 
 /**

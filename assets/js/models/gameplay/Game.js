@@ -3,7 +3,7 @@ import { Tower } from './Tower.js';
 import { Wave } from './Wave.js';
 import { PathFactory } from '../core/PathFactory.js';
 import { Missile } from './Missile.js';
-import { GameStateChangedEvent, GameOverEvent } from '../../utils/events/GameEvent.js';
+import { GameStateChangedEvent, GameOverEvent } from '../../events/GameEvent.js';
 import { EventBus } from '../../utils/EventBus.js';
 
 /**

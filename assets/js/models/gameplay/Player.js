@@ -1,5 +1,5 @@
 import { Wallet } from './Wallet.js';
-import { PlayerDamagedEvent } from '../../utils/events/PlayerEvent.js';
+import { PlayerDamagedEvent } from '../../events/PlayerEvent.js';
 import { EventBus } from '../../utils/EventBus.js';
 
 /**

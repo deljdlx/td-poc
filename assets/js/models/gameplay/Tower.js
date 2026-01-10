@@ -1,5 +1,5 @@
 import { Entity } from '../core/Entity.js';
-import { TowerFiredEvent } from '../../utils/events/TowerEvent.js';
+import { TowerFiredEvent } from '../../events/TowerEvent.js';
 import { EventBus } from '../../utils/EventBus.js';
 
 /**

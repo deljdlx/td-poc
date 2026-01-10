@@ -1,5 +1,5 @@
 import { Entity } from '../core/Entity.js';
-import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../utils/events/EnemyEvent.js';
+import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../events/EnemyEvent.js';
 import { EventBus } from '../../utils/EventBus.js';
 
 /**

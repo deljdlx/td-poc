@@ -1,6 +1,6 @@
 import { Enemy } from '../models/gameplay/Enemy.js';
-import { WaveStartedEvent, WaveCompletedEvent } from '../utils/events/WaveEvent.js';
-import { EnemySpawnedEvent } from '../utils/events/EnemyEvent.js';
+import { WaveStartedEvent, WaveCompletedEvent } from '../events/WaveEvent.js';
+import { EnemySpawnedEvent } from '../events/EnemyEvent.js';
 
 /**
  * WaveManager - Handles enemy wave spawning
