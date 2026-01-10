@@ -8,6 +8,9 @@ export class CoordinateSystem {
     /** @type {number} */
     viewportHeight = window.innerHeight;
     
+    /** @type {Function|null} */
+    boundUpdateViewportSize = null;
+    
     constructor() {
         this.updateViewportSize();
         this.handleResize();
@@ -25,7 +28,8 @@ export class CoordinateSystem {
      * @returns {void}
      */
     handleResize() {
-        window.addEventListener('resize', this.updateViewportSize.bind(this));
+        this.boundUpdateViewportSize = this.updateViewportSize.bind(this);
+        window.addEventListener('resize', this.boundUpdateViewportSize);
     }
     
     /**
@@ -95,5 +99,16 @@ export class CoordinateSystem {
     pixelsToCells(pixels) {
         const cellSize = this.getCellSize();
         return cellSize > 0 ? pixels / cellSize : 0;
+    }
+    
+    /**
+     * Destroy CoordinateSystem and cleanup
+     * @returns {void}
+     */
+    destroy() {
+        if (this.boundUpdateViewportSize) {
+            window.removeEventListener('resize', this.boundUpdateViewportSize);
+            this.boundUpdateViewportSize = null;
+        }
     }
 }

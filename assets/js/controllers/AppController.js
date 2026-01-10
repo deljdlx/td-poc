@@ -44,6 +44,18 @@ export class AppController {
     /** @type {TowerStatsPopup} */
     towerStatsPopup = null;
     
+    /** @type {Function|null} */
+    boundHandleCellClick = null;
+    
+    /** @type {Function|null} */
+    boundHandleCellHover = null;
+    
+    /** @type {Function|null} */
+    boundHandleCellLeave = null;
+    
+    /** @type {Function|null} */
+    boundHandlePlayerInfoClick = null;
+    
     /**
      * @param {DIContainer} container
      */
@@ -189,19 +201,26 @@ export class AppController {
      */
     bindEvents() {
         const container = document.getElementById('grid-container');
-        container.addEventListener('click', this.handleCellClick.bind(this));
-        container.addEventListener('contextmenu', this.handleCellClick.bind(this)); // Right-click
+        
+        // Store bound references for cleanup
+        this.boundHandleCellClick = this.handleCellClick.bind(this);
+        this.boundHandleCellHover = this.handleCellHover.bind(this);
+        this.boundHandleCellLeave = this.handleCellLeave.bind(this);
+        
+        container.addEventListener('click', this.boundHandleCellClick);
+        container.addEventListener('contextmenu', this.boundHandleCellClick); // Right-click
         
         // Grid hover detection for tower range display (on cells, not canvas)
-        container.addEventListener('mousemove', this.handleCellHover.bind(this));
-        container.addEventListener('mouseleave', this.handleCellLeave.bind(this));
+        container.addEventListener('mousemove', this.boundHandleCellHover);
+        container.addEventListener('mouseleave', this.boundHandleCellLeave);
         
         // Player info button
         const playerInfoBtn = document.getElementById('player-info-btn');
         if (playerInfoBtn) {
-            playerInfoBtn.addEventListener('click', () => {
+            this.boundHandlePlayerInfoClick = () => {
                 this.playerInfoPopup.show();
-            });
+            };
+            playerInfoBtn.addEventListener('click', this.boundHandlePlayerInfoClick);
         }
     }
     
@@ -292,16 +311,28 @@ export class AppController {
         // 2. Remove event listeners
         const container = document.getElementById('grid-container');
         if (container) {
-            // Note: These are bound with .bind(this), so we can't remove them
-            // without storing references. This is a known memory leak.
-            // TODO: Store bound references in constructor for proper cleanup
+            if (this.boundHandleCellClick) {
+                container.removeEventListener('click', this.boundHandleCellClick);
+                container.removeEventListener('contextmenu', this.boundHandleCellClick);
+            }
+            if (this.boundHandleCellHover) {
+                container.removeEventListener('mousemove', this.boundHandleCellHover);
+            }
+            if (this.boundHandleCellLeave) {
+                container.removeEventListener('mouseleave', this.boundHandleCellLeave);
+            }
         }
         
         const playerInfoBtn = document.getElementById('player-info-btn');
-        if (playerInfoBtn) {
-            // Note: Anonymous arrow function, cannot remove
-            // TODO: Store reference for cleanup
+        if (playerInfoBtn && this.boundHandlePlayerInfoClick) {
+            playerInfoBtn.removeEventListener('click', this.boundHandlePlayerInfoClick);
         }
+        
+        // Clear bound references
+        this.boundHandleCellClick = null;
+        this.boundHandleCellHover = null;
+        this.boundHandleCellLeave = null;
+        this.boundHandlePlayerInfoClick = null;
         
         // 3. Destroy OWNED instances
         if (this.gridSystem?.destroy) {

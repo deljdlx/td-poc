@@ -36,6 +36,9 @@ export class CanvasView {
     /** @type {DOMEnemyRenderer} */
     domEnemyRenderer = null;
     
+    /** @type {Function|null} */
+    boundHandleResize = null;
+    
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
@@ -61,7 +64,8 @@ export class CanvasView {
     setupCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        window.addEventListener('resize', this.handleResize.bind(this));
+        this.boundHandleResize = this.handleResize.bind(this);
+        window.addEventListener('resize', this.boundHandleResize);
     }
     
     /**
@@ -206,5 +210,25 @@ export class CanvasView {
                 this.debug.warning(`No renderer found for entity type: ${type}`);
             }
         }
+    }
+    
+    /**
+     * Destroy CanvasView and cleanup resources
+     * @returns {void}
+     */
+    destroy() {
+        // Remove resize event listener
+        if (this.boundHandleResize) {
+            window.removeEventListener('resize', this.boundHandleResize);
+            this.boundHandleResize = null;
+        }
+        
+        // Clear references
+        this.canvas = null;
+        this.ctx = null;
+        this.coordSystem = null;
+        this.effects = [];
+        this.renderers = {};
+        this.domEnemyRenderer = null;
     }
 }

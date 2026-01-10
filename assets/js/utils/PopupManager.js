@@ -41,6 +41,12 @@ export class PopupManager {
      */
     debug;
     
+    /** @type {Function|null} */
+    boundHandleOverlayClick = null;
+    
+    /** @type {Function|null} */
+    boundHandleKeydown = null;
+    
     /**
      * @param {DIContainer} diContainer
      */
@@ -82,18 +88,20 @@ export class PopupManager {
      */
     bindEvents() {
         // Close on overlay click
-        this.overlay.addEventListener('click', (e) => {
+        this.boundHandleOverlayClick = (e) => {
             if (e.target === this.overlay) {
                 this.hide();
             }
-        });
+        };
+        this.overlay.addEventListener('click', this.boundHandleOverlayClick);
         
         // Close on ESC key
-        document.addEventListener('keydown', (e) => {
+        this.boundHandleKeydown = (e) => {
             if (e.key === 'Escape' && this.isOpen) {
                 this.hide();
             }
-        });
+        };
+        document.addEventListener('keydown', this.boundHandleKeydown);
     }
     
     /**
@@ -241,6 +249,32 @@ export class PopupManager {
      */
     isPopupOpen() {
         return this.isOpen;
+    }
+    
+    /**
+     * Destroy PopupManager and cleanup
+     * @returns {void}
+     */
+    destroy() {
+        // Remove event listeners
+        if (this.boundHandleOverlayClick && this.overlay) {
+            this.overlay.removeEventListener('click', this.boundHandleOverlayClick);
+            this.boundHandleOverlayClick = null;
+        }
+        
+        if (this.boundHandleKeydown) {
+            document.removeEventListener('keydown', this.boundHandleKeydown);
+            this.boundHandleKeydown = null;
+        }
+        
+        // Remove DOM elements
+        if (this.overlay && this.overlay.parentNode) {
+            this.overlay.parentNode.removeChild(this.overlay);
+        }
+        
+        // Clear references
+        this.overlay = null;
+        this.container = null;
     }
     
 }

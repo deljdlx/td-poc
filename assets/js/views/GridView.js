@@ -29,6 +29,9 @@ export class GridView {
     /** @type {CoordinateSystem} */
     coordSystem = null;
     
+    /** @type {Function|null} */
+    boundHandleResize = null;
+    
     /**
      * @param {string} containerId
      * @param {GridModel} model
@@ -50,7 +53,7 @@ export class GridView {
      * @returns {void}
      */
     setupResizeListener() {
-        window.addEventListener('resize', () => {
+        this.boundHandleResize = () => {
             if (this.resizeTimeout) {
                 clearTimeout(this.resizeTimeout);
             }
@@ -60,7 +63,9 @@ export class GridView {
                 this.calculateAndApplyCellDimensions();
                 this.updateAllCellPositions();
             }, 150);
-        });
+        };
+        
+        window.addEventListener('resize', this.boundHandleResize);
     }
     
     /**
@@ -308,10 +313,11 @@ export class GridView {
             this.resizeTimeout = null;
         }
         
-        // Note: The resize listener is an anonymous arrow function,
-        // so we cannot remove it without storing a reference.
-        // TODO: Refactor to store bound handler reference in constructor
-        // For now, this is a known memory leak that will be fixed in next iteration
+        // Remove resize event listener
+        if (this.boundHandleResize) {
+            window.removeEventListener('resize', this.boundHandleResize);
+            this.boundHandleResize = null;
+        }
         
         // Clear DOM references
         this.container = null;
