@@ -1,8 +1,8 @@
 import { GameState } from './GameState.js';
-import { Tower } from './Tower.js';
+import { Tower } from '../../domain/combat/entities/Tower.js';
 import { Wave } from './Wave.js';
 import { PathFactory } from '../core/PathFactory.js';
-import { Missile } from './Missile.js';
+import { Missile } from '../../domain/combat/entities/Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../events/GameEvent.js';
 import { EventBus } from '../../utils/EventBus.js';
 
@@ -15,12 +15,12 @@ export class Game {
      * @type {GameState}
      */
     state = GameState.READY;
-    
+
     /**
      * @type {number}
      */
     currentWaveNumber = 0;
-    
+
     /**
      * @type {number}
      */

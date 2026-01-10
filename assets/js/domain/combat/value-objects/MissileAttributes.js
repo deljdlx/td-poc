@@ -1,4 +1,4 @@
-import { Attributes } from './Attributes.js';
+import { Attributes } from '../../shared/Attributes.js';
 
 /**
  * MissileAttributes - Munition-specific stats
