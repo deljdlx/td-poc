@@ -104,7 +104,7 @@ export class AppController {
             this.entityManager,
             this.container
         );
-        
+
         // Connect TowerDragHandler to Game (delegation pattern)
         this.towerDragHandler.setMoveCallback((tower, fromCell, toCell) => {
             return this.game.moveTower(tower, fromCell, toCell);
@@ -122,17 +122,14 @@ export class AppController {
         this.game.init();
         this.gridSystem.renderPaths();
         
-        // Listen to game events for visual effects
-        this.game.events.on('missileImpact', (event) => {
-            this.canvasView.addSimpleExplosion(event.x, event.y);
-            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
-        });
+        // Setup centralized game event listeners
+        this.setupGameEventListeners();
         
         // Tower shoot callback - delegate to Game
         const onTowerShoot = (tower, x, y, targetX, targetY) => {
             this.game.createMissile(tower, x, y, targetX, targetY);
         };
-        
+
         // Placer des tours aléatoirement pour le test
         const placedCells = this.game.placeRandomTowers(5, onTowerShoot);
         
@@ -150,6 +147,46 @@ export class AppController {
         
         // Start the game (will start first wave)
         this.game.start();
+    }
+
+    /**
+     * Setup centralized game event listeners
+     * All game events are handled here and dispatched to appropriate views/renderers
+     * @returns {void}
+     */
+    setupGameEventListeners() {
+        this.debug.info('🎯 Setting up centralized game event listeners');
+        
+        // Missile impact → Visual effects on canvas
+        this.game.events.on('missileImpact', (event) => {
+            this.canvasView.addSimpleExplosion(event.x, event.y);
+            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
+        });
+        
+        // Enemy spawned → Setup listeners for that specific enemy
+        this.game.events.on('enemySpawned', (event) => {
+            const enemy = event.enemy;
+            
+            // Enemy hit → Visual feedback (could delegate to DOMEnemyRenderer)
+            enemy.events.on('hit', (hitEvent) => {
+                this.debug.event(`Enemy ${enemy.id} hit for ${hitEvent.damage} damage`);
+                // DOMEnemyRenderer handles this internally for now
+            });
+            
+            // Enemy death → Visual effects + cleanup
+            enemy.events.on('death', (deathEvent) => {
+                this.debug.event(`Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`);
+                // DOMEnemyRenderer handles death animation
+                // Could add canvas explosion here if needed
+            });
+            
+            // Enemy reached end → Game over logic handled by Game
+            enemy.events.on('reachedEnd', (endEvent) => {
+                this.debug.warning(`Enemy ${enemy.id} reached the end!`);
+            });
+        });
+        
+        this.debug.success('✅ Game event listeners configured');
     }
 
     /**

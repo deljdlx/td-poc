@@ -11,7 +11,8 @@ export {
     EnemyEvent,
     EnemyHitEvent,
     EnemyDeathEvent,
-    EnemyReachedEndEvent
+    EnemyReachedEndEvent,
+    EnemySpawnedEvent
 } from './EnemyEvent.js';
 
 // Tower Events

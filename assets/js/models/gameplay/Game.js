@@ -100,6 +100,9 @@ export class Game {
         this.container = container;
         this.debug = container.createDebug('Game', true);
         this.events = EventBus.createHandler(this);
+        
+        // Give WaveManager access to Game events
+        this.waveManager.setGameEvents(this.events);
     }
     
     /**

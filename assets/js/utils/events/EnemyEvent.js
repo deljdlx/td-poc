@@ -90,3 +90,22 @@ export class EnemyReachedEndEvent extends EnemyEvent {
         this.position = position;
     }
 }
+
+/**
+ * EnemySpawnedEvent - Enemy was spawned on the map
+ */
+export class EnemySpawnedEvent extends EnemyEvent {
+    /**
+     * @type {Object}
+     */
+    position;
+    
+    /**
+     * @param {Enemy} enemy
+     * @param {Object} position - {x, y}
+     */
+    constructor(enemy, position) {
+        super('spawned', enemy, { position });
+        this.position = position;
+    }
+}

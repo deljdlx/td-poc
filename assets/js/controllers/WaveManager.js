@@ -1,5 +1,6 @@
 import { Enemy } from '../models/gameplay/Enemy.js';
 import { WaveStartedEvent, WaveCompletedEvent } from '../utils/events/WaveEvent.js';
+import { EnemySpawnedEvent } from '../utils/events/EnemyEvent.js';
 
 /**
  * WaveManager - Handles enemy wave spawning
@@ -23,6 +24,9 @@ export class WaveManager {
     /** @type {boolean} */
     isSpawning = false;
     
+    /** @type {Object} - Game event bus for emitting enemy spawned events */
+    gameEvents = null;
+    
     /**
      * @param {EntityManager} entityManager
      * @param {CoordinateSystem} coordSystem
@@ -32,6 +36,15 @@ export class WaveManager {
         this.entityManager = entityManager;
         this.coordSystem = coordSystem;
         this.debug = diContainer.createDebug('WaveManager', true);
+    }
+    
+    /**
+     * Set game events handler (called by Game)
+     * @param {Object} gameEvents - EventBus handler from Game
+     * @returns {void}
+     */
+    setGameEvents(gameEvents) {
+        this.gameEvents = gameEvents;
     }
     
     /**
@@ -124,6 +137,12 @@ export class WaveManager {
         enemy.coordSystem = this.coordSystem;
         
         this.entityManager.addEntity(enemy);
+        
+        // Emit enemy spawned event to Game event bus
+        if (this.gameEvents) {
+            const spawnEvent = new EnemySpawnedEvent(enemy, spawnPos);
+            this.gameEvents.emit('enemySpawned', spawnEvent);
+        }
         
         this.debug.info('Enemy spawned', {
             position: spawnPos,
