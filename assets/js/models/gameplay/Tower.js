@@ -28,19 +28,14 @@ export class Tower extends Entity {
     size;
     
     /**
-     * @type {number}
+     * @type {Object} - Gameplay attributes (tower stats)
      */
-    range;
+    attributes;
     
     /**
      * @type {Object}
      */
     coordSystem;
-    
-    /**
-     * @type {number}
-     */
-    cooldown;
     
     /**
      * @type {number}
@@ -56,16 +51,6 @@ export class Tower extends Entity {
      * @type {Object}
      */
     stats;
-    
-    /**
-     * @type {number}
-     */
-    critChance;
-    
-    /**
-     * @type {number}
-     */
-    critMultiplier;
     
     /**
      * @type {string}
@@ -98,14 +83,18 @@ export class Tower extends Entity {
         this.onShoot = onShoot;
         this.color = '#6366f1'; // Blue for towers (will be player color later)
         this.size = 8;
-        this.range = 3.5; // Range in cells (logical unit)
         this.coordSystem = coordSystem;
         this.entityManager = entityManager;
-        this.cooldown = 1.0; // 1 second between shots
         this.currentCooldown = 0.0; // Start ready to shoot
-        this.critChance = 0.0; // 0% crit chance
-        this.critMultiplier = 1.5; // 1.5x crit multiplier
         this.events = EventBus.createHandler(this);
+        
+        // Gameplay attributes (tower stats)
+        this.attributes = {
+            range: 3.5,          // Range in cells (logical unit)
+            cooldown: 1.0,       // 1 second between shots
+            critChance: 0.0,     // 0% crit chance
+            critMultiplier: 1.5  // 1.5x crit multiplier
+        };
         
         // Stats tracking
         this.stats = {
@@ -143,7 +132,7 @@ export class Tower extends Entity {
         this.events.emit('fired', event);
         
         // Reset cooldown
-        this.currentCooldown = this.cooldown;
+        this.currentCooldown = this.attributes.cooldown;
         return true;
     }
     
@@ -217,7 +206,7 @@ export class Tower extends Entity {
      * @returns {Array<Enemy>} - Enemies in range
      */
     getEnemiesInRange(entityManager) {
-        const rangePixels = this.coordSystem.cellsToPixels(this.range);
+        const rangePixels = this.coordSystem.cellsToPixels(this.attributes.range);
         const enemies = entityManager.getEntities().filter(e => 
             e.getType() === 'enemy' && e.alive
         );

@@ -208,11 +208,11 @@ export class TowerStatsPopup {
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-label">Range</div>
-                            <div class="stat-value">${tower.range} <span class="stat-unit">cells</span></div>
+                            <div class="stat-value">${tower.attributes.range} <span class="stat-unit">cells</span></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Fire Rate</div>
-                            <div class="stat-value">${(1 / tower.cooldown).toFixed(2)} <span class="stat-unit">/sec</span></div>
+                            <div class="stat-value">${(1 / tower.attributes.cooldown).toFixed(2)} <span class="stat-unit">/sec</span></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Damage</div>
@@ -220,11 +220,11 @@ export class TowerStatsPopup {
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Crit Chance</div>
-                            <div class="stat-value">${(tower.critChance || 0) * 100}%</div>
+                            <div class="stat-value">${(tower.attributes.critChance || 0) * 100}%</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Crit Multiplier</div>
-                            <div class="stat-value">×${tower.critMultiplier || 1.5}</div>
+                            <div class="stat-value">×${tower.attributes.critMultiplier || 1.5}</div>
                         </div>
                     </div>
                 </div>

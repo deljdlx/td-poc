@@ -45,7 +45,7 @@ export class TowerRangeView {
      */
     show(tower) {
         // Convert range from cells to pixels
-        const rangePixels = this.coordSystem.cellsToPixels(tower.range);
+        const rangePixels = this.coordSystem.cellsToPixels(tower.attributes.range);
         const diameter = rangePixels * 2;
         
         // Position at tower center

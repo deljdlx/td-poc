@@ -560,8 +560,8 @@ export class Game {
             // Check if enemy is in splash zone
             if (distance <= splashRadius) {
                 // Calculate critical hit using tower stats (tireur)
-                const isCritical = Math.random() < tower.critChance;
-                const finalDamage = isCritical ? Math.floor(baseDamage * tower.critMultiplier) : baseDamage;
+                const isCritical = Math.random() < tower.attributes.critChance;
+                const finalDamage = isCritical ? Math.floor(baseDamage * tower.attributes.critMultiplier) : baseDamage;
                 
                 const wasAlive = enemy.alive;
                 enemy.takeDamage(finalDamage, tower); // Pass tower as attacker
@@ -577,7 +577,7 @@ export class Game {
                 }
                 
                 if (isCritical) {
-                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.critMultiplier}x) - HP: ${enemy.health}/${enemy.maxHealth}`);
+                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.attributes.critMultiplier}x) - HP: ${enemy.health}/${enemy.maxHealth}`);
                 } else {
                     this.debug.debug(`Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.health}/${enemy.maxHealth}`);
                 }
