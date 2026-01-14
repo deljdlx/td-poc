@@ -1,5 +1,6 @@
 import { Entity } from '../../../models/core/Entity.js';
 import { EnemyAttributes } from '../value-objects/EnemyAttributes.js';
+import { AttributesProxy } from '../../shared/AttributesProxy.js';
 import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../../events/EnemyEvent.js';
 import { EventBus } from '../../../services/core/EventBus.js';
 
@@ -26,9 +27,16 @@ export class Enemy extends Entity {
     size;
     
     /**
-     * @type {EnemyAttributes}
+     * @type {EnemyAttributes} - Base attributes (internal storage)
+     * @private
      */
-    attributes;
+    _attributes;
+    
+    /**
+     * @type {AttributesProxy} - Proxy for attribute access with modifiers
+     * @private
+     */
+    _attributesProxy;
     
     /**
      * @type {Tower|null} - Tower that killed this enemy (set when taking damage)
@@ -70,9 +78,18 @@ export class Enemy extends Entity {
         this.enemyType = 'basic';
         this.color = '#dc2626'; // Red for enemies
         this.size = 10;
-        this.attributes = new EnemyAttributes(100, 100, 1.0, 100);
+        this._attributes = new EnemyAttributes(100, 100, 1.0, 100);
+        this._attributesProxy = new AttributesProxy(this._attributes, this);
         this.events = EventBus.createHandler(this);
         this.coordSystem = null; // Will be set when added to path
+    }
+    
+    /**
+     * Get attributes with modifiers applied
+     * @returns {AttributesProxy}
+     */
+    get attributes() {
+        return this._attributesProxy;
     }
     
     /**
@@ -88,7 +105,8 @@ export class Enemy extends Entity {
      * @param {number} value
      */
     set health(value) {
-        this.attributes.setHealth(value);
+        this._attributes._base.health = value;
+        this._attributesProxy.invalidate('health');
     }
     
     /**
@@ -104,7 +122,8 @@ export class Enemy extends Entity {
      * @param {number} value
      */
     set maxHealth(value) {
-        this.attributes._base.maxHealth = value;
+        this._attributes._base.maxHealth = value;
+        this._attributesProxy.invalidate('maxHealth');
     }
     
     /**
@@ -120,7 +139,8 @@ export class Enemy extends Entity {
      * @param {number} value
      */
     set speed(value) {
-        this.attributes._base.speed = value;
+        this._attributes._base.speed = value;
+        this._attributesProxy.invalidate('speed');
     }
     
     /**
@@ -139,7 +159,7 @@ export class Enemy extends Entity {
      */
     takeDamage(amount, attacker = null) {
         const previousHealth = this.health;
-        this.attributes.setHealth(this.health - amount);
+        this.health -= amount;
         
         // Store killer if this attack will kill
         if (this.health <= 0 && attacker) {
@@ -151,7 +171,7 @@ export class Enemy extends Entity {
         this.events.emit('hit', event);
         
         if (this.health <= 0) {
-            this.attributes.setHealth(0);
+            this.health = 0;
             this.kill();
         }
     }
