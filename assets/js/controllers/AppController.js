@@ -189,6 +189,23 @@ export class AppController {
         
         // Render game entities (paths sont statiques en DOM, pas besoin de redraw)
         this.canvasView.renderEntities(this.entityManager.getEntities(), deltaTime);
+        
+        // Update gold display in header
+        this.updateGoldDisplay();
+    }
+    
+    /**
+     * Update gold display in header
+     * @returns {void}
+     */
+    updateGoldDisplay() {
+        const activePlayer = this.game.playerManager.getActivePlayer();
+        if (activePlayer) {
+            const goldElement = document.getElementById('gold-amount');
+            if (goldElement) {
+                goldElement.textContent = activePlayer.wallet.get('money');
+            }
+        }
     }
     
     /**
