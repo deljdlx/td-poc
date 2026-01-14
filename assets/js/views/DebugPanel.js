@@ -18,11 +18,6 @@ export class DebugPanel {
     /**
      * @type {boolean}
      */
-    isCollapsed = false;
-    
-    /**
-     * @type {boolean}
-     */
     isDragging = false;
     
     /**
@@ -72,12 +67,6 @@ export class DebugPanel {
      * @returns {void}
      */
     bindEvents() {
-        // Toggle collapse/expand
-        const toggleBtn = document.getElementById('debug-panel-toggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => this.toggle());
-        }
-        
         // Log level selector
         const logLevelSelect = document.getElementById('debug-log-level');
         if (logLevelSelect) {
@@ -95,23 +84,6 @@ export class DebugPanel {
                 console.clear();
                 console.log('🧹 Console cleared');
             });
-        }
-    }
-    
-    /**
-     * Toggle panel collapse state
-     * @returns {void}
-     */
-    toggle() {
-        this.isCollapsed = !this.isCollapsed;
-        const toggleBtn = document.getElementById('debug-panel-toggle');
-        
-        if (this.isCollapsed) {
-            this.panel.classList.add('collapsed');
-            if (toggleBtn) toggleBtn.textContent = '+';
-        } else {
-            this.panel.classList.remove('collapsed');
-            if (toggleBtn) toggleBtn.textContent = '−';
         }
     }
     
