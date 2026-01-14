@@ -77,6 +77,38 @@ export class Debug {
         data: '📊',
     };
     
+    /** @type {Object} - Theme configuration for all visual styles */
+    theme = {
+        contextBadge: {
+            color: 'white',
+            padding: '2px 8px',
+            borderRadius: '3px',
+            fontWeight: 'bold',
+        },
+        timestamp: {
+            color: '#94a3b8',
+            fontSize: '0.9em',
+        },
+        message: {
+            fontWeight: '500',
+        },
+        data: {
+            fontStyle: 'italic',
+        },
+        separator: {
+            lineColor: '#475569',
+            labelColor: '#64748b',
+            fontWeight: 'bold',
+            textAlign: 'center',
+        },
+        trace: {
+            fontWeight: 'bold',
+        },
+        table: {
+            fontWeight: 'bold',
+        },
+    };
+    
     /** @type {Object} - Mapping des types vers les niveaux */
     typeLevels = {
         debug: Debug.LEVELS.DEBUG,
@@ -179,22 +211,22 @@ export class Debug {
         // Style pour le badge du contexte
         const contextStyle = `
             background: ${color};
-            color: white;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-weight: bold;
+            color: ${this.theme.contextBadge.color};
+            padding: ${this.theme.contextBadge.padding};
+            border-radius: ${this.theme.contextBadge.borderRadius};
+            font-weight: ${this.theme.contextBadge.fontWeight};
         `;
         
         // Style pour le timestamp
         const timeStyle = `
-            color: #94a3b8;
-            font-size: 0.9em;
+            color: ${this.theme.timestamp.color};
+            font-size: ${this.theme.timestamp.fontSize};
         `;
         
         // Style pour le message
         const messageStyle = `
             color: ${color};
-            font-weight: 500;
+            font-weight: ${this.theme.message.fontWeight};
         `;
         
         // Affichage
@@ -207,7 +239,7 @@ export class Debug {
         
         // Afficher les données si présentes
         if (data !== null && data !== undefined) {
-            console.log('%c└─ Data:', `color: ${color}; font-style: italic;`, data);
+            console.log('%c└─ Data:', `color: ${color}; font-style: ${this.theme.data.fontStyle};`, data);
         }
     }
     
@@ -323,7 +355,7 @@ export class Debug {
             return;
         }
         
-        console.log(`%c${this.context} 📊 Table:`, `color: ${this.colors.data}; font-weight: bold;`);
+        console.log(`%c${this.context} 📊 Table:`, `color: ${this.colors.data}; font-weight: ${this.theme.table.fontWeight};`);
         console.table(data);
     }
     
@@ -355,7 +387,7 @@ export class Debug {
             return;
         }
         
-        console.log(`%c${this.context} 🔍 ${message}`, `color: ${this.colors.debug}; font-weight: bold;`);
+        console.log(`%c${this.context} 🔍 ${message}`, `color: ${this.colors.debug}; font-weight: ${this.theme.trace.fontWeight};`);
         console.trace();
     }
     
@@ -370,10 +402,10 @@ export class Debug {
         }
         
         const line = '═'.repeat(50);
-        console.log(`%c${line}`, 'color: #475569;');
+        console.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
         if (label) {
-            console.log(`%c${label}`, 'color: #64748b; font-weight: bold; text-align: center;');
-            console.log(`%c${line}`, 'color: #475569;');
+            console.log(`%c${label}`, `color: ${this.theme.separator.labelColor}; font-weight: ${this.theme.separator.fontWeight}; text-align: ${this.theme.separator.textAlign};`);
+            console.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
         }
     }
     
