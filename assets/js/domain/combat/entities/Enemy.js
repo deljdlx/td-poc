@@ -110,23 +110,6 @@ export class Enemy extends Entity {
     }
     
     /**
-     * Get max health (proxy to attributes)
-     * @returns {number}
-     */
-    get maxHealth() {
-        return this.attributes.maxHealth;
-    }
-    
-    /**
-     * Set max health (proxy to attributes)
-     * @param {number} value
-     */
-    set maxHealth(value) {
-        this._attributes._base.maxHealth = value;
-        this._attributesProxy.invalidate('maxHealth');
-    }
-    
-    /**
      * Take damage from missile
      * @param {number} amount
      * @param {Tower|null} attacker - Tower that dealt damage (optional)
