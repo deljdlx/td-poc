@@ -151,7 +151,9 @@ export class Debug {
         if (!levelCheck) return false;
         
         // Vérifier le filtre de contexte
-        if (Debug.filterMode === 'whitelist' && Debug.enabledContexts.size > 0) {
+        if (Debug.filterMode === 'whitelist') {
+            // En mode whitelist, le contexte doit être explicitement dans la liste
+            // Si la liste est vide, rien n'est autorisé
             return Debug.enabledContexts.has(this.context);
         }
         
