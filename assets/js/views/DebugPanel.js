@@ -64,6 +64,7 @@ export class DebugPanel {
         
         this.bindEvents();
         this.initDraggable();
+        this.initToggleButton();
     }
     
     /**
@@ -144,6 +145,47 @@ export class DebugPanel {
     getLevelName(level) {
         const names = ['ALL', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'NONE'];
         return names[level] || 'UNKNOWN';
+    }
+    
+    /**
+     * Initialize toggle button in footer
+     * @returns {void}
+     */
+    initToggleButton() {
+        const toggleBtn = document.getElementById('debug-panel-toggle-btn');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                this.toggleVisibility();
+            });
+        }
+    }
+    
+    /**
+     * Toggle panel visibility
+     * @returns {void}
+     */
+    toggleVisibility() {
+        if (this.panel.style.display === 'none') {
+            this.panel.style.display = 'block';
+        } else {
+            this.panel.style.display = 'none';
+        }
+    }
+    
+    /**
+     * Show panel
+     * @returns {void}
+     */
+    show() {
+        this.panel.style.display = 'block';
+    }
+    
+    /**
+     * Hide panel
+     * @returns {void}
+     */
+    hide() {
+        this.panel.style.display = 'none';
     }
     
     /**
