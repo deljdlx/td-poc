@@ -38,6 +38,26 @@
     font-size: 14px;
 }
 
+.debug-panel-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.debug-panel-close:hover {
+    color: #ff6b6b;
+}
+
 .debug-panel-toggle {
     background: transparent;
     border: none;

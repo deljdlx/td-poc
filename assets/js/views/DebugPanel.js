@@ -67,6 +67,12 @@ export class DebugPanel {
      * @returns {void}
      */
     bindEvents() {
+        // Close button
+        const closeBtn = document.getElementById('debug-panel-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hide());
+        }
+        
         // Log level selector
         const logLevelSelect = document.getElementById('debug-log-level');
         if (logLevelSelect) {
