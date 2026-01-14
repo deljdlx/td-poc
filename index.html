@@ -58,45 +58,73 @@
             <span class="debug-panel-title">🔍 Debug</span>
             <button id="debug-panel-close" class="debug-panel-close">×</button>
         </div>
-        <div class="debug-panel-content">
-            <div class="debug-section">
-                <div class="debug-section-title">Log Level</div>
-                <select id="debug-log-level" class="debug-select">
-                    <option value="0">ALL</option>
-                    <option value="1" selected>DEBUG</option>
-                    <option value="2">INFO</option>
-                    <option value="3">WARN</option>
-                    <option value="4">ERROR</option>
-                    <option value="5">NONE</option>
-                </select>
-            </div>
-            <div class="debug-section">
-                <div class="debug-section-title">Quick Actions</div>
-                <button id="debug-clear-console" class="debug-button">Clear Console</button>
-            </div>
-            <div class="debug-section">
-                <div class="debug-section-title">
-                    Context Filters
-                    <div class="debug-context-actions">
-                        <button id="debug-select-all" class="debug-mini-button">All</button>
-                        <button id="debug-clear-all" class="debug-mini-button">None</button>
+        
+        <!-- Tabs -->
+        <div class="debug-panel-tabs">
+            <button class="debug-tab active" data-tab="logs">📋 Logs</button>
+            <button class="debug-tab" data-tab="tests">🧪 Tests</button>
+            <button class="debug-tab" data-tab="actions">⚡ Actions</button>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="debug-tab-content">
+            <!-- Logs Tab -->
+            <div id="tab-logs" class="debug-tab-panel active">
+                <div class="debug-section">
+                    <div class="debug-section-title">Log Level</div>
+                    <select id="debug-log-level" class="debug-select">
+                        <option value="0">ALL</option>
+                        <option value="1" selected>DEBUG</option>
+                        <option value="2">INFO</option>
+                        <option value="3">WARN</option>
+                        <option value="4">ERROR</option>
+                        <option value="5">NONE</option>
+                    </select>
+                </div>
+                <div class="debug-section">
+                    <div class="debug-section-title">Quick Actions</div>
+                    <button id="debug-clear-console" class="debug-button">Clear Console</button>
+                </div>
+                <div class="debug-section">
+                    <div class="debug-section-title">
+                        Context Filters
+                        <div class="debug-context-actions">
+                            <button id="debug-select-all" class="debug-mini-button">All</button>
+                            <button id="debug-clear-all" class="debug-mini-button">None</button>
+                        </div>
+                    </div>
+                    <div id="debug-context-list" class="debug-context-list">
+                        <!-- Populated by JavaScript -->
                     </div>
                 </div>
-                <div id="debug-context-list" class="debug-context-list">
-                    <!-- Populated by JavaScript -->
+                <div class="debug-section">
+                    <div class="debug-section-title">Info</div>
+                    <div class="debug-info">
+                        <div class="debug-info-item">
+                            <span class="debug-info-label">FPS:</span>
+                            <span class="debug-info-value" id="debug-fps">--</span>
+                        </div>
+                        <div class="debug-info-item">
+                            <span class="debug-info-label">Entities:</span>
+                            <span class="debug-info-value" id="debug-entities">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="debug-section">
-                <div class="debug-section-title">Info</div>
-                <div class="debug-info">
-                    <div class="debug-info-item">
-                        <span class="debug-info-label">FPS:</span>
-                        <span class="debug-info-value" id="debug-fps">--</span>
-                    </div>
-                    <div class="debug-info-item">
-                        <span class="debug-info-label">Entities:</span>
-                        <span class="debug-info-value" id="debug-entities">--</span>
-                    </div>
+            
+            <!-- Tests Tab -->
+            <div id="tab-tests" class="debug-tab-panel">
+                <div class="debug-section">
+                    <div class="debug-section-title">Unit Tests</div>
+                    <p style="color: #999; font-size: 11px;">Coming soon...</p>
+                </div>
+            </div>
+            
+            <!-- Actions Tab -->
+            <div id="tab-actions" class="debug-tab-panel">
+                <div class="debug-section">
+                    <div class="debug-section-title">Quick Actions</div>
+                    <p style="color: #999; font-size: 11px;">Coming soon...</p>
                 </div>
             </div>
         </div>

@@ -60,6 +60,7 @@ export class DebugPanel {
         this.bindEvents();
         this.initDraggable();
         this.initToggleButton();
+        this.initTabs();
         this.loadPreferences();
         this.populateContextList();
     }
@@ -149,6 +150,48 @@ export class DebugPanel {
             toggleBtn.addEventListener('click', () => {
                 this.toggleVisibility();
             });
+        }
+    }
+    
+    /**
+     * Initialize tabs system
+     * @returns {void}
+     */
+    initTabs() {
+        const tabs = this.panel.querySelectorAll('.debug-tab');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                this.switchTab(targetTab);
+            });
+        });
+    }
+    
+    /**
+     * Switch to a specific tab
+     * @param {string} tabName
+     * @returns {void}
+     */
+    switchTab(tabName) {
+        // Remove active from all tabs
+        const tabs = this.panel.querySelectorAll('.debug-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        // Remove active from all panels
+        const panels = this.panel.querySelectorAll('.debug-tab-panel');
+        panels.forEach(p => p.classList.remove('active'));
+        
+        // Add active to clicked tab
+        const activeTab = this.panel.querySelector(`[data-tab="${tabName}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+        
+        // Add active to corresponding panel
+        const activePanel = this.panel.querySelector(`#tab-${tabName}`);
+        if (activePanel) {
+            activePanel.classList.add('active');
         }
     }
     

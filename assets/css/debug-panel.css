@@ -72,6 +72,55 @@
     color: #fff;
 }
 
+/* Tabs */
+.debug-panel-tabs {
+    display: flex;
+    gap: 2px;
+    background: #1a1a1a;
+    padding: 4px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.debug-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #999;
+    padding: 6px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.debug-tab:hover {
+    background: #2a2a2a;
+    color: #ccc;
+}
+
+.debug-tab.active {
+    background: #8b5cf6;
+    color: white;
+}
+
+.debug-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.debug-tab-panel {
+    display: none;
+}
+
+.debug-tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .debug-panel-content {
     display: flex;
     flex-direction: column;
