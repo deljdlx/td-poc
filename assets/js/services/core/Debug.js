@@ -1,13 +1,37 @@
 /**
- * Système de debug avec console.log stylisé
+ * Système de debug avec console.log stylisé et niveaux de log
  * Peut être injecté dans les classes pour un debugging visuel
  */
 export class Debug {
+    /**
+     * Niveaux de log avec priorités
+     * @type {Object}
+     * @static
+     */
+    static LEVELS = {
+        ALL: 0,      // Tous les logs
+        DEBUG: 1,    // Logs de debug détaillés
+        INFO: 2,     // Informations générales
+        WARN: 3,     // Avertissements
+        ERROR: 4,    // Erreurs
+        NONE: 5      // Aucun log
+    };
+    
+    /**
+     * Niveau de log global (peut être modifié pour filtrer tous les debugs)
+     * @type {number}
+     * @static
+     */
+    static globalLevel = Debug.LEVELS.DEBUG;
+    
     /** @type {boolean} */
     enabled = true;
     
     /** @type {string} */
     context = 'App';
+    
+    /** @type {number} - Niveau minimum pour ce contexte */
+    minLevel = Debug.LEVELS.ALL;
     
     /** @type {Object} */
     colors = {
@@ -29,6 +53,17 @@ export class Debug {
         debug: '🔍',
         event: '⚡',
         data: '📊',
+    };
+    
+    /** @type {Object} - Mapping des types vers les niveaux */
+    typeLevels = {
+        debug: Debug.LEVELS.DEBUG,
+        data: Debug.LEVELS.DEBUG,
+        event: Debug.LEVELS.DEBUG,
+        info: Debug.LEVELS.INFO,
+        success: Debug.LEVELS.INFO,
+        warning: Debug.LEVELS.WARN,
+        error: Debug.LEVELS.ERROR,
     };
     
     /**
@@ -57,6 +92,40 @@ export class Debug {
     }
     
     /**
+     * Définit le niveau minimum pour ce contexte
+     * @param {number} level - Niveau minimum (Debug.LEVELS.*)
+     * @returns {void}
+     */
+    setLevel(level) {
+        this.minLevel = level;
+    }
+    
+    /**
+     * Définit le niveau global pour tous les debugs
+     * @param {number} level - Niveau minimum (Debug.LEVELS.*)
+     * @static
+     * @returns {void}
+     */
+    static setGlobalLevel(level) {
+        Debug.globalLevel = level;
+    }
+    
+    /**
+     * Vérifie si un log doit être affiché selon son niveau
+     * @param {string} type - Type de log
+     * @returns {boolean}
+     * @private
+     */
+    _shouldLog(type) {
+        if (!this.enabled) {
+            return false;
+        }
+        
+        const typeLevel = this.typeLevels[type] || Debug.LEVELS.INFO;
+        return typeLevel >= this.minLevel && typeLevel >= Debug.globalLevel;
+    }
+    
+    /**
      * Log générique avec style
      * @param {string} type - Type de log (info, success, warning, error, debug, event, data)
      * @param {string} message - Message à afficher
@@ -64,7 +133,7 @@ export class Debug {
      * @returns {void}
      */
     log(type, message, data = null) {
-        if (!this.enabled) {
+        if (!this._shouldLog(type)) {
             return;
         }
         
