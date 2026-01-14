@@ -1,5 +1,6 @@
 import { Entity } from '../../../models/core/Entity.js';
 import { TowerAttributes } from '../value-objects/TowerAttributes.js';
+import { AttributesProxy } from '../../shared/AttributesProxy.js';
 import { TowerFiredEvent } from '../../../events/TowerEvent.js';
 import { EventBus } from '../../../services/core/EventBus.js';
 
@@ -31,9 +32,16 @@ export class Tower extends Entity {
     size;
     
     /**
-     * @type {TowerAttributes} - Gameplay attributes (tower stats)
+     * @type {TowerAttributes} - Base attributes (internal storage)
+     * @private
      */
-    attributes;
+    _attributes;
+    
+    /**
+     * @type {AttributesProxy} - Proxy for attribute access with modifiers
+     * @private
+     */
+    _attributesProxy;
     
     /**
      * @type {Object}
@@ -92,7 +100,8 @@ export class Tower extends Entity {
         this.events = EventBus.createHandler(this);
         
         // Gameplay attributes (tower stats)
-        this.attributes = new TowerAttributes(3.5, 1.0, 0.0, 1.5);
+        this._attributes = new TowerAttributes(3.5, 1.0, 0.0, 1.5);
+        this._attributesProxy = new AttributesProxy(this._attributes, this);
         
         // Stats tracking
         this.stats = {
@@ -104,6 +113,14 @@ export class Tower extends Entity {
         };
 
         debug.success('Tower created', { row: cell.row, col: cell.col, x: center.x, y: center.y });
+    }
+    
+    /**
+     * Get attributes with modifiers applied
+     * @returns {AttributesProxy}
+     */
+    get attributes() {
+        return this._attributesProxy;
     }
     
     /**
