@@ -149,15 +149,46 @@ body {
 }
 
 .game-footer {
-    height: 40px;
+    height: 50px;
     background: var(--color-surface);
     border-top: 1px solid var(--color-border);
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 12px;
     flex-shrink: 0;
     font-size: 12px;
     color: var(--color-text-dim);
+    padding: 0 16px;
+}
+
+/* Debug Buttons in Footer */
+.debug-btn {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--color-text);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.debug-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.debug-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.2);
 }
 
 /* ==========================================
