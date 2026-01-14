@@ -131,7 +131,7 @@ export class WaveManager {
         enemy.enemyType = config.type;
         enemy.health = config.health;
         enemy.maxHealth = config.health;
-        enemy.speed = config.speed; // Speed in cells/second
+        enemy.attributes.speed = config.speed; // Speed in cells/second
         enemy.path = path;
         enemy.currentPathIndex = 0;
         enemy.coordSystem = this.coordSystem;

@@ -127,23 +127,6 @@ export class Enemy extends Entity {
     }
     
     /**
-     * Get speed (proxy to attributes)
-     * @returns {number}
-     */
-    get speed() {
-        return this.attributes.speed;
-    }
-    
-    /**
-     * Set speed (proxy to attributes)
-     * @param {number} value
-     */
-    set speed(value) {
-        this._attributes._base.speed = value;
-        this._attributesProxy.invalidate('speed');
-    }
-    
-    /**
      * Take damage from missile
      * @param {number} amount
      * @param {Tower|null} attacker - Tower that dealt damage (optional)
@@ -252,7 +235,7 @@ export class Enemy extends Entity {
         
         // Move toward target
         // Convert logical speed (cells/sec) to pixels/sec
-        const speedPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.speed) : this.speed;
+        const speedPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.attributes.speed) : this.attributes.speed;
         const moveDistance = speedPixels * deltaTime;
         
         if (moveDistance >= distance) {
