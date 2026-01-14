@@ -17,11 +17,6 @@ export class Tower extends Entity {
     cell;
     
     /**
-     * @type {Function}
-     */
-    onShoot;
-    
-    /**
      * @type {string}
      */
     color;
@@ -76,10 +71,9 @@ export class Tower extends Entity {
     /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {string} playerId - ID of the player who owns this tower
-     * @param {Function} onShoot - Callback to create missiles: (tower, x, y, targetX, targetY) => void
      * @param {DIContainer} diContainer
      */
-    constructor(cell, playerId, onShoot, diContainer) {
+    constructor(cell, playerId, diContainer) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
         const entityManager = diContainer.get('entityManager');
@@ -91,7 +85,6 @@ export class Tower extends Entity {
         
         this.cell = cell;
         this.playerId = playerId;
-        this.onShoot = onShoot;
         this.color = '#6366f1'; // Blue for towers (will be player color later)
         this.size = 8;
         this.coordSystem = coordSystem;
@@ -135,14 +128,20 @@ export class Tower extends Entity {
             return false;
         }
         
-        if (this.onShoot) {
-            this.onShoot(this, this.x, this.y, targetX, targetY);
-        }
-        
         // Track shot
         this.stats.shotsFired++;
         
-        // Emit typed event
+        // Emit shoot event with target coordinates (before creating missile)
+        this.events.emit('shoot', {
+            tower: this,
+            x: this.x,
+            y: this.y,
+            targetX,
+            targetY,
+            target
+        });
+        
+        // Emit typed event (legacy - can be deprecated later)
         const event = new TowerFiredEvent(this, target, null); // missile is null for now
         this.events.emit('fired', event);
         

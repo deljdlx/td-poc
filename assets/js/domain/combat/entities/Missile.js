@@ -1,6 +1,7 @@
 import { Entity } from '../../../models/core/Entity.js';
 import { MissileAttributes } from '../value-objects/MissileAttributes.js';
 import { AttributesProxy } from '../../shared/AttributesProxy.js';
+import { EventBus } from '../../../services/core/EventBus.js';
 
 /**
  * Missile - Projectile entity that travels from source to target
@@ -60,11 +61,6 @@ export class Missile extends Entity {
     trailLength;
     
     /**
-     * @type {Function|null}
-     */
-    onArrival;
-    
-    /**
      * @type {number}
      */
     age;
@@ -98,13 +94,12 @@ export class Missile extends Entity {
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
      * @param {number} speed - Missile speed in pixels/second (default: 200)
-     * @param {Function} onArrival - Callback when missile reaches target (missile, impactX, impactY, splashRadiusPixels) => void
      * @param {number} maxLifeTime - Maximum lifetime in seconds (default: 3.0)
      * @param {number} splashRadius - Splash damage radius in CELLS (default: 0.5)
      * @param {number} damage - Damage amount (default: 25)
      * @param {Object} coordSystem - Coordinate system for conversions
      */
-    constructor(tower, x, y, targetX, targetY, speed = 200, onArrival = null, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null) {
+    constructor(tower, x, y, targetX, targetY, speed = 200, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null) {
         super('missile', x, y);
         
         this.tower = tower;
@@ -125,7 +120,6 @@ export class Missile extends Entity {
         this.size = 4;
         this.trail = [];
         this.trailLength = 10;
-        this.onArrival = onArrival;
         this.age = 0;
         this.maxLifeTime = maxLifeTime;
         
@@ -175,12 +169,14 @@ export class Missile extends Entity {
         const distanceToTarget = Math.sqrt(dx * dx + dy * dy);
         
         if (distanceToTarget < 5) {
-            // Trigger arrival callback before death
-            if (this.onArrival) {
-                // Convert splash radius from cells to pixels for rendering
-                const splashRadiusPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.attributes.splashRadius) : this.attributes.splashRadius;
-                this.onArrival(this, this.targetX, this.targetY, splashRadiusPixels);
-            }
+            // Emit impact event before death
+            const splashRadiusPixels = this.coordSystem ? this.coordSystem.cellsToPixels(this.attributes.splashRadius) : this.attributes.splashRadius;
+            EventBus.emitGlobal('missile:impact', {
+                missile: this,
+                x: this.targetX,
+                y: this.targetY,
+                splashRadius: splashRadiusPixels
+            });
             this.kill();
         }
     }

@@ -138,8 +138,13 @@ export class Game {
     setupGameEventListeners() {
         this.debug.info('🎯 Setting up Game event listeners (business logic + visual effects)');
         
+        // Tower shoot → Create missile
+        EventBus.onGlobal('shoot', (data) => {
+            this.createMissile(data.tower, data.x, data.y, data.targetX, data.targetY);
+        });
+        
         // Missile impact → Visual effects + Combat logic
-        this.events.on('missileImpact', (event) => {
+        EventBus.onGlobal('missile:impact', (event) => {
             // Visual effects
             this.canvasView.addSimpleExplosion(event.x, event.y);
             this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
@@ -303,10 +308,9 @@ export class Game {
     /**
      * Place a tower on a cell
      * @param {Cell} cell
-     * @param {Function} onShoot - Callback when tower shoots
      * @returns {boolean} - True if tower was placed successfully
      */
-    placeTower(cell, onShoot) {
+    placeTower(cell) {
         const activePlayer = this.playerManager.getActivePlayer();
         
         if (!activePlayer) {
@@ -333,8 +337,7 @@ export class Game {
         // Create and place tower
         const tower = new Tower(
             cell, 
-            activePlayer.id, 
-            onShoot, 
+            activePlayer.id,
             this.container
         );
         
@@ -353,10 +356,9 @@ export class Game {
     /**
      * Place N towers randomly on empty cells (for testing)
      * @param {number} count
-     * @param {Function} onShoot
      * @returns {Array<Cell>} - Array of cells where towers were placed
      */
-    placeRandomTowers(count, onShoot) {
+    placeRandomTowers(count) {
         const emptyCells = this.gridModel.getEmptyCells();
         
         if (emptyCells.length < count) {
@@ -377,8 +379,7 @@ export class Game {
         selectedCells.forEach(cell => {
             const tower = new Tower(
                 cell, 
-                activePlayer.id, 
-                onShoot, 
+                activePlayer.id,
                 this.container
             );
             
@@ -508,15 +509,6 @@ export class Game {
             startX, startY,
             targetX, targetY,
             this.config.missile.speed,
-            (missile, impactX, impactY, splashRadiusPixels) => {
-                // Emit impact event (visual FX + combat handled by listener)
-                this.events.emit('missileImpact', {
-                    missile,
-                    x: impactX, 
-                    y: impactY, 
-                    splashRadius: splashRadiusPixels 
-                });
-            },
             this.config.missile.lifetime,
             this.config.missile.splashRadius,
             this.config.missile.damage, // Damage from config (munition type)

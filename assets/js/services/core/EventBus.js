@@ -118,6 +118,19 @@ export class EventBus {
     }
     
     /**
+     * Emit a global event (without entity source)
+     * @param {string} eventName
+     * @param {*} data - Event data
+     */
+    static emitGlobal(eventName, data) {
+        if (EventBus.globalListeners.has(eventName)) {
+            EventBus.globalListeners.get(eventName).forEach(callback => {
+                callback(data);
+            });
+        }
+    }
+    
+    /**
      * Get statistics for debugging
      * @returns {Object}
      */

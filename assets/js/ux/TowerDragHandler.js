@@ -1,4 +1,5 @@
 import { DragDropManager } from '../services/ui/DragDropManager.js';
+import { EventBus } from '../services/core/EventBus.js';
 
 /**
  * Gestionnaire du drag and drop des tourelles
@@ -13,7 +14,7 @@ export class TowerDragHandler {
 
     /** @type {CoordinateSystem} */
     coordSystem = null;
-    
+
     /** @type {EntityManager} */
     entityManager = null;
     
@@ -25,9 +26,6 @@ export class TowerDragHandler {
     
     /** @type {Cell|null} */
     sourceCell = null;
-    
-    /** @type {Function|null} */
-    onTowerMoved = null;
     
     /**
      * @param {GridModel} model
@@ -50,15 +48,6 @@ export class TowerDragHandler {
             onDragEnd: this.handleDragEnd.bind(this),
             onCancel: this.handleCancel.bind(this)
         });
-    }
-    
-    /**
-     * Set callback for tower movement (business logic)
-     * @param {Function} callback - Called with (tower, fromCell, toCell)
-     * @returns {void}
-     */
-    setMoveCallback(callback) {
-        this.onTowerMoved = callback;
     }
     
     /**
@@ -161,18 +150,16 @@ export class TowerDragHandler {
             return false;
         }
         
-        // Drop valide : déléguer au Game pour validation et logique métier
-        if (this.onTowerMoved) {
-            const success = this.onTowerMoved(tower, sourceCell, targetCell);
-            if (success) {
-                this.updateTowerUI(tower, sourceCell, targetCell);
-            }
-            return success;
-        } else {
-            // Fallback si pas de callback (rétrocompatibilité)
-            this.moveTower(tower, sourceCell, targetCell);
-            return true;
-        }
+        // Drop valide : émettre event pour validation et logique métier
+        EventBus.emitGlobal('tower:moveAttempt', {
+            tower,
+            fromCell: sourceCell,
+            toCell: targetCell,
+            uiHandler: this
+        });
+        
+        // Return true pour le drag/drop UI (la logique métier validera via event)
+        return true;
     }
     
     /**

@@ -4,6 +4,7 @@ import { TowerRangeView } from '../views/TowerRangeView.js';
 import { TowerDragHandler } from '../ux/TowerDragHandler.js';
 import { Game } from '../models/gameplay/Game.js';
 import { DebugPanel } from '../views/DebugPanel.js';
+import { EventBus } from '../services/core/EventBus.js';
 
 /**
  * Contrôleur principal de l'application
@@ -110,9 +111,12 @@ export class AppController {
             this.container
         );
 
-        // Connect TowerDragHandler to Game (delegation pattern)
-        this.towerDragHandler.setMoveCallback((tower, fromCell, toCell) => {
-            return this.game.moveTower(tower, fromCell, toCell);
+        // Listen to tower move attempts and delegate to Game
+        EventBus.onGlobal('tower:moveAttempt', (data) => {
+            const success = this.game.moveTower(data.tower, data.fromCell, data.toCell);
+            if (success) {
+                data.uiHandler.updateTowerUI(data.tower, data.fromCell, data.toCell);
+            }
         });
         
         this.debug.success('Application initialisée avec succès', {
@@ -129,14 +133,9 @@ export class AppController {
         // Initialize Game (creates paths, etc.)
         this.game.init();
         this.gridSystem.renderPaths();
-        
-        // Tower shoot callback - delegate to Game
-        const onTowerShoot = (tower, x, y, targetX, targetY) => {
-            this.game.createMissile(tower, x, y, targetX, targetY);
-        };
 
         // Placer des tours aléatoirement pour le test
-        const placedCells = this.game.placeRandomTowers(5, onTowerShoot);
+        const placedCells = this.game.placeRandomTowers(5);
         
         // Enable drag and drop for placed towers
         placedCells.forEach(cell => {
