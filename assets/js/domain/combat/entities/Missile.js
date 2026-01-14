@@ -1,5 +1,6 @@
 import { Entity } from '../../../models/core/Entity.js';
 import { MissileAttributes } from '../value-objects/MissileAttributes.js';
+import { AttributesProxy } from '../../shared/AttributesProxy.js';
 
 /**
  * Missile - Projectile entity that travels from source to target
@@ -74,9 +75,16 @@ export class Missile extends Entity {
     maxLifeTime;
     
     /**
-     * @type {MissileAttributes} - Gameplay attributes (munition stats)
+     * @type {MissileAttributes} - Base attributes (internal storage)
+     * @private
      */
-    attributes;
+    _attributes;
+    
+    /**
+     * @type {AttributesProxy} - Proxy for attribute access with modifiers
+     * @private
+     */
+    _attributesProxy;
     
     /**
      * @type {Object}
@@ -122,9 +130,18 @@ export class Missile extends Entity {
         this.maxLifeTime = maxLifeTime;
         
         // Gameplay attributes (munition stats)
-        this.attributes = new MissileAttributes(damage, splashRadius);
+        this._attributes = new MissileAttributes(damage, splashRadius);
+        this._attributesProxy = new AttributesProxy(this._attributes, this);
         
         this.coordSystem = coordSystem;
+    }
+    
+    /**
+     * Get attributes with modifiers applied
+     * @returns {AttributesProxy}
+     */
+    get attributes() {
+        return this._attributesProxy;
     }
     
     /**
