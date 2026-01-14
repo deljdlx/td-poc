@@ -3,6 +3,7 @@ import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
 import { TowerDragHandler } from '../ux/TowerDragHandler.js';
 import { Game } from '../models/gameplay/Game.js';
+import { DebugPanel } from '../views/DebugPanel.js';
 
 /**
  * Contrôleur principal de l'application
@@ -40,6 +41,9 @@ export class AppController {
     
     /** @type {TowerRangeView} */
     towerRangeView = null;
+    
+    /** @type {DebugPanel} */
+    debugPanel = null;
     
     /** @type {TowerStatsPopup} */
     towerStatsPopup = null;
@@ -119,6 +123,9 @@ export class AppController {
         // Initialize GridSystem (render grid)
         this.gridSystem.init();
         
+        // Initialize Debug Panel
+        this.debugPanel = new DebugPanel(this.container);
+        
         // Initialize Game (creates paths, etc.)
         this.game.init();
         this.gridSystem.renderPaths();
@@ -162,6 +169,13 @@ export class AppController {
             this.render(deltaTime);
             // Update UI components after render
             uiUpdateManager.update(deltaTime);
+            // Update debug panel info
+            if (this.debugPanel) {
+                this.debugPanel.update({
+                    fps: this.gameClock.getFPS(),
+                    entityCount: this.entityManager.getEntities().length
+                });
+            }
         });
         
         // Démarrer

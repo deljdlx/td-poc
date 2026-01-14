@@ -29,6 +29,15 @@ export class GameClock {
     /** @type {Debug} */
     debug = null;
     
+    /** @type {number} - Current FPS (calculated) */
+    currentFPS = 0;
+    
+    /** @type {number} - Frame count for FPS calculation */
+    frameCount = 0;
+    
+    /** @type {number} - Last FPS update time */
+    lastFPSUpdate = 0;
+    
     /**
      * @param {DIContainer} container
      */
@@ -48,6 +57,8 @@ export class GameClock {
         
         this.isRunning = true;
         this.lastTime = performance.now();
+        this.lastFPSUpdate = this.lastTime;
+        this.frameCount = 0;
         this.tick();
         
         this.debug.success('GameClock démarrée', {
@@ -106,6 +117,15 @@ export class GameClock {
             this.onRender(frameDelta / 1000); // Convertir en secondes
         }
         
+        // Calculate FPS (update every second)
+        this.frameCount++;
+        const fpsElapsed = currentTime - this.lastFPSUpdate;
+        if (fpsElapsed >= 1000) { // Update every second
+            this.currentFPS = (this.frameCount * 1000) / fpsElapsed;
+            this.frameCount = 0;
+            this.lastFPSUpdate = currentTime;
+        }
+        
         this.animationFrameId = requestAnimationFrame(this.tick.bind(this));
     }
     
@@ -125,5 +145,13 @@ export class GameClock {
      */
     setRenderCallback(callback) {
         this.onRender = callback;
+    }
+    
+    /**
+     * Get current FPS
+     * @returns {number}
+     */
+    getFPS() {
+        return this.currentFPS;
     }
 }
