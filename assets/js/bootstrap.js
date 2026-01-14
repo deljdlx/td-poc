@@ -26,7 +26,7 @@ const container = new DIContainer();
 export function bootstrapDI() {
     // Factory pour créer des instances de Debug
     container.registerFactory('debug.factory', () => {
-        return (context, enabled = true) => new Debug(context, enabled);
+        return (context, enabled = true, logger = console) => new Debug(context, enabled, logger);
     });
     
     // CoordinateSystem (singleton)

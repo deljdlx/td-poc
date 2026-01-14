@@ -76,7 +76,7 @@ export class Debug {
         event: '⚡',
         data: '📊',
     };
-    
+
     /** @type {Object} - Theme configuration for all visual styles */
     theme = {
         contextBadge: {
@@ -120,13 +120,18 @@ export class Debug {
         error: Debug.LEVELS.ERROR,
     };
     
+    /** @type {Console} - Interface de logging injectable */
+    logger = console;
+    
     /**
      * @param {string} context - Nom du contexte (classe, module, etc.)
      * @param {boolean} enabled - Active/désactive le debug
+     * @param {Console} logger - Interface de logging (injectable pour tests/custom loggers)
      */
-    constructor(context = 'App', enabled = true) {
+    constructor(context = 'App', enabled = true, logger = console) {
         this.context = context;
         this.enabled = enabled;
+        this.logger = logger;
         
         // Auto-register this context
         Debug.registeredContexts.set(context, this);
@@ -230,7 +235,7 @@ export class Debug {
         `;
         
         // Affichage
-        console.log(
+        this.logger.log(
             `%c${this.context}%c ${timestamp} %c${icon} ${message}`,
             contextStyle,
             timeStyle,
@@ -239,7 +244,7 @@ export class Debug {
         
         // Afficher les données si présentes
         if (data !== null && data !== undefined) {
-            console.log('%c└─ Data:', `color: ${color}; font-style: ${this.theme.data.fontStyle};`, data);
+            this.logger.log('%c└─ Data:', `color: ${color}; font-style: ${this.theme.data.fontStyle};`, data);
         }
     }
     
@@ -324,9 +329,9 @@ export class Debug {
             return;
         }
         
-        console.group(`🔽 ${this.context} - ${label}`);
+        this.logger.group(`🔽 ${this.context} - ${label}`);
         callback();
-        console.groupEnd();
+        this.logger.groupEnd();
     }
     
     /**
@@ -340,9 +345,9 @@ export class Debug {
             return;
         }
         
-        console.groupCollapsed(`▶️ ${this.context} - ${label}`);
+        this.logger.groupCollapsed(`▶️ ${this.context} - ${label}`);
         callback();
-        console.groupEnd();
+        this.logger.groupEnd();
     }
     
     /**
@@ -355,8 +360,8 @@ export class Debug {
             return;
         }
         
-        console.log(`%c${this.context} 📊 Table:`, `color: ${this.colors.data}; font-weight: ${this.theme.table.fontWeight};`);
-        console.table(data);
+        this.logger.log(`%c${this.context} 📊 Table:`, `color: ${this.colors.data}; font-weight: ${this.theme.table.fontWeight};`);
+        this.logger.table(data);
     }
     
     /**
@@ -371,9 +376,9 @@ export class Debug {
         }
         
         const timerLabel = `⏱️ ${this.context} - ${label}`;
-        console.time(timerLabel);
+        this.logger.time(timerLabel);
         const result = callback();
-        console.timeEnd(timerLabel);
+        this.logger.timeEnd(timerLabel);
         return result;
     }
     
@@ -387,8 +392,8 @@ export class Debug {
             return;
         }
         
-        console.log(`%c${this.context} 🔍 ${message}`, `color: ${this.colors.debug}; font-weight: ${this.theme.trace.fontWeight};`);
-        console.trace();
+        this.logger.log(`%c${this.context} 🔍 ${message}`, `color: ${this.colors.debug}; font-weight: ${this.theme.trace.fontWeight};`);
+        this.logger.trace();
     }
     
     /**
@@ -402,10 +407,10 @@ export class Debug {
         }
         
         const line = '═'.repeat(50);
-        console.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
+        this.logger.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
         if (label) {
-            console.log(`%c${label}`, `color: ${this.theme.separator.labelColor}; font-weight: ${this.theme.separator.fontWeight}; text-align: ${this.theme.separator.textAlign};`);
-            console.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
+            this.logger.log(`%c${label}`, `color: ${this.theme.separator.labelColor}; font-weight: ${this.theme.separator.fontWeight}; text-align: ${this.theme.separator.textAlign};`);
+            this.logger.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
         }
     }
     
