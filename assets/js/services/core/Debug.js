@@ -24,6 +24,28 @@ export class Debug {
      */
     static globalLevel = Debug.LEVELS.DEBUG;
     
+    /**
+     * Registre de tous les contextes Debug créés
+     * @type {Map<string, Debug>}
+     * @static
+     */
+    static registeredContexts = new Map();
+    
+    /**
+     * Set des contextes activés (whitelist)
+     * Si vide, tous sont activés
+     * @type {Set<string>}
+     * @static
+     */
+    static enabledContexts = new Set();
+    
+    /**
+     * Mode de filtrage: 'all' (tous actifs) ou 'whitelist' (seulement enabledContexts)
+     * @type {string}
+     * @static
+     */
+    static filterMode = 'all';
+    
     /** @type {boolean} */
     enabled = true;
     
@@ -73,6 +95,9 @@ export class Debug {
     constructor(context = 'App', enabled = true) {
         this.context = context;
         this.enabled = enabled;
+        
+        // Auto-register this context
+        Debug.registeredContexts.set(context, this);
     }
     
     /**
@@ -111,7 +136,7 @@ export class Debug {
     }
     
     /**
-     * Vérifie si un log doit être affiché selon son niveau
+     * Vérifie si un log doit être affiché selon le niveau ET le contexte
      * @param {string} type - Type de log
      * @returns {boolean}
      * @private
@@ -122,7 +147,15 @@ export class Debug {
         }
         
         const typeLevel = this.typeLevels[type] || Debug.LEVELS.INFO;
-        return typeLevel >= this.minLevel && typeLevel >= Debug.globalLevel;
+        const levelCheck = typeLevel >= this.minLevel && typeLevel >= Debug.globalLevel;
+        if (!levelCheck) return false;
+        
+        // Vérifier le filtre de contexte
+        if (Debug.filterMode === 'whitelist' && Debug.enabledContexts.size > 0) {
+            return Debug.enabledContexts.has(this.context);
+        }
+        
+        return true;
     }
     
     /**
@@ -340,5 +373,77 @@ export class Debug {
             console.log(`%c${label}`, 'color: #64748b; font-weight: bold; text-align: center;');
             console.log(`%c${line}`, 'color: #475569;');
         }
+    }
+    
+    /**
+     * Obtient la liste de tous les contextes enregistrés
+     * @returns {string[]}
+     * @static
+     */
+    static getRegisteredContexts() {
+        return Array.from(Debug.registeredContexts.keys()).sort();
+    }
+    
+    /**
+     * Active un contexte spécifique
+     * @param {string} context
+     * @returns {void}
+     * @static
+     */
+    static enableContext(context) {
+        Debug.enabledContexts.add(context);
+        Debug.filterMode = 'whitelist';
+    }
+    
+    /**
+     * Désactive un contexte spécifique
+     * @param {string} context
+     * @returns {void}
+     * @static
+     */
+    static disableContext(context) {
+        Debug.enabledContexts.delete(context);
+    }
+    
+    /**
+     * Active tous les contextes (désactive le filtre)
+     * @returns {void}
+     * @static
+     */
+    static enableAllContexts() {
+        Debug.filterMode = 'all';
+        Debug.enabledContexts.clear();
+    }
+    
+    /**
+     * Désactive tous les contextes
+     * @returns {void}
+     * @static
+     */
+    static disableAllContexts() {
+        Debug.filterMode = 'whitelist';
+        Debug.enabledContexts.clear();
+    }
+    
+    /**
+     * Définit les contextes actifs
+     * @param {string[]} contexts
+     * @returns {void}
+     * @static
+     */
+    static setEnabledContexts(contexts) {
+        Debug.enabledContexts = new Set(contexts);
+        Debug.filterMode = contexts.length > 0 ? 'whitelist' : 'all';
+    }
+    
+    /**
+     * Vérifie si un contexte est activé
+     * @param {string} context
+     * @returns {boolean}
+     * @static
+     */
+    static isContextEnabled(context) {
+        if (Debug.filterMode === 'all') return true;
+        return Debug.enabledContexts.has(context);
     }
 }

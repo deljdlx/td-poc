@@ -60,6 +60,8 @@ export class DebugPanel {
         this.bindEvents();
         this.initDraggable();
         this.initToggleButton();
+        this.loadPreferences();
+        this.populateContextList();
     }
     
     /**
@@ -90,6 +92,18 @@ export class DebugPanel {
                 console.clear();
                 console.log('🧹 Console cleared');
             });
+        }
+        
+        // Select all contexts
+        const selectAllBtn = document.getElementById('debug-select-all');
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', () => this.selectAllContexts());
+        }
+        
+        // Clear all contexts
+        const clearAllBtn = document.getElementById('debug-clear-all');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', () => this.clearAllContexts());
         }
     }
     
@@ -300,6 +314,107 @@ export class DebugPanel {
         if (this.boundOnTouchEnd) {
             document.removeEventListener('touchend', this.boundOnTouchEnd);
             this.boundOnTouchEnd = null;
+        }
+    }
+    
+    /**
+     * Populate context list with checkboxes
+     * @returns {void}
+     */
+    populateContextList() {
+        const contextList = document.getElementById('debug-context-list');
+        if (!contextList) return;
+        
+        const contexts = Debug.getRegisteredContexts();
+        contextList.innerHTML = '';
+        
+        contexts.forEach(context => {
+            const item = document.createElement('label');
+            item.className = 'debug-context-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'debug-context-checkbox';
+            checkbox.value = context;
+            checkbox.checked = Debug.isContextEnabled(context);
+            checkbox.addEventListener('change', (e) => this.onContextToggle(context, e.target.checked));
+            
+            const label = document.createElement('span');
+            label.textContent = context;
+            
+            item.appendChild(checkbox);
+            item.appendChild(label);
+            contextList.appendChild(item);
+        });
+    }
+    
+    /**
+     * Handle context toggle
+     * @param {string} context
+     * @param {boolean} enabled
+     * @returns {void}
+     */
+    onContextToggle(context, enabled) {
+        if (enabled) {
+            Debug.enableContext(context);
+        } else {
+            Debug.disableContext(context);
+        }
+        this.savePreferences();
+    }
+    
+    /**
+     * Select all contexts
+     * @returns {void}
+     */
+    selectAllContexts() {
+        Debug.enableAllContexts();
+        this.populateContextList();
+        this.savePreferences();
+    }
+    
+    /**
+     * Clear all contexts
+     * @returns {void}
+     */
+    clearAllContexts() {
+        Debug.disableAllContexts();
+        this.populateContextList();
+        this.savePreferences();
+    }
+    
+    /**
+     * Save preferences to localStorage
+     * @returns {void}
+     */
+    savePreferences() {
+        const preferences = {
+            filterMode: Debug.filterMode,
+            enabledContexts: Array.from(Debug.enabledContexts),
+            logLevel: Debug.globalLevel
+        };
+        localStorage.setItem('debug-preferences', JSON.stringify(preferences));
+    }
+    
+    /**
+     * Load preferences from localStorage
+     * @returns {void}
+     */
+    loadPreferences() {
+        const stored = localStorage.getItem('debug-preferences');
+        if (!stored) return;
+        
+        try {
+            const preferences = JSON.parse(stored);
+            Debug.filterMode = preferences.filterMode || 'all';
+            Debug.enabledContexts = new Set(preferences.enabledContexts || []);
+            if (preferences.logLevel !== undefined) {
+                Debug.setGlobalLevel(preferences.logLevel);
+                const select = document.getElementById('debug-log-level');
+                if (select) select.value = preferences.logLevel;
+            }
+        } catch (e) {
+            console.error('Failed to load debug preferences:', e);
         }
     }
 }
