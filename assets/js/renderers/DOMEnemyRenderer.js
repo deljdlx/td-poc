@@ -160,7 +160,7 @@ export class DOMEnemyRenderer {
     updateHealthBar(element, enemy) {
         const healthFill = element.querySelector('.enemy-health-fill');
         if (healthFill) {
-            const healthPercent = (enemy.health / enemy.attributes.maxHealth) * 100;
+            const healthPercent = (enemy.attributes.health / enemy.attributes.maxHealth) * 100;
             healthFill.style.width = `${healthPercent}%`;
         }
     }

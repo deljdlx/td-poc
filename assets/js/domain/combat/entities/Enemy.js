@@ -93,43 +93,26 @@ export class Enemy extends Entity {
     }
     
     /**
-     * Get current health (proxy to attributes)
-     * @returns {number}
-     */
-    get health() {
-        return this.attributes.health;
-    }
-    
-    /**
-     * Set current health (proxy to attributes)
-     * @param {number} value
-     */
-    set health(value) {
-        this._attributes._base.health = value;
-        this._attributesProxy.invalidate('health');
-    }
-    
-    /**
      * Take damage from missile
      * @param {number} amount
      * @param {Tower|null} attacker - Tower that dealt damage (optional)
      * @returns {void}
      */
     takeDamage(amount, attacker = null) {
-        const previousHealth = this.health;
-        this.health -= amount;
+        const previousHealth = this.attributes.health;
+        this.attributes.health -= amount;
         
         // Store killer if this attack will kill
-        if (this.health <= 0 && attacker) {
+        if (this.attributes.health <= 0 && attacker) {
             this.killer = attacker;
         }
         
         // Trigger hit event with typed Event
-        const event = new EnemyHitEvent(this, amount, previousHealth, this.health);
+        const event = new EnemyHitEvent(this, amount, previousHealth, this.attributes.health);
         this.events.emit('hit', event);
         
-        if (this.health <= 0) {
-            this.health = 0;
+        if (this.attributes.health <= 0) {
+            this.attributes.health = 0;
             this.kill();
         }
     }
@@ -139,7 +122,7 @@ export class Enemy extends Entity {
      * @returns {boolean}
      */
     isDead() {
-        return this.health <= 0 || !this.alive;
+        return this.attributes.health <= 0 || !this.alive;
     }
     
     /**

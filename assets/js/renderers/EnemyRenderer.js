@@ -54,7 +54,7 @@ export class EnemyRenderer {
         ctx.fillRect(barX, barY, barWidth, barHeight);
         
         // Health
-        const healthPercent = enemy.health / enemy.attributes.maxHealth;
+        const healthPercent = enemy.attributes.health / enemy.attributes.maxHealth;
         ctx.fillStyle = healthPercent > 0.5 ? '#22c55e' : (healthPercent > 0.25 ? '#f59e0b' : '#dc2626');
         ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
         

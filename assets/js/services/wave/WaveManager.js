@@ -129,7 +129,7 @@ export class WaveManager {
         // Create enemy with config
         const enemy = new Enemy(spawnPos.x, spawnPos.y);
         enemy.enemyType = config.type;
-        enemy.health = config.health;
+        enemy.attributes.health = config.health;
         enemy.attributes.maxHealth = config.health;
         enemy.attributes.speed = config.speed; // Speed in cells/second
         enemy.path = path;

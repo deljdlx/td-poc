@@ -577,9 +577,9 @@ export class Game {
                 }
                 
                 if (isCritical) {
-                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.attributes.critMultiplier}x) - HP: ${enemy.health}/${enemy.attributes.maxHealth}`);
+                    this.debug.success(`💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.attributes.critMultiplier}x) - HP: ${enemy.attributes.health}/${enemy.attributes.maxHealth}`);
                 } else {
-                    this.debug.debug(`Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.health}/${enemy.attributes.maxHealth}`);
+                    this.debug.debug(`Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.attributes.health}/${enemy.attributes.maxHealth}`);
                 }
             }
         });
