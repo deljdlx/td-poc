@@ -456,16 +456,16 @@ export class Game {
         }
         
         // Award gold
-        owner.wallet.add('money', enemy.goldReward);
+        owner.wallet.add('money', enemy.attributes.goldReward);
         
         // Update stats
         owner.stats.enemiesKilled++;
-        owner.score += enemy.goldReward;
+        owner.score += enemy.attributes.goldReward;
         
         // Update global score
-        this.globalScore += enemy.goldReward;
+        this.globalScore += enemy.attributes.goldReward;
         
-        this.debug.success(`💰 ${owner.name} earned ${enemy.goldReward} gold`, { 
+        this.debug.success(`💰 ${owner.name} earned ${enemy.attributes.goldReward} gold`, { 
             total: owner.wallet.get('money'),
             kills: owner.stats.enemiesKilled
         });

@@ -144,14 +144,6 @@ export class Enemy extends Entity {
     }
     
     /**
-     * Get gold reward (proxy to attributes)
-     * @returns {number}
-     */
-    get goldReward() {
-        return this.attributes.goldReward;
-    }
-    
-    /**
      * Take damage from missile
      * @param {number} amount
      * @param {Tower|null} attacker - Tower that dealt damage (optional)
