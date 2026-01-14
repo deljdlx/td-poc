@@ -544,8 +544,8 @@ export class Game {
         const tower = missile.tower;
         const baseDamage = missile.attributes.damage;
         
-        // Calculate splash radius from config
-        const splashRadius = this.config.missile.splashRadius * this.coordSystem.getCellSize();
+        // Calculate splash radius from missile attributes
+        const splashRadius = missile.attributes.splashRadius * this.coordSystem.getCellSize();
         
         const enemies = this.entityManager.getEntitiesByType('enemy');
         let hitCount = 0;

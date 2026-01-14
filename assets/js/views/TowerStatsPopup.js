@@ -216,7 +216,7 @@ export class TowerStatsPopup {
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Damage</div>
-                            <div class="stat-value stat-damage">${tower.damage || 25}</div>
+                            <div class="stat-value stat-damage">${tower.attributes.damage || 25}</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Crit Chance</div>
