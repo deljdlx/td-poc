@@ -161,11 +161,67 @@ export class TowerStatsPopup {
         
         return `
             <div class="tower-stats">
+                <!-- Tower Stats (Shooter) -->
+                <div class="stats-section">
+                    <h3 class="stats-section-title">
+                        <span class="stats-icon">🗼</span>
+                        Tower Stats
+                    </h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Range</div>
+                            <div class="stat-value">${tower.attributes.range} <span class="stat-unit">cells</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Cooldown</div>
+                            <div class="stat-value">${tower.attributes.cooldown.toFixed(2)} <span class="stat-unit">sec</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Fire Rate</div>
+                            <div class="stat-value">${(1 / tower.attributes.cooldown).toFixed(2)} <span class="stat-unit">/sec</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Crit Chance</div>
+                            <div class="stat-value">${(tower.attributes.critChance * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Crit Multiplier</div>
+                            <div class="stat-value">×${tower.attributes.critMultiplier.toFixed(1)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Missile Stats (Munitions) -->
+                <div class="stats-section">
+                    <h3 class="stats-section-title">
+                        <span class="stats-icon">🚀</span>
+                        Missile Stats
+                    </h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Damage</div>
+                            <div class="stat-value stat-damage">${tower.missileConfig.damage}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Splash Radius</div>
+                            <div class="stat-value">${tower.missileConfig.splashRadius} <span class="stat-unit">cells</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Speed</div>
+                            <div class="stat-value">${tower.missileConfig.speed} <span class="stat-unit">px/s</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Lifetime</div>
+                            <div class="stat-value">${tower.missileConfig.lifetime.toFixed(1)} <span class="stat-unit">sec</span></div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Combat Stats -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">
                         <span class="stats-icon">⚔️</span>
-                        Combat Stats
+                        Performance
                     </h3>
                     <div class="stats-grid">
                         <div class="stat-item">
@@ -195,36 +251,6 @@ export class TowerStatsPopup {
                         <div class="stat-item">
                             <div class="stat-label">Avg Damage/Hit</div>
                             <div class="stat-value" data-stat="avgDamage">${avgDamage}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Configuration -->
-                <div class="stats-section">
-                    <h3 class="stats-section-title">
-                        <span class="stats-icon">⚙️</span>
-                        Configuration
-                    </h3>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-label">Range</div>
-                            <div class="stat-value">${tower.attributes.range} <span class="stat-unit">cells</span></div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Fire Rate</div>
-                            <div class="stat-value">${(1 / tower.attributes.cooldown).toFixed(2)} <span class="stat-unit">/sec</span></div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Damage</div>
-                            <div class="stat-value stat-damage">${tower.attributes.damage || 25}</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Crit Chance</div>
-                            <div class="stat-value">${(tower.attributes.critChance || 0) * 100}%</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Crit Multiplier</div>
-                            <div class="stat-value">×${tower.attributes.critMultiplier || 1.5}</div>
                         </div>
                     </div>
                 </div>
