@@ -92,7 +92,7 @@ export class Game {
             name: 'Standard Missile',
             damage: 25,
             splashRadius: 0.5,  // in cells
-            speed: 200,         // pixels/sec
+            speed: 4.0,         // cells/sec (business logic)
             lifetime: 3.0,      // seconds
             effects: {
                 // Gameplay effects on impact (future: stun, knockback, slow, etc.)

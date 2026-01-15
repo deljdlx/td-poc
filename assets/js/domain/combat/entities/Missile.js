@@ -98,29 +98,32 @@ export class Missile extends Entity {
      * @param {number} y - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
-     * @param {number} speed - Missile speed in pixels/second (default: 200)
+     * @param {number} speed - Missile speed in CELLS/second (will be converted to pixels/sec)
      * @param {number} maxLifeTime - Maximum lifetime in seconds (default: 3.0)
      * @param {number} splashRadius - Splash damage radius in CELLS (default: 0.5)
      * @param {number} damage - Damage amount (default: 25)
      * @param {Object} coordSystem - Coordinate system for conversions
      * @param {Object} visualFx - Visual effects configuration from blueprint
      */
-    constructor(tower, x, y, targetX, targetY, speed = 200, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null, visualFx = null) {
+    constructor(tower, x, y, targetX, targetY, speed = 4.0, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null, visualFx = null) {
         super('missile', x, y);
         
         this.tower = tower;
         this.targetX = targetX;
         this.targetY = targetY;
-        this.speed = speed;
+        
+        // Convert speed from cells/sec to pixels/sec (business logic → rendering)
+        const speedInPixels = coordSystem ? coordSystem.cellsToPixels(speed) : speed * 50;
+        this.speed = speedInPixels;
         
         // Calculate direction vector
         const dx = targetX - x;
         const dy = targetY - y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // Normalize and scale by speed
-        this.vx = (dx / distance) * speed;
-        this.vy = (dy / distance) * speed;
+        // Normalize and scale by speed (in pixels)
+        this.vx = (dx / distance) * speedInPixels;
+        this.vy = (dy / distance) * speedInPixels;
         
         // Visual effects from blueprint or defaults
         this.visualFx = visualFx || {
