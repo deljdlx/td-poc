@@ -127,14 +127,14 @@ export class Missile extends Entity {
         
         // Visual effects from blueprint or defaults
         this.visualFx = visualFx || {
-            trail: { color: '#ff6b6b', width: 2 },
+            trail: { color: '#ff6b6b', width: 2, length: 10 },
             explosion: { type: 'simple', scale: 1.0 }
         };
         
         this.color = this.visualFx.trail.color;
         this.size = 4;
         this.trail = [];
-        this.trailLength = 10;
+        this.trailLength = this.visualFx.trail.length || 10;
         this.age = 0;
         this.maxLifeTime = maxLifeTime;
         

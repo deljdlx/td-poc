@@ -102,7 +102,8 @@ export class Game {
                 // Visual effects (future: trail color, explosion type, particle effects, etc.)
                 trail: {
                     color: '#ff0',
-                    width: 1
+                    width: 1,
+                    length: 10  // Number of trail points
                 },
                 explosion: {
                     type: 'firework',
@@ -123,7 +124,8 @@ export class Game {
             visualFx: {
                 trail: {
                     color: '#0f0',  // Vert fluo
-                    width: 8        // Trail épais
+                    width: 8,       // Trail épais
+                    length: 25      // Trail longue pour missile lourd
                 },
                 explosion: {
                     type: 'simple',  // Explosion simple au lieu de firework
