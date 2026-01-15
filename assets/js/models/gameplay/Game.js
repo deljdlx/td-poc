@@ -5,6 +5,7 @@ import { PathFactory } from '../core/PathFactory.js';
 import { Missile } from '../../domain/combat/entities/Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../events/GameEvent.js';
 import { EventBus } from '../../services/core/EventBus.js';
+import { missileTypes } from './MissileTypeRegistry.js';
 
 /**
  * Game - Core game logic and state management
@@ -84,56 +85,9 @@ export class Game {
     };
     
     /**
-     * @type {Object} - Missile type blueprints
+     * @type {Object} - Missile type blueprints (imported from registry)
      */
-    missileTypes = {
-        'standard': {
-            id: 'standard',
-            name: 'Standard Missile',
-            damage: 25,
-            splashRadius: 0.5,  // in cells
-            speed: 4.0,         // cells/sec (business logic)
-            lifetime: 3.0,      // seconds
-            effects: {
-                // Gameplay effects on impact (future: stun, knockback, slow, etc.)
-                onImpact: []
-            },
-            visualFx: {
-                // Visual effects (future: trail color, explosion type, particle effects, etc.)
-                trail: {
-                    color: '#ff0',
-                    width: 1,
-                    length: 10  // Number of trail points
-                },
-                explosion: {
-                    type: 'firework',
-                    scale: 1.0
-                }
-            }
-        },
-        'heavy': {
-            id: 'heavy',
-            name: 'Heavy Missile',
-            damage: 50,
-            splashRadius: 1.0,  // in cells (plus large)
-            speed: 2.0,         // cells/sec (plus lent)
-            lifetime: 4.0,      // seconds (vit plus longtemps)
-            effects: {
-                onImpact: []
-            },
-            visualFx: {
-                trail: {
-                    color: '#0f0',  // Vert fluo
-                    width: 8,       // Trail épais
-                    length: 25      // Trail longue pour missile lourd
-                },
-                explosion: {
-                    type: 'simple',  // Explosion simple au lieu de firework
-                    scale: 2.0       // Plus grosse
-                }
-            }
-        }
-    };
+    missileTypes = missileTypes;
     
     /**
      * @param {GridModel} gridModel
@@ -181,7 +135,7 @@ export class Game {
         this.state = GameState.READY;
         this.debug.success('Game initialized - Ready to start');
     }
-    
+
     /**
      * Setup game event listeners for business logic (rewards, scoring, game over)
      * AND visual effects (explosions, animations)
