@@ -171,17 +171,20 @@ export class Game {
             // Choose explosion effect based on type
             switch(explosionConfig.type) {
                 case 'firework':
-                    this.canvasView.addFirework(event.x, event.y, { scale: explosionConfig.scale });
+                    // Pass all firework parameters from blueprint
+                    const { type, ...fireworkParams } = explosionConfig;
+                    this.canvasView.addFirework(event.x, event.y, fireworkParams);
                     break;
                 case 'simple':
-                    this.canvasView.addSimpleExplosion(event.x, event.y, { scale: explosionConfig.scale });
+                    this.canvasView.addSimpleExplosion(event.x, event.y, explosionConfig);
                     break;
                 case 'none':
                     // No explosion effect
                     break;
                 default:
                     // Default to firework
-                    this.canvasView.addFirework(event.x, event.y, { scale: explosionConfig.scale });
+                    const { type: _, ...defaultParams } = explosionConfig;
+                    this.canvasView.addFirework(event.x, event.y, defaultParams);
             }
             
             // Always show splash zone

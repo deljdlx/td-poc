@@ -27,7 +27,12 @@ export const missileTypes = {
             },
             explosion: {
                 type: 'firework',
-                scale: 1.0
+                particleCount: 20,
+                power: 120,
+                spread: 60,
+                gravity: 300,
+                particleSize: { min: 2, max: 5 },
+                lifetime: { min: 1.0, max: 1.5 }
             }
         }
     },
@@ -48,8 +53,13 @@ export const missileTypes = {
                 length: 25      // Trail longue pour missile lourd
             },
             explosion: {
-                type: 'simple',  // Explosion simple au lieu de firework
-                scale: 2.0       // Plus grosse
+                type: 'firework',
+                particleCount: 80,     // Beaucoup plus de particules
+                power: 250,            // Explosion puissante
+                spread: 120,           // Large dispersion
+                gravity: 150,          // Gravité plus faible = particules montent plus
+                particleSize: { min: 5, max: 12 },  // Grosses particules
+                lifetime: { min: 2.0, max: 3.5 }    // Longue durée
             }
         }
     }
