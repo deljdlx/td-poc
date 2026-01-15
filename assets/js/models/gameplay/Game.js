@@ -6,6 +6,7 @@ import { Missile } from '../../domain/combat/entities/Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../events/GameEvent.js';
 import { EventBus } from '../../services/core/EventBus.js';
 import { missileTypes } from './MissileTypeRegistry.js';
+import { towerTypes } from './TowerTypeRegistry.js';
 
 /**
  * Game - Core game logic and state management
@@ -88,6 +89,11 @@ export class Game {
      * @type {Object} - Missile type blueprints (imported from registry)
      */
     missileTypes = missileTypes;
+    
+    /**
+     * @type {Object} - Tower type blueprints (imported from registry)
+     */
+    towerTypes = towerTypes;
     
     /**
      * @param {GridModel} gridModel
@@ -349,9 +355,10 @@ export class Game {
     /**
      * Place a tower on a cell
      * @param {Cell} cell
+     * @param {string} towerTypeId - Tower type ID from registry (default: 'basic')
      * @returns {boolean} - True if tower was placed successfully
      */
-    placeTower(cell) {
+    placeTower(cell, towerTypeId = 'basic') {
         const activePlayer = this.playerManager.getActivePlayer();
         
         if (!activePlayer) {
@@ -359,8 +366,15 @@ export class Game {
             return false;
         }
 
+        // Get tower blueprint
+        const towerBlueprint = this.towerTypes[towerTypeId];
+        if (!towerBlueprint) {
+            this.debug.error(`Unknown tower type: ${towerTypeId}`);
+            return false;
+        }
+
         // Check if player can afford the tower
-        const cost = this.config.towerCost.money;
+        const cost = towerBlueprint.cost;
         if (!activePlayer.wallet.has('money', cost)) {
             this.debug.warning('Cannot place tower - insufficient funds', {
                 required: cost,
@@ -375,16 +389,13 @@ export class Game {
             remaining: activePlayer.wallet.get('money')
         });
         
-        // Get missile blueprint
-        const missileBlueprint = this.missileTypes['standard'];
-        
-        // Create and place tower
+        // Create and place tower from blueprint
         const tower = new Tower(
             cell, 
             activePlayer.id,
             this.container,
             this,
-            missileBlueprint
+            towerBlueprint
         );
         
         cell.setTower(tower);
@@ -423,16 +434,17 @@ export class Game {
         
         // For random placement (testing), give free towers
         selectedCells.forEach(cell => {
-            // Choose random missile type for architecture testing
-            const missileTypeId = Math.random() > 0.5 ? 'standard' : 'heavy';
-            const missileBlueprint = this.missileTypes[missileTypeId];
+            // Choose random tower type for architecture testing
+            const towerTypeIds = ['basic', 'sniper', 'artillery'];
+            const towerTypeId = towerTypeIds[Math.floor(Math.random() * towerTypeIds.length)];
+            const towerBlueprint = this.towerTypes[towerTypeId];
             
             const tower = new Tower(
                 cell, 
                 activePlayer.id,
                 this.container,
                 this,
-                missileBlueprint
+                towerBlueprint
             );
             
             cell.setTower(tower);

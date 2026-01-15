@@ -74,6 +74,11 @@ export class Tower extends Entity {
     playerId;
     
     /**
+     * @type {string} - Tower type ID (reference to blueprint)
+     */
+    towerTypeId;
+    
+    /**
      * @type {string} - Missile type ID (reference to blueprint)
      */
     missileTypeId;
@@ -93,9 +98,9 @@ export class Tower extends Entity {
      * @param {string} playerId - ID of the player who owns this tower
      * @param {DIContainer} diContainer
      * @param {Game} game - Game instance for blueprint lookup
-     * @param {Object} missileBlueprint - Missile type blueprint
+     * @param {Object} towerBlueprint - Tower type blueprint
      */
-    constructor(cell, playerId, diContainer, game, missileBlueprint) {
+    constructor(cell, playerId, diContainer, game, towerBlueprint) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
         const entityManager = diContainer.get('entityManager');
@@ -107,8 +112,6 @@ export class Tower extends Entity {
         
         this.cell = cell;
         this.playerId = playerId;
-        this.color = '#6366f1'; // Blue for towers (will be player color later)
-        this.size = 8;
         this.coordSystem = coordSystem;
         this.container = diContainer;
         this.game = game;
@@ -116,11 +119,25 @@ export class Tower extends Entity {
         this.currentCooldown = 0.0; // Start ready to shoot
         this.events = EventBus.createHandler(this);
         
-        // Gameplay attributes (tower stats)
-        this._attributes = new TowerAttributes(3.5, 1.0, 0.0, 1.5);
+        // Store tower type ID
+        this.towerTypeId = towerBlueprint.id;
+        
+        // Visual attributes from blueprint
+        this.color = towerBlueprint.visualFx.color;
+        this.size = towerBlueprint.visualFx.size;
+        
+        // Gameplay attributes from blueprint
+        const cooldown = 1.0 / towerBlueprint.stats.fireRate; // Convert fireRate to cooldown
+        this._attributes = new TowerAttributes(
+            towerBlueprint.stats.range,
+            cooldown,
+            towerBlueprint.stats.critChance,
+            towerBlueprint.stats.critMultiplier
+        );
         this._attributesProxy = new AttributesProxy(this._attributes, this);
         
-        // Store missile type ID (IMPORTANT: ne pas perdre le nom du blueprint)
+        // Get missile blueprint from tower blueprint
+        const missileBlueprint = game.missileTypes[towerBlueprint.missileTypeId];
         this.missileTypeId = missileBlueprint.id;
         
         // Missile configuration (munition specs) - Initialize from blueprint
