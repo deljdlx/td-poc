@@ -181,7 +181,10 @@ export class Tower extends Entity {
         // Track shot
         this.stats.shotsFired++;
         
-        // Emit shoot event with target coordinates and missile specs (before creating missile)
+        // Get full missile blueprint for visual effects
+        const missileBlueprint = this.getMissileBlueprint();
+        
+        // Emit shoot event with target coordinates and full blueprint
         this.events.emit('shoot', {
             tower: this,
             x: this.x,
@@ -189,7 +192,7 @@ export class Tower extends Entity {
             targetX,
             targetY,
             target,
-            missileConfig: this.missileConfig
+            missileBlueprint: missileBlueprint
         });
         
         // Emit typed event (legacy - can be deprecated later)

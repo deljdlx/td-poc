@@ -83,6 +83,11 @@ export class Missile extends Entity {
     _attributesProxy;
     
     /**
+     * @type {Object} - Visual effects configuration from blueprint
+     */
+    visualFx;
+    
+    /**
      * @type {Object}
      */
     coordSystem;
@@ -98,8 +103,9 @@ export class Missile extends Entity {
      * @param {number} splashRadius - Splash damage radius in CELLS (default: 0.5)
      * @param {number} damage - Damage amount (default: 25)
      * @param {Object} coordSystem - Coordinate system for conversions
+     * @param {Object} visualFx - Visual effects configuration from blueprint
      */
-    constructor(tower, x, y, targetX, targetY, speed = 200, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null) {
+    constructor(tower, x, y, targetX, targetY, speed = 200, maxLifeTime = 3.0, splashRadius = 0.5, damage = 25, coordSystem = null, visualFx = null) {
         super('missile', x, y);
         
         this.tower = tower;
@@ -116,7 +122,13 @@ export class Missile extends Entity {
         this.vx = (dx / distance) * speed;
         this.vy = (dy / distance) * speed;
         
-        this.color = '#ff6b6b';
+        // Visual effects from blueprint or defaults
+        this.visualFx = visualFx || {
+            trail: { color: '#ff6b6b', width: 2 },
+            explosion: { type: 'simple', scale: 1.0 }
+        };
+        
+        this.color = this.visualFx.trail.color;
         this.size = 4;
         this.trail = [];
         this.trailLength = 10;

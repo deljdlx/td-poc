@@ -100,13 +100,13 @@ export class Game {
             },
             visualFx: {
                 // Visual effects (future: trail color, explosion type, particle effects, etc.)
-                trail: { 
-                    color: '#ff6b6b', 
-                    width: 2 
+                trail: {
+                    color: '#ff0',
+                    width: 1
                 },
-                explosion: { 
-                    type: 'simple', 
-                    scale: 1.0 
+                explosion: {
+                    type: 'simple',
+                    scale: 1.0
                 }
             }
         }
@@ -169,7 +169,14 @@ export class Game {
         
         // Tower shoot → Create missile
         EventBus.onGlobal('shoot', (data) => {
-            this.createMissile(data.tower, data.x, data.y, data.targetX, data.targetY, data.missileConfig);
+            this.createMissile(
+                data.tower, 
+                data.x, 
+                data.y, 
+                data.targetX, 
+                data.targetY, 
+                data.missileBlueprint
+            );
         });
         
         // Missile impact → Visual effects + Combat logic
@@ -346,7 +353,7 @@ export class Game {
             this.debug.error('Cannot place tower - no active player');
             return false;
         }
-        
+
         // Check if player can afford the tower
         const cost = this.config.towerCost.money;
         if (!activePlayer.wallet.has('money', cost)) {
@@ -539,22 +546,20 @@ export class Game {
      * @param {number} startY - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
-     * @param {Object} missileConfig - Missile configuration from tower
+     * @param {Object} missileBlueprint - Full missile blueprint (config + visualFx)
      * @returns {Missile}
      */
-    createMissile(tower, startX, startY, targetX, targetY, missileConfig) {
-        // Use tower's missile config or fallback to game config
-        const config = missileConfig || this.config.missile;
-        
+    createMissile(tower, startX, startY, targetX, targetY, missileBlueprint) {
         const missile = new Missile(
             tower,
             startX, startY,
             targetX, targetY,
-            config.speed,
-            config.lifetime,
-            config.splashRadius,
-            config.damage,
-            this.coordSystem
+            missileBlueprint.speed,
+            missileBlueprint.lifetime,
+            missileBlueprint.splashRadius,
+            missileBlueprint.damage,
+            this.coordSystem,
+            missileBlueprint.visualFx
         );
         
         this.entityManager.addEntity(missile);
