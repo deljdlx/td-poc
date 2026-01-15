@@ -64,6 +64,11 @@ export class Tower extends Entity {
     playerId;
     
     /**
+     * @type {string} - Missile type ID (reference to blueprint)
+     */
+    missileTypeId;
+    
+    /**
      * @type {Object} - Missile configuration for this tower
      */
     missileConfig;
@@ -77,8 +82,9 @@ export class Tower extends Entity {
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {string} playerId - ID of the player who owns this tower
      * @param {DIContainer} diContainer
+     * @param {Object} missileBlueprint - Missile type blueprint
      */
-    constructor(cell, playerId, diContainer) {
+    constructor(cell, playerId, diContainer, missileBlueprint) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
         const entityManager = diContainer.get('entityManager');
@@ -101,12 +107,15 @@ export class Tower extends Entity {
         this._attributes = new TowerAttributes(3.5, 1.0, 0.0, 1.5);
         this._attributesProxy = new AttributesProxy(this._attributes, this);
         
-        // Missile configuration (munition specs)
+        // Store missile type ID (IMPORTANT: ne pas perdre le nom du blueprint)
+        this.missileTypeId = missileBlueprint.id;
+        
+        // Missile configuration (munition specs) - Initialize from blueprint
         this.missileConfig = {
-            damage: 25,
-            splashRadius: 0.5, // in cells
-            speed: 200,
-            lifetime: 3.0
+            damage: missileBlueprint.damage,
+            splashRadius: missileBlueprint.splashRadius,
+            speed: missileBlueprint.speed,
+            lifetime: missileBlueprint.lifetime
         };
         
         // Stats tracking
@@ -118,7 +127,13 @@ export class Tower extends Entity {
             criticalHits: 0
         };
 
-        debug.success('Tower created', { row: cell.row, col: cell.col, x: center.x, y: center.y });
+        debug.success('Tower created', { 
+            row: cell.row, 
+            col: cell.col, 
+            x: center.x, 
+            y: center.y,
+            missileType: this.missileTypeId
+        });
     }
     
     /**

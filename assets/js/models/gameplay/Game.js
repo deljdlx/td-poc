@@ -84,6 +84,35 @@ export class Game {
     };
     
     /**
+     * @type {Object} - Missile type blueprints
+     */
+    missileTypes = {
+        'standard': {
+            id: 'standard',
+            name: 'Standard Missile',
+            damage: 25,
+            splashRadius: 0.5,  // in cells
+            speed: 200,         // pixels/sec
+            lifetime: 3.0,      // seconds
+            effects: {
+                // Gameplay effects on impact (future: stun, knockback, slow, etc.)
+                onImpact: []
+            },
+            visualFx: {
+                // Visual effects (future: trail color, explosion type, particle effects, etc.)
+                trail: { 
+                    color: '#ff6b6b', 
+                    width: 2 
+                },
+                explosion: { 
+                    type: 'simple', 
+                    scale: 1.0 
+                }
+            }
+        }
+    };
+    
+    /**
      * @param {GridModel} gridModel
      * @param {EntityManager} entityManager
      * @param {PlayerManager} playerManager
@@ -334,11 +363,15 @@ export class Game {
             remaining: activePlayer.wallet.get('money')
         });
         
+        // Get missile blueprint
+        const missileBlueprint = this.missileTypes['standard'];
+        
         // Create and place tower
         const tower = new Tower(
             cell, 
             activePlayer.id,
-            this.container
+            this.container,
+            missileBlueprint
         );
         
         cell.setTower(tower);
@@ -376,11 +409,14 @@ export class Game {
         }
         
         // For random placement (testing), give free towers
+        const missileBlueprint = this.missileTypes['standard'];
+        
         selectedCells.forEach(cell => {
             const tower = new Tower(
                 cell, 
                 activePlayer.id,
-                this.container
+                this.container,
+                missileBlueprint
             );
             
             cell.setTower(tower);
