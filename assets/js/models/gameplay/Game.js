@@ -109,6 +109,27 @@ export class Game {
                     scale: 1.0
                 }
             }
+        },
+        'heavy': {
+            id: 'heavy',
+            name: 'Heavy Missile',
+            damage: 50,
+            splashRadius: 1.0,  // in cells (plus large)
+            speed: 2.0,         // cells/sec (plus lent)
+            lifetime: 4.0,      // seconds (vit plus longtemps)
+            effects: {
+                onImpact: []
+            },
+            visualFx: {
+                trail: {
+                    color: '#0f0',  // Vert fluo
+                    width: 8        // Trail épais
+                },
+                explosion: {
+                    type: 'simple',  // Explosion simple au lieu de firework
+                    scale: 2.0       // Plus grosse
+                }
+            }
         }
     };
     
@@ -442,9 +463,11 @@ export class Game {
         }
         
         // For random placement (testing), give free towers
-        const missileBlueprint = this.missileTypes['standard'];
-        
         selectedCells.forEach(cell => {
+            // Choose random missile type for architecture testing
+            const missileTypeId = Math.random() > 0.5 ? 'standard' : 'heavy';
+            const missileBlueprint = this.missileTypes[missileTypeId];
+            
             const tower = new Tower(
                 cell, 
                 activePlayer.id,
