@@ -20,6 +20,11 @@ export const missileTypes = {
         },
         visualFx: {
             // Visual effects (future: trail color, explosion type, particle effects, etc.)
+            sprite: {
+                type: 'star',           // star, circle, diamond, square, triangle
+                spikes: 6,              // For star: number of spikes
+                rotationSpeed: 3        // Rotation speed (rad/sec)
+            },
             trail: {
                 color: '#ff0',
                 width: 1,
@@ -47,6 +52,10 @@ export const missileTypes = {
             onImpact: []
         },
         visualFx: {
+            sprite: {
+                type: 'diamond',        // Massif et imposant
+                rotationSpeed: 0.5      // Rotation lente pour missile lourd
+            },
             trail: {
                 color: '#0f0',  // Vert fluo
                 width: 8,       // Trail épais

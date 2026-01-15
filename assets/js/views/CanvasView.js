@@ -8,8 +8,8 @@ import { SplashEffect } from '../fx/SplashEffect.js';
 import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
 import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
 import { SquareSpriteRenderer } from '../renderers/sprites/SquareSpriteRenderer.js';
-import { TriangleSpriteRenderer } from '../renderers/sprites/TriangleSpriteRenderer.js';
 import { DiamondSpriteRenderer } from '../renderers/sprites/DiamondSpriteRenderer.js';
+import { TriangleSpriteRenderer } from '../renderers/sprites/TriangleSpriteRenderer.js';
 
 /**
  * Vue Canvas pour dessiner des connexions
@@ -73,9 +73,8 @@ export class CanvasView {
      * @returns {void}
      */
     setupRenderers() {
-        // Missiles - star sprite
-        const starSprite = new StarSpriteRenderer(6, 3);
-        this.renderers['missile'] = new MissileRenderer(null, starSprite);
+        // Missiles - sprite will be created per-missile based on visualFx
+        this.renderers['missile'] = new MissileRenderer();
         
         // Towers - diamond sprite
         const towerSprite = new DiamondSpriteRenderer(1.5);
