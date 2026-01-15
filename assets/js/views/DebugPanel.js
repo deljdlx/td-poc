@@ -106,6 +106,42 @@ export class DebugPanel {
         if (clearAllBtn) {
             clearAllBtn.addEventListener('click', () => this.clearAllContexts());
         }
+        
+        // Time scale controls
+        this.bindTimeScaleControls();
+    }
+    
+    /**
+     * Bind time scale controls
+     * @returns {void}
+     */
+    bindTimeScaleControls() {
+        const gameClock = this.container.get('gameClock');
+        
+        // Slider
+        const slider = document.getElementById('debug-time-scale');
+        const valueDisplay = document.getElementById('debug-time-scale-value');
+        
+        if (slider && valueDisplay) {
+            slider.addEventListener('input', (e) => {
+                const percentage = parseInt(e.target.value);
+                const scale = percentage / 100;
+                gameClock.setTimeScale(scale);
+                valueDisplay.textContent = `${percentage}%`;
+            });
+        }
+        
+        // Quick buttons
+        const speedButtons = document.querySelectorAll('[data-speed]');
+        speedButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const percentage = parseInt(btn.dataset.speed);
+                const scale = percentage / 100;
+                gameClock.setTimeScale(scale);
+                if (slider) slider.value = percentage;
+                if (valueDisplay) valueDisplay.textContent = `${percentage}%`;
+            });
+        });
     }
     
     /**

@@ -38,6 +38,9 @@ export class GameClock {
     /** @type {number} - Last FPS update time */
     lastFPSUpdate = 0;
     
+    /** @type {number} - Time scale (1.0 = normal, 0.5 = half speed, 2.0 = double speed) */
+    timeScale = 1.0;
+    
     /**
      * @param {DIContainer} container
      */
@@ -94,7 +97,8 @@ export class GameClock {
         
         // Limiter deltaTime pour éviter la "spiral of death"
         const frameDelta = Math.min(deltaTime, 100);
-        this.accumulator += frameDelta;
+        // Apply time scale
+        this.accumulator += frameDelta * this.timeScale;
         
         // Fixed timestep updates
         let updateCount = 0;
@@ -153,5 +157,23 @@ export class GameClock {
      */
     getFPS() {
         return this.currentFPS;
+    }
+    
+    /**
+     * Set time scale (speed multiplier)
+     * @param {number} scale - Time scale (1.0 = normal, 0.5 = half, 2.0 = double, 0 = pause)
+     * @returns {void}
+     */
+    setTimeScale(scale) {
+        this.timeScale = Math.max(0, Math.min(scale, 10.0)); // Clamp between 0x (pause) and 10x
+        this.debug.info('Time scale changed', { timeScale: this.timeScale });
+    }
+    
+    /**
+     * Get current time scale
+     * @returns {number}
+     */
+    getTimeScale() {
+        return this.timeScale;
     }
 }

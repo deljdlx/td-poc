@@ -123,8 +123,20 @@
             <!-- Actions Tab -->
             <div id="tab-actions" class="debug-tab-panel">
                 <div class="debug-section">
-                    <div class="debug-section-title">Quick Actions</div>
-                    <p style="color: #999; font-size: 11px;">Coming soon...</p>
+                    <div class="debug-section-title">Game Speed</div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <label for="debug-time-scale" style="flex-shrink: 0;">Speed:</label>
+                        <input type="range" id="debug-time-scale" min="0" max="1000" value="100" step="25" style="flex: 1;">
+                        <span id="debug-time-scale-value" style="min-width: 60px; text-align: right;">100%</span>
+                    </div>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        <button class="debug-mini-button" data-speed="0">⏸ 0%</button>
+                        <button class="debug-mini-button" data-speed="50">50%</button>
+                        <button class="debug-mini-button" data-speed="100">100%</button>
+                        <button class="debug-mini-button" data-speed="200">200%</button>
+                        <button class="debug-mini-button" data-speed="500">500%</button>
+                        <button class="debug-mini-button" data-speed="1000">⚡ 1000%</button>
+                    </div>
                 </div>
             </div>
         </div>
