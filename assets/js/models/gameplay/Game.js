@@ -181,9 +181,16 @@ export class Game {
         
         // Missile impact → Visual effects + Combat logic
         EventBus.onGlobal('missile:impact', (event) => {
+            this.debug.info('💥 Missile impact', { 
+                x: event.x, 
+                y: event.y, 
+                splashRadius: event.splashRadius 
+            });
+            
             // Visual effects
-            this.canvasView.addSimpleExplosion(event.x, event.y);
-            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
+            this.canvasView.addFirework(event.x, event.y);           // Firework explosion
+            this.canvasView.addSimpleExplosion(event.x, event.y);    // Simple flash
+            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius); // Splash zone
             
             // Combat logic: apply splash damage
             this.applyDamage(event.missile, event.x, event.y);
