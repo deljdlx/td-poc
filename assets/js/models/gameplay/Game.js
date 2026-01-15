@@ -140,7 +140,7 @@ export class Game {
         
         // Tower shoot → Create missile
         EventBus.onGlobal('shoot', (data) => {
-            this.createMissile(data.tower, data.x, data.y, data.targetX, data.targetY);
+            this.createMissile(data.tower, data.x, data.y, data.targetX, data.targetY, data.missileConfig);
         });
         
         // Missile impact → Visual effects + Combat logic
@@ -501,17 +501,21 @@ export class Game {
      * @param {number} startY - Start Y position
      * @param {number} targetX - Target X position
      * @param {number} targetY - Target Y position
+     * @param {Object} missileConfig - Missile configuration from tower
      * @returns {Missile}
      */
-    createMissile(tower, startX, startY, targetX, targetY) {
+    createMissile(tower, startX, startY, targetX, targetY, missileConfig) {
+        // Use tower's missile config or fallback to game config
+        const config = missileConfig || this.config.missile;
+        
         const missile = new Missile(
             tower,
             startX, startY,
             targetX, targetY,
-            this.config.missile.speed,
-            this.config.missile.lifetime,
-            this.config.missile.splashRadius,
-            this.config.missile.damage, // Damage from config (munition type)
+            config.speed,
+            config.lifetime,
+            config.splashRadius,
+            config.damage,
             this.coordSystem
         );
         

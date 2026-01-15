@@ -64,6 +64,11 @@ export class Tower extends Entity {
     playerId;
     
     /**
+     * @type {Object} - Missile configuration for this tower
+     */
+    missileConfig;
+    
+    /**
      * @type {Object} EventBus handler
      */
     events;
@@ -95,6 +100,14 @@ export class Tower extends Entity {
         // Gameplay attributes (tower stats)
         this._attributes = new TowerAttributes(3.5, 1.0, 0.0, 1.5);
         this._attributesProxy = new AttributesProxy(this._attributes, this);
+        
+        // Missile configuration (munition specs)
+        this.missileConfig = {
+            damage: 25,
+            splashRadius: 0.5, // in cells
+            speed: 200,
+            lifetime: 3.0
+        };
         
         // Stats tracking
         this.stats = {
@@ -131,14 +144,15 @@ export class Tower extends Entity {
         // Track shot
         this.stats.shotsFired++;
         
-        // Emit shoot event with target coordinates (before creating missile)
+        // Emit shoot event with target coordinates and missile specs (before creating missile)
         this.events.emit('shoot', {
             tower: this,
             x: this.x,
             y: this.y,
             targetX,
             targetY,
-            target
+            target,
+            missileConfig: this.missileConfig
         });
         
         // Emit typed event (legacy - can be deprecated later)
