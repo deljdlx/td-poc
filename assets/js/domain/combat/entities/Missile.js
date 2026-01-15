@@ -187,7 +187,8 @@ export class Missile extends Entity {
                 missile: this,
                 x: this.targetX,
                 y: this.targetY,
-                splashRadius: splashRadiusPixels
+                splashRadius: splashRadiusPixels,
+                visualFx: this.visualFx
             });
             this.kill();
         }

@@ -105,7 +105,7 @@ export class Game {
                     width: 1
                 },
                 explosion: {
-                    type: 'simple',
+                    type: 'firework',
                     scale: 1.0
                 }
             }
@@ -184,13 +184,31 @@ export class Game {
             this.debug.info('💥 Missile impact', { 
                 x: event.x, 
                 y: event.y, 
-                splashRadius: event.splashRadius 
+                splashRadius: event.splashRadius,
+                explosionType: event.visualFx?.explosion?.type
             });
             
-            // Visual effects
-            this.canvasView.addFirework(event.x, event.y);           // Firework explosion
-            this.canvasView.addSimpleExplosion(event.x, event.y);    // Simple flash
-            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius); // Splash zone
+            // Visual effects based on blueprint configuration
+            const explosionConfig = event.visualFx?.explosion || { type: 'firework', scale: 1.0 };
+            
+            // Choose explosion effect based on type
+            switch(explosionConfig.type) {
+                case 'firework':
+                    this.canvasView.addFirework(event.x, event.y, { scale: explosionConfig.scale });
+                    break;
+                case 'simple':
+                    this.canvasView.addSimpleExplosion(event.x, event.y, { scale: explosionConfig.scale });
+                    break;
+                case 'none':
+                    // No explosion effect
+                    break;
+                default:
+                    // Default to firework
+                    this.canvasView.addFirework(event.x, event.y, { scale: explosionConfig.scale });
+            }
+            
+            // Always show splash zone
+            this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
             
             // Combat logic: apply splash damage
             this.applyDamage(event.missile, event.x, event.y);
