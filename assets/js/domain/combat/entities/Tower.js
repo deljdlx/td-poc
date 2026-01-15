@@ -15,7 +15,7 @@ export class Tower extends Entity {
      * @type {Cell}
      */
     cell;
-    
+
     /**
      * @type {string}
      */
@@ -42,6 +42,16 @@ export class Tower extends Entity {
      * @type {Object}
      */
     coordSystem;
+    
+    /**
+     * @type {DIContainer}
+     */
+    container;
+    
+    /**
+     * @type {Game}
+     */
+    game;
     
     /**
      * @type {number}
@@ -82,9 +92,10 @@ export class Tower extends Entity {
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {string} playerId - ID of the player who owns this tower
      * @param {DIContainer} diContainer
+     * @param {Game} game - Game instance for blueprint lookup
      * @param {Object} missileBlueprint - Missile type blueprint
      */
-    constructor(cell, playerId, diContainer, missileBlueprint) {
+    constructor(cell, playerId, diContainer, game, missileBlueprint) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
         const entityManager = diContainer.get('entityManager');
@@ -99,6 +110,8 @@ export class Tower extends Entity {
         this.color = '#6366f1'; // Blue for towers (will be player color later)
         this.size = 8;
         this.coordSystem = coordSystem;
+        this.container = diContainer;
+        this.game = game;
         this.entityManager = entityManager;
         this.currentCooldown = 0.0; // Start ready to shoot
         this.events = EventBus.createHandler(this);
@@ -142,6 +155,15 @@ export class Tower extends Entity {
      */
     get attributes() {
         return this._attributesProxy;
+    }
+    
+    /**
+     * Get missile blueprint from Game registry (for introspection)
+     * Allows dynamic lookup in case missile type changes
+     * @returns {Object|null} - Missile blueprint or null if not found
+     */
+    getMissileBlueprint() {
+        return this.game.missileTypes[this.missileTypeId] || null;
     }
     
     /**

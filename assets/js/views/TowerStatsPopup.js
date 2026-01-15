@@ -13,6 +13,11 @@ export class TowerStatsPopup {
     uiUpdateManager;
     
     /**
+     * @type {Game}
+     */
+    game;
+    
+    /**
      * @type {Debug}
      */
     debug;
@@ -33,6 +38,7 @@ export class TowerStatsPopup {
     constructor(diContainer) {
         this.popupManager = diContainer.get('popupManager');
         this.uiUpdateManager = diContainer.get('uiUpdateManager');
+        this.game = diContainer.get('game');
         this.debug = diContainer.createDebug('TowerStatsPopup', true);
     }
     
@@ -195,24 +201,24 @@ export class TowerStatsPopup {
                 <div class="stats-section">
                     <h3 class="stats-section-title">
                         <span class="stats-icon">🚀</span>
-                        Missile Stats
+                        Missile Stats <span class="stats-subtitle">${tower.getMissileBlueprint()?.name || tower.missileTypeId}</span>
                     </h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-label">Damage</div>
-                            <div class="stat-value stat-damage">${tower.missileConfig.damage}</div>
+                            <div class="stat-value stat-damage">${tower.getMissileBlueprint()?.damage || 0}</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Splash Radius</div>
-                            <div class="stat-value">${tower.missileConfig.splashRadius} <span class="stat-unit">cells</span></div>
+                            <div class="stat-value">${tower.getMissileBlueprint()?.splashRadius || 0} <span class="stat-unit">cells</span></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Speed</div>
-                            <div class="stat-value">${tower.missileConfig.speed} <span class="stat-unit">px/s</span></div>
+                            <div class="stat-value">${tower.getMissileBlueprint()?.speed || 0} <span class="stat-unit">px/s</span></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Lifetime</div>
-                            <div class="stat-value">${tower.missileConfig.lifetime.toFixed(1)} <span class="stat-unit">sec</span></div>
+                            <div class="stat-value">${tower.getMissileBlueprint()?.lifetime.toFixed(1) || 0} <span class="stat-unit">sec</span></div>
                         </div>
                     </div>
                 </div>

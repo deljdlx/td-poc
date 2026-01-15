@@ -371,6 +371,7 @@ export class Game {
             cell, 
             activePlayer.id,
             this.container,
+            this,
             missileBlueprint
         );
         
@@ -416,6 +417,7 @@ export class Game {
                 cell, 
                 activePlayer.id,
                 this.container,
+                this,
                 missileBlueprint
             );
             
