@@ -4,6 +4,7 @@ import { Wave } from './Wave.js';
 import { PathFactory } from '../../map/PathFactory.js';
 import { Missile } from '../../combat/entities/Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../../events/GameEvent.js';
+import { TowerPlacedEvent } from '../../../events/TowerEvent.js';
 import { EventBus } from '../../../services/core/EventBus.js';
 import { missileTypes } from '../registries/MissileTypeRegistry.js';
 import { towerTypes } from '../registries/TowerTypeRegistry.js';
@@ -206,7 +207,7 @@ export class Game {
         
         // Initialize grid (render DOM elements)
         this.gridSystem.init();
-        
+
         // Create perimeter path
         const perimeterPath = PathFactory.createPerimeter(
             this.gridModel,
@@ -219,9 +220,18 @@ export class Game {
         // Render paths in DOM
         this.gridSystem.renderPaths();
         
+        // Setup tower drag handler to listen for tower placement (BEFORE placing towers!)
+        this.events.on('towerPlaced', (event) => {
+            this.towerDragHandler.enableTowerDrag(event.cell);
+        });
+        
         // Place initial towers for testing
         this.placeRandomTowers(5);
         this.debug.success('Initial towers placed');
+        
+        // Log tower drag handlers status
+        const towersCount = this.gridModel.getCellsWithTowers().length;
+        this.debug.info(`Drag enabled on ${towersCount} towers`);
         
         // Setup game event listeners for business logic
         this.setupGameEventListeners();
@@ -243,6 +253,28 @@ export class Game {
      */
     setupGameEventListeners() {
         this.debug.info('🎯 Setting up Game event listeners (business logic + visual effects)');
+        
+        // Tower move attempt → Validate and execute move
+        EventBus.onGlobal('tower:moveAttempt', (data) => {
+            const { tower, fromCell, toCell, uiHandler } = data;
+            
+            // Validate move (business logic)
+            const isValid = this.moveTower(tower, fromCell, toCell);
+            
+            if (isValid) {
+                // Update cells (data layer)
+                fromCell.removeTower();
+                toCell.setTower(tower);
+                
+                // Update tower position and re-enable drag
+                uiHandler.updateTowerUI(tower, fromCell, toCell);
+                
+                this.debug.success('Tower moved', {
+                    from: { row: fromCell.row, col: fromCell.col },
+                    to: { row: toCell.row, col: toCell.col }
+                });
+            }
+        });
         
         // Tower shoot → Create missile
         EventBus.onGlobal('shoot', (data) => {
@@ -632,6 +664,10 @@ export class Game {
         this.entityManager.addEntity(tower);
         activePlayer.addTower(tower);
         
+        // Emit tower placed event
+        const event = new TowerPlacedEvent(tower, cell);
+        this.events.emit('towerPlaced', event);
+        
         this.debug.success('Tower placed', {
             player: activePlayer.name,
             totalTowers: activePlayer.towers.length
@@ -680,6 +716,10 @@ export class Game {
             cell.setTower(tower);
             this.entityManager.addEntity(tower);
             activePlayer.addTower(tower);
+            
+            // Emit tower placed event
+            const event = new TowerPlacedEvent(tower, cell);
+            this.events.emit('towerPlaced', event);
         });
         
         this.debug.success(`Placed ${count} free towers for testing`, {

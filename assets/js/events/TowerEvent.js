@@ -45,3 +45,22 @@ export class TowerFiredEvent extends TowerEvent {
         this.missile = missile;
     }
 }
+
+/**
+ * TowerPlacedEvent - Tower was placed on a cell
+ */
+export class TowerPlacedEvent extends TowerEvent {
+    /**
+     * @type {Cell}
+     */
+    cell;
+    
+    /**
+     * @param {Tower} tower
+     * @param {Cell} cell
+     */
+    constructor(tower, cell) {
+        super('placed', tower, { cell });
+        this.cell = cell;
+    }
+}

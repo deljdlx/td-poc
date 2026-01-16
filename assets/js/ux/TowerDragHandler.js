@@ -61,13 +61,18 @@ export class TowerDragHandler {
             return;
         }
         
+        if (!cell.element) {
+            this.debug.error('Cannot enable drag - cell has no DOM element', { row: cell.row, col: cell.col });
+            return;
+        }
+        
         const dragData = {
             cell: cell,
             tower: cell.getTower()
         };
         
         this.dragDropManager.enableDrag(cell.element, dragData);
-        this.debug.info('Tower drag enabled', { row: cell.row, col: cell.col });
+        this.debug.success('Tower drag enabled', { row: cell.row, col: cell.col });
     }
     
     /**
