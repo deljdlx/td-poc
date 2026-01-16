@@ -20,9 +20,14 @@ export class EventBus {
     static eventQueue = [];
     
     /**
-     * @type {Array<{eventName: string, timestamp: number, data: Object}>}
+     * @type {Array<{sequence: number, eventName: string, timestamp: number, data: Object}>}
      */
     static sourceableEvents = [];
+    
+    /**
+     * @type {number}
+     */
+    static sequenceNumber = 0;
     
     /**
      * Create event handler for an entity
@@ -69,6 +74,7 @@ export class EventBus {
                 // TRUSTED PATH: Capture sourceable events (Event Sourcing)
                 if (data && data.sourceable === true) {
                     EventBus.sourceableEvents.push({
+                        sequence: EventBus.sequenceNumber++,
                         eventName,
                         timestamp: Date.now(),
                         data
@@ -140,6 +146,7 @@ export class EventBus {
         // Capture sourceable events for debugging/event sourcing
         if (data && data.sourceable === true) {
             EventBus.sourceableEvents.push({
+                sequence: EventBus.sequenceNumber++,
                 eventName,
                 timestamp: Date.now(),
                 data
@@ -181,5 +188,6 @@ export class EventBus {
      */
     static clearSourceableEvents() {
         EventBus.sourceableEvents = [];
+        EventBus.sequenceNumber = 0;
     }
 }

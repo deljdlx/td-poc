@@ -671,6 +671,25 @@ export class Game {
             towerBlueprint
         );
         
+        // Emit tower created event (SOURCEABLE: business event)
+        this.events.emit('towerCreated', {
+            sourceable: true,
+            metadata: {
+                towerId: tower.id,
+                towerType: towerTypeId,
+                playerId: activePlayer.id,
+                cost: cost,
+                stats: {
+                    damage: tower.attributes.damage,
+                    range: tower.attributes.range,
+                    fireRate: tower.attributes.fireRate,
+                    critChance: tower.attributes.critChance,
+                    critMultiplier: tower.attributes.critMultiplier
+                },
+                timestamp: Date.now()
+            }
+        });
+        
         cell.setTower(tower);
         this.entityManager.addEntity(tower);
         activePlayer.addTower(tower);
@@ -729,6 +748,25 @@ export class Game {
                 this,
                 towerBlueprint
             );
+            
+            // Emit tower created event (SOURCEABLE: business event)
+            this.events.emit('towerCreated', {
+                sourceable: true,
+                metadata: {
+                    towerId: tower.id,
+                    towerType: towerTypeId,
+                    playerId: activePlayer.id,
+                    cost: 0, // Free tower for testing
+                    stats: {
+                        damage: tower.attributes.damage,
+                        range: tower.attributes.range,
+                        fireRate: tower.attributes.fireRate,
+                        critChance: tower.attributes.critChance,
+                        critMultiplier: tower.attributes.critMultiplier
+                    },
+                    timestamp: Date.now()
+                }
+            });
             
             cell.setTower(tower);
             this.entityManager.addEntity(tower);

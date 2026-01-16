@@ -685,17 +685,15 @@ export class DebugPanel {
             return;
         }
         
-        // Reverse to show most recent first
-        const recentEvents = [...events].reverse();
-        
-        eventsList.innerHTML = recentEvents.map((e, idx) => {
+        // Display in natural order (guaranteed by sequence number)
+        eventsList.innerHTML = events.map((e, idx) => {
             const time = new Date(e.timestamp).toLocaleTimeString();
             const metadataJson = JSON.stringify(e.data.metadata || {}, null, 2);
             
             return `
                 <div class="event-item" style="margin-bottom: 8px; padding: 8px; background: #1a1a1a; border-radius: 4px; border-left: 3px solid #4CAF50;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <span style="color: #4CAF50; font-weight: bold; font-size: 11px;">${e.eventName}</span>
+                        <span style="color: #4CAF50; font-weight: bold; font-size: 11px;">#${e.sequence} ${e.eventName}</span>
                         <span style="color: #888; font-size: 10px;">${time}</span>
                     </div>
                     <pre style="margin: 0; font-size: 10px; color: #ddd; white-space: pre-wrap; word-wrap: break-word;">${metadataJson}</pre>
