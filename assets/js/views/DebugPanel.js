@@ -1,4 +1,5 @@
 import { Debug } from '../services/core/Debug.js';
+import { EventBus } from '../services/core/EventBus.js';
 
 /**
  * DebugPanel - UI controller for debug panel
@@ -113,6 +114,7 @@ export class DebugPanel {
             <div class="debug-panel-tabs">
                 <button class="debug-tab active" data-tab="logs">📋 Logs</button>
                 <button class="debug-tab" data-tab="towers">🗼 Towers</button>
+                <button class="debug-tab" data-tab="events">📡 Events</button>
                 <button class="debug-tab" data-tab="tests">🧪 Tests</button>
                 <button class="debug-tab" data-tab="actions">⚡ Actions</button>
             </div>
@@ -169,6 +171,19 @@ export class DebugPanel {
                         <div class="debug-section-title">Active Towers</div>
                         <div id="debug-towers-list" class="debug-towers-list">
                             <div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">–</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Events Tab -->
+                <div id="tab-events" class="debug-tab-panel">
+                    <div class="debug-section">
+                        <div class="debug-section-title">
+                            Sourceable Events
+                            <button id="debug-clear-events" class="debug-mini-button" style="margin-left: 8px;">Clear</button>
+                        </div>
+                        <div id="debug-events-list" class="debug-events-list" style="max-height: 400px; overflow-y: auto;">
+                            <div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No events yet</div>
                         </div>
                     </div>
                 </div>
@@ -246,6 +261,15 @@ export class DebugPanel {
             clearAllBtn.addEventListener('click', () => this.clearAllContexts());
         }
         
+        // Clear events button
+        const clearEventsBtn = document.getElementById('debug-clear-events');
+        if (clearEventsBtn) {
+            clearEventsBtn.addEventListener('click', () => {
+                EventBus.clearSourceableEvents();
+                this.refreshEventsTab();
+            });
+        }
+        
         // Time scale controls will be bound when setGameClock() is called
     }
     
@@ -305,6 +329,12 @@ export class DebugPanel {
         
         if (entitiesElement && info.entityCount !== undefined) {
             entitiesElement.textContent = info.entityCount;
+        }
+        
+        // Auto-refresh events tab if visible
+        const eventsPanel = document.getElementById('tab-events');
+        if (eventsPanel && eventsPanel.classList.contains('active')) {
+            this.refreshEventsTab();
         }
     }
     
@@ -638,5 +668,39 @@ export class DebugPanel {
         } catch (e) {
             console.error('Failed to load debug preferences:', e);
         }
+    }
+    
+    /**
+     * Refresh events tab with sourceable events
+     * @returns {void}
+     */
+    refreshEventsTab() {
+        const eventsList = document.getElementById('debug-events-list');
+        if (!eventsList) return;
+        
+        const events = EventBus.getSourceableEvents();
+        
+        if (events.length === 0) {
+            eventsList.innerHTML = '<div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No events yet</div>';
+            return;
+        }
+        
+        // Reverse to show most recent first
+        const recentEvents = [...events].reverse();
+        
+        eventsList.innerHTML = recentEvents.map((e, idx) => {
+            const time = new Date(e.timestamp).toLocaleTimeString();
+            const metadataJson = JSON.stringify(e.data.metadata || {}, null, 2);
+            
+            return `
+                <div class="event-item" style="margin-bottom: 8px; padding: 8px; background: #1a1a1a; border-radius: 4px; border-left: 3px solid #4CAF50;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: #4CAF50; font-weight: bold; font-size: 11px;">${e.eventName}</span>
+                        <span style="color: #888; font-size: 10px;">${time}</span>
+                    </div>
+                    <pre style="margin: 0; font-size: 10px; color: #ddd; white-space: pre-wrap; word-wrap: break-word;">${metadataJson}</pre>
+                </div>
+            `;
+        }).join('');
     }
 }

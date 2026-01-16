@@ -20,6 +20,11 @@ export class EventBus {
     static eventQueue = [];
     
     /**
+     * @type {Array<{eventName: string, timestamp: number, data: Object}>}
+     */
+    static sourceableEvents = [];
+    
+    /**
      * Create event handler for an entity
      * @param {Object} entity - Entity that will emit/listen to events
      * @returns {Object} - Event handler with on/off/emit methods
@@ -61,6 +66,15 @@ export class EventBus {
              * @param {*} data - Event data
              */
             emit(eventName, data) {
+                // TRUSTED PATH: Capture sourceable events (Event Sourcing)
+                if (data && data.sourceable === true) {
+                    EventBus.sourceableEvents.push({
+                        eventName,
+                        timestamp: Date.now(),
+                        data
+                    });
+                }
+                
                 // Trigger local listeners (immediate)
                 const entityListeners = EventBus.handlers.get(entity);
                 if (entityListeners.has(eventName)) {
@@ -123,6 +137,15 @@ export class EventBus {
      * @param {*} data - Event data
      */
     static emitGlobal(eventName, data) {
+        // Capture sourceable events for debugging/event sourcing
+        if (data && data.sourceable === true) {
+            EventBus.sourceableEvents.push({
+                eventName,
+                timestamp: Date.now(),
+                data
+            });
+        }
+        
         if (EventBus.globalListeners.has(eventName)) {
             EventBus.globalListeners.get(eventName).forEach(callback => {
                 callback(data);
@@ -142,5 +165,21 @@ export class EventBus {
                 count: callbacks.size
             }))
         };
+    }
+    
+    /**
+     * Get all sourceable events (for Event Sourcing)
+     * @returns {Array<{eventName: string, timestamp: number, data: Object}>}
+     */
+    static getSourceableEvents() {
+        return EventBus.sourceableEvents;
+    }
+    
+    /**
+     * Clear sourceable events history
+     * @returns {void}
+     */
+    static clearSourceableEvents() {
+        EventBus.sourceableEvents = [];
     }
 }
