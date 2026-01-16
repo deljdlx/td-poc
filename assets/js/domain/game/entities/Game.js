@@ -823,6 +823,21 @@ export class Game {
         // Update global score
         this.globalScore += enemy.attributes.goldReward;
         
+        // Emit sourceable event (BUSINESS EVENT for Event Sourcing)
+        this.events.emit('enemyKilled', {
+            sourceable: true,
+            metadata: {
+                enemyId: enemy.id,
+                enemyType: enemy.attributes.type || 'basic',
+                killerId: killer.id,
+                killerType: killer.attributes?.type || 'unknown',
+                playerId: owner.id,
+                goldReward: enemy.attributes.goldReward,
+                position: { x: enemy.x, y: enemy.y },
+                timestamp: Date.now()
+            }
+        });
+        
         this.debug.success(`💰 ${owner.name} earned ${enemy.attributes.goldReward} gold`, { 
             total: owner.wallet.get('money'),
             kills: owner.stats.enemiesKilled
