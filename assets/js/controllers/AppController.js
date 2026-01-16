@@ -47,6 +47,7 @@ export class AppController {
         
         // Wire debug panel to game
         this.debugPanel.setGameClock(this.game.gameClock);
+        this.debugPanel.setGame(this.game);
         this.game.setDebugPanel(this.debugPanel);
         
         this.debug.success('✅ Application initialized');

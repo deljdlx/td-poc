@@ -83,6 +83,14 @@ export class EntityManager {
     }
     
     /**
+     * Get all towers
+     * @returns {Array<Tower>}
+     */
+    getTowers() {
+        return this.getEntitiesByType('tower');
+    }
+    
+    /**
      * Get entity count
      * @returns {number}
      */

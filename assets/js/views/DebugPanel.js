@@ -52,6 +52,11 @@ export class DebugPanel {
     gameClock = null;
     
     /**
+     * @type {Game|null}
+     */
+    game = null;
+    
+    /**
      * @param {DIContainer} container
      */
     constructor(container) {
@@ -75,6 +80,15 @@ export class DebugPanel {
     setGameClock(gameClock) {
         this.gameClock = gameClock;
         this.bindTimeScaleControls();
+    }
+    
+    /**
+     * Set the game instance
+     * @param {Game} game
+     * @returns {void}
+     */
+    setGame(game) {
+        this.game = game;
     }
     
     /**
@@ -329,6 +343,12 @@ export class DebugPanel {
         
         if (entitiesElement && info.entityCount !== undefined) {
             entitiesElement.textContent = info.entityCount;
+        }
+        
+        // Auto-refresh towers tab if visible
+        const towersPanel = document.getElementById('tab-towers');
+        if (towersPanel && towersPanel.classList.contains('active')) {
+            this.refreshTowersTab();
         }
         
         // Auto-refresh events tab if visible
@@ -668,6 +688,51 @@ export class DebugPanel {
         } catch (e) {
             console.error('Failed to load debug preferences:', e);
         }
+    }
+    
+    /**
+     * Refresh towers tab with active towers
+     * @returns {void}
+     */
+    refreshTowersTab() {
+        const towersList = document.getElementById('debug-towers-list');
+        if (!towersList) return;
+        
+        // Check if game instance is set
+        if (!this.game || !this.game.entityManager) {
+            towersList.innerHTML = '<div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No game instance</div>';
+            return;
+        }
+        
+        const towers = this.game.entityManager.getTowers();
+        
+        if (towers.length === 0) {
+            towersList.innerHTML = '<div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No towers placed</div>';
+            return;
+        }
+        
+        // Display tower info
+        towersList.innerHTML = towers.map((tower, idx) => {
+            const pos = tower.gridPosition || { row: '?', col: '?' };
+            const stats = tower.stats || {};
+            
+            return `
+                <div class="tower-item" style="margin-bottom: 8px; padding: 8px; background: #1a1a1a; border-radius: 4px; border-left: 3px solid #2196F3;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: #2196F3; font-weight: bold; font-size: 11px;">${tower.type || 'Unknown'}</span>
+                        <span style="color: #888; font-size: 10px;">ID: ${tower.id}</span>
+                    </div>
+                    <div style="font-size: 10px; color: #ddd; line-height: 1.4;">
+                        <div>📍 Position: [${pos.row}, ${pos.col}]</div>
+                        <div>💰 Cost: ${tower.cost || '?'}</div>
+                        <div>⚔️ Damage: ${stats.damage || '?'}</div>
+                        <div>🎯 Range: ${stats.range || '?'}</div>
+                        <div>⏱️ Fire Rate: ${stats.fireRate || '?'}</div>
+                        ${tower.kills !== undefined ? `<div>💀 Kills: ${tower.kills}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
     
     /**
