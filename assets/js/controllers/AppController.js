@@ -7,7 +7,22 @@ import { DebugPanel } from '../views/DebugPanel.js';
 import { EventBus } from '../services/core/EventBus.js';
 
 /**
- * Contrôleur principal de l'application
+ * AppController - Main application controller
+ * 
+ * Responsibilities:
+ * 1. Create and initialize app-specific components (Grid, Game, Views)
+ * 2. Wire up dependencies between components
+ * 3. Start the game loop
+ * 4. Handle UI events
+ * 
+ * Initialization flow:
+ * 1. Get DI services (CoordinateSystem, GameClock, EntityManager, etc.)
+ * 2. Create GridSystem (GridModel + GridView)
+ * 3. Create Views (CanvasView, TowerRangeView)
+ * 4. Create Game (with all dependencies including GridModel)
+ * 5. Create UI handlers (TowerDragHandler, DebugPanel)
+ * 6. Initialize Game (create paths, setup listeners)
+ * 7. Bind events and start game loop
  */
 export class AppController {
     /** @type {GridSystem} */
@@ -71,12 +86,15 @@ export class AppController {
     }
     
     /**
+     * Initialize the application
+     * Creates and wires up all components in the correct order
      * @returns {void}
      */
     init() {
-        this.debug.info('🚀 Initialisation de l\'application');
+        this.debug.info('🚀 Initializing application');
         
-        // Récupération des services via DI
+        // === PHASE 1: Get DI services ===
+        this.debug.info('📦 Phase 1: Loading DI services');
         this.coordSystem = this.container.get('coordinateSystem');
         this.gameClock = this.container.get('gameClock');
         this.entityManager = this.container.get('entityManager');
@@ -86,12 +104,14 @@ export class AppController {
         const uiUpdateManager = this.container.get('uiUpdateManager');
         const waveManager = this.container.get('waveManager');
         
-        // Initialize GridSystem (encapsulates GridModel + GridView)
+        // === PHASE 2: Create core components ===
+        this.debug.info('🏗️  Phase 2: Creating core components');
         this.gridSystem = new GridSystem(15, 10, 'grid-container', this.container);
         this.canvasView = new CanvasView('canvas-layer', this.coordSystem, this.container);
         this.towerRangeView = new TowerRangeView(this.container);
         
-        // Initialize Game with all dependencies (including CanvasView for visual effects)
+        // === PHASE 3: Create Game (central game logic) ===
+        this.debug.info('🎮 Phase 3: Initializing Game');
         this.game = new Game(
             this.gridSystem.getModel(),
             this.entityManager,
@@ -102,7 +122,8 @@ export class AppController {
             this.container
         );
         
-        // Initialize TowerDragHandler (UI service)
+        // === PHASE 4: Create UI handlers ===
+        this.debug.info('🖱️  Phase 4: Creating UI handlers');
         this.towerDragHandler = new TowerDragHandler(
             this.gridSystem.getModel(),
             this.gridSystem.getView(),
@@ -111,7 +132,8 @@ export class AppController {
             this.container
         );
 
-        // Listen to tower move attempts and delegate to Game
+        // === PHASE 5: Wire up cross-component events ===
+        this.debug.info('🔌 Phase 5: Wiring events');
         EventBus.onGlobal('tower:moveAttempt', (data) => {
             const success = this.game.moveTower(data.tower, data.fromCell, data.toCell);
             if (success) {
@@ -119,42 +141,38 @@ export class AppController {
             }
         });
         
-        this.debug.success('Application initialisée avec succès', {
-            rows: this.gridSystem.getModel().rows,
-            cols: this.gridSystem.getModel().cols
-        });
-        
-        // Initialize GridSystem (render grid)
+        // === PHASE 6: Initialize components ===
+        this.debug.info('⚙️  Phase 6: Initializing components');
         this.gridSystem.init();
-        
-        // Initialize Debug Panel
         this.debugPanel = new DebugPanel(this.container);
-        
-        // Initialize Game (creates paths, etc.)
         this.game.init();
         this.gridSystem.renderPaths();
 
-        // Placer des tours aléatoirement pour le test
+        // === PHASE 7: Setup initial game state ===
+        this.debug.info('🎯 Phase 7: Setting up initial game state');
         const placedCells = this.game.placeRandomTowers(5);
-        
-        // Enable drag and drop for placed towers
         placedCells.forEach(cell => {
             this.towerDragHandler.enableTowerDrag(cell);
             this.gridSystem.updateCell(cell);
         });
         
-        // Bind events
+        // === PHASE 8: Bind events and start ===
+        this.debug.info('▶️  Phase 8: Binding events and starting');
         this.bindEvents();
-        
-        // Configurer et démarrer GameClock
         this.setupGameClock();
+        
+        this.debug.success('✅ Application initialized successfully', {
+            rows: this.gridSystem.getModel().rows,
+            cols: this.gridSystem.getModel().cols,
+            towers: placedCells.length
+        });
         
         // Start the game (will start first wave)
         this.game.start();
     }
 
     /**
-     * Configure la GameClock
+     * Setup GameClock callbacks and start the game loop
      * @returns {void}
      */
     setupGameClock() {
@@ -177,23 +195,23 @@ export class AppController {
             }
         });
         
-        // Démarrer
+        // Start the clock
         this.gameClock.start();
     }
     
     /**
-     * Update gameplay (appelé à 60 Hz fixe)
-     * @param {number} deltaTime - en secondes
+     * Update gameplay (called at fixed 60Hz timestep)
+     * @param {number} deltaTime - in seconds
      * @returns {void}
      */
     updateGameplay(deltaTime) {
-        // Delegate to Game
+        // Delegate all gameplay logic to Game
         this.game.update(deltaTime);
     }
     
     /**
-     * Render (appelé chaque frame)
-     * @param {number} deltaTime - en secondes
+     * Render (called every frame)
+     * @param {number} deltaTime - in seconds
      * @returns {void}
      */
     render(deltaTime) {

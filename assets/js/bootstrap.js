@@ -10,10 +10,17 @@ import { UIUpdateManager } from './services/ui/UIUpdateManager.js';
 import { PlayerManager } from './domain/player/managers/PlayerManager.js';
 import { Game } from './domain/game/entities/Game.js';
 import { WaveManager } from './services/wave/WaveManager.js';
-import { TowerDragHandler } from './ux/TowerDragHandler.js';
 
 /**
- * Configuration et initialisation du conteneur DI
+ * Bootstrap - DI Container configuration
+ * 
+ * Registers ONLY reusable, stateless or global singleton services.
+ * 
+ * NOT registered here (created directly by AppController):
+ * - Game (needs GridModel which doesn't exist yet)
+ * - GridSystem/GridModel (app-specific state)
+ * - TowerDragHandler (needs GridModel)
+ * - Views (GridView, CanvasView, etc.)
  */
 
 // Créer le conteneur
@@ -78,19 +85,6 @@ export function bootstrapDI() {
         const coordSystem = container.get('coordinateSystem');
         return new WaveManager(entityManager, coordSystem, container);
     });
-    
-    // TowerDragHandler (singleton) - Will be initialized with gridModel by AppController
-    container.registerFactory('towerDragHandler', (container) => {
-        return null; // Lazy initialization by AppController after gridModel creation
-    });
-    
-    // Game (singleton) - Core game logic
-    container.registerFactory('game', (container) => {
-        // gridModel will be set by AppController after creation
-        return null; // Lazy initialization by AppController
-    });
-    
-    // Autres services à ajouter au besoin...
 }
 
 // Export du container

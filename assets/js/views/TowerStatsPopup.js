@@ -13,11 +13,6 @@ export class TowerStatsPopup {
     uiUpdateManager;
     
     /**
-     * @type {Game}
-     */
-    game;
-    
-    /**
      * @type {Debug}
      */
     debug;
@@ -38,7 +33,6 @@ export class TowerStatsPopup {
     constructor(diContainer) {
         this.popupManager = diContainer.get('popupManager');
         this.uiUpdateManager = diContainer.get('uiUpdateManager');
-        this.game = diContainer.get('game');
         this.debug = diContainer.createDebug('TowerStatsPopup', true);
     }
     
