@@ -74,5 +74,3 @@ export class AppController {
         this.debug.success('✅ AppController destroyed');
     }
 }
-// Cache buster: 1768588001
-// Cache buster: 1768587927

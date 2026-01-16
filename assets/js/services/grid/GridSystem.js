@@ -84,15 +84,6 @@ export class GridSystem {
     }
     
     /**
-     * Update cell visual state
-     * @param {Cell} cell
-     * @returns {void}
-     */
-    updateCell(cell) {
-        this.view.updateCell(cell);
-    }
-    
-    /**
      * Get all paths
      * @returns {Array<Path>}
      */

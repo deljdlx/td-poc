@@ -216,55 +216,6 @@ export class TowerDragHandler {
     }
     
     /**
-     * Update UI after tower movement (DEPRECATED - EVENT-DRIVEN FLOW)
-     * @param {Tower} tower
-     * @param {Cell} sourceCell
-     * @param {Cell} targetCell
-     * @returns {void}
-     * @deprecated No longer needed - UI updates via cell:towerChanged events, drag re-enabled via tower:moved event
-     */
-    updateTowerUI(tower, sourceCell, targetCell) {
-        this.debug.warning('updateTowerUI() is deprecated - using event-driven flow instead');
-        // This method is kept for backward compatibility but should not be called
-        // The event-driven flow handles everything:
-        // 1. Data mutation emits cell:towerChanged → GridView updates DOM
-        // 2. tower:moved event → TowerDragHandler re-enables drag
-    }
-    
-    /**
-     * Déplace une tourelle d'une cellule à une autre (legacy method)
-     * @param {Tower} tower
-     * @param {Cell} sourceCell
-     * @param {Cell} targetCell
-     * @returns {void}
-     * @deprecated Use updateTowerUI instead and delegate logic to Game
-     */
-    moveTower(tower, sourceCell, targetCell) {
-        // Retirer la tour de la cellule source
-        sourceCell.setTower(null);
-        this.gridView.updateCell(sourceCell);
-        
-        // Ajouter la tour à la cellule cible
-        targetCell.setTower(tower);
-        this.gridView.updateCell(targetCell);
-        
-        // Mettre à jour les coordonnées de la tour (pour le canvas)
-        const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
-        tower.x = targetCenter.x;
-        tower.y = targetCenter.y;
-        tower.cell = targetCell;
-        
-        // Réactiver le drag sur la nouvelle cellule
-        this.enableTowerDrag(targetCell);
-        
-        this.debug.success('Tower moved', {
-            from: { row: sourceCell.row, col: sourceCell.col },
-            to: { row: targetCell.row, col: targetCell.col },
-            newPos: { x: tower.x, y: tower.y }
-        });
-    }
-    
-    /**
      * Détruit le handler et nettoie les ressources
      * @returns {void}
      */

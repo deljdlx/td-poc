@@ -329,18 +329,6 @@ export class GridView {
     }
     
     /**
-     * Update cell DOM classes (DEPRECATED - use updateCellVisual via events)
-     * @param {Cell} cell
-     * @returns {void}
-     * @deprecated Listen to cell:towerChanged events instead
-     */
-    updateCell(cell) {
-        // Legacy method - kept for backward compatibility
-        // New code should listen to cell:towerChanged events
-        this.updateCellVisual(cell, null, cell.tower);
-    }
-    
-    /**
      * Recalcule et applique les positions de toutes les cellules
      * Utilisé lors du resize du viewport
      * @returns {void}
