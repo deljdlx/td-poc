@@ -19,6 +19,10 @@ import { TowerDragHandler } from '../../../ux/TowerDragHandler.js';
 import { TowerStatsPopup } from '../../../views/TowerStatsPopup.js';
 import { PlayerInfoPopup } from '../../../views/PlayerInfoPopup.js';
 import { GameDebugPanel } from '../debug/GameDebugPanel.js';
+import { TowerService } from '../services/TowerService.js';
+import { CombatService } from '../services/CombatService.js';
+import { RewardService } from '../services/RewardService.js';
+import { GameStateService } from '../services/GameStateService.js';
 
 /**
  * Game - Autonomous tower defense game instance
@@ -121,6 +125,26 @@ export class Game {
     events;
     
     /**
+     * @type {TowerService}
+     */
+    towerService;
+    
+    /**
+     * @type {CombatService}
+     */
+    combatService;
+    
+    /**
+     * @type {RewardService}
+     */
+    rewardService;
+    
+    /**
+     * @type {GameStateService}
+     */
+    gameStateService;
+    
+    /**
      * @type {Object}
      */
     config = {
@@ -191,7 +215,51 @@ export class Game {
         this.debugPanel = new GameDebugPanel(container, this);
         this.debugPanel.setGameClock(this.gameClock);
         
-        this.debug.success('✅ Game components created');
+        // Create game services
+        this.debug.info('🔧 Creating game services...');
+        
+        // Game state object for services
+        const gameState = {
+            state: this.state,
+            currentWaveNumber: this.currentWaveNumber,
+            globalScore: this.globalScore,
+            config: this.config
+        };
+        
+        this.towerService = new TowerService(
+            container,
+            this.entityManager,
+            this.playerManager,
+            this.towerTypes,
+            this.events,
+            this
+        );
+        
+        this.combatService = new CombatService(
+            container,
+            this.coordSystem,
+            this.entityManager
+        );
+        
+        this.rewardService = new RewardService(
+            container,
+            this.playerManager,
+            this.events,
+            gameState
+        );
+        
+        this.gameStateService = new GameStateService(
+            container,
+            this.events,
+            this.waveManager,
+            this.gridModel,
+            this.playerManager,
+            this.gameClock,
+            gameState,
+            this
+        );
+        
+        this.debug.success('✅ Game components and services created');
     }
     
     /**
@@ -505,414 +573,117 @@ export class Game {
     }
     
     /**
-     * Start the game
+     * Start the game (delegates to GameStateService)
      * @returns {void}
      */
     start() {
-        if (this.state !== GameState.READY) {
-            this.debug.warning('Cannot start game - not in READY state', { currentState: this.state });
-            return;
-        }
-        
-        const oldState = this.state;
-        this.state = GameState.RUNNING;
-        
-        // Emit state changed event
-        const event = new GameStateChangedEvent(this, oldState, this.state);
-        this.events.emit('stateChanged', event);
-        
-        // Start game clock
-        this.gameClock.start();
-        
-        this.debug.success('🎮 Game started!');
-        
-        // Start first wave
-        this.nextWave();
+        this.gameStateService.start();
+        // Sync state back to Game
+        this.state = this.gameStateService.gameState.state;
     }
     
     /**
-     * Pause the game
+     * Pause the game (delegates to GameStateService)
      * @returns {void}
      */
     pause() {
-        if (this.state !== GameState.RUNNING) {
-            return;
-        }
-        
-        const oldState = this.state;
-        this.state = GameState.PAUSED;
-        
-        const event = new GameStateChangedEvent(this, oldState, this.state);
-        this.events.emit('stateChanged', event);
-        
-        this.debug.info('⏸️ Game paused');
+        this.gameStateService.pause();
+        // Sync state back to Game
+        this.state = this.gameStateService.gameState.state;
     }
     
     /**
-     * Resume the game
+     * Resume the game (delegates to GameStateService)
      * @returns {void}
      */
     resume() {
-        if (this.state !== GameState.PAUSED) {
-            return;
-        }
-        
-        const oldState = this.state;
-        this.state = GameState.RUNNING;
-        
-        const event = new GameStateChangedEvent(this, oldState, this.state);
-        this.events.emit('stateChanged', event);
-        
-        this.debug.info('▶️ Game resumed');
+        this.gameStateService.resume();
+        // Sync state back to Game
+        this.state = this.gameStateService.gameState.state;
     }
     
     /**
-     * Trigger game over
+     * Trigger game over (delegates to GameStateService)
      * @param {string} reason
      * @returns {void}
      */
     gameOver(reason = 'Unknown') {
-        const oldState = this.state;
-        this.state = GameState.GAME_OVER;
-        
-        // Emit state changed
-        const stateEvent = new GameStateChangedEvent(this, oldState, this.state);
-        this.events.emit('stateChanged', stateEvent);
-        
-        // Emit game over
-        const gameOverEvent = new GameOverEvent(this, reason, this.globalScore);
-        this.events.emit('over', gameOverEvent);
-        
-        this.debug.error('💀 GAME OVER', { reason, finalScore: this.globalScore });
+        this.gameStateService.gameOver(reason);
+        // Sync state back to Game
+        this.state = this.gameStateService.gameState.state;
     }
     
     /**
-     * Trigger victory
+     * Trigger victory (delegates to GameStateService)
      * @returns {void}
      */
     victory() {
-        this.state = GameState.VICTORY;
-        this.debug.success('🎉 VICTORY!', { finalScore: this.globalScore });
+        this.gameStateService.victory();
+        // Sync state back to Game
+        this.state = this.gameStateService.gameState.state;
     }
     
     /**
-     * Start next wave
+     * Start next wave (delegates to GameStateService)
      * @returns {void}
      */
     nextWave() {
-        const perimeterPath = this.gridModel.getPaths()[0];
-        
-        if (!perimeterPath) {
-            this.debug.error('Cannot start wave - no path available');
-            return;
-        }
-        
-        this.currentWaveNumber++;
-        
-        // Progressive difficulty: more enemies each wave
-        const enemyCount = 10 + (this.currentWaveNumber - 1) * this.config.waveEnemyIncrement;
-        
-        const wave = new Wave(
-            [
-                { 
-                    type: 'basic', 
-                    health: 100 * this.config.difficulty, 
-                    speed: 1.0, 
-                    count: enemyCount 
-                }
-            ],
-            this.config.startingWaveDelay,
-            perimeterPath
-        );
-        
-        this.waveManager.startWave(wave, this.currentWaveNumber);
-        this.debug.success(`Wave ${this.currentWaveNumber} started`, { 
-            enemyCount,
-            difficulty: this.config.difficulty 
-        });
+        this.gameStateService.nextWave();
+        // Sync state back to Game
+        this.currentWaveNumber = this.gameStateService.gameState.currentWaveNumber;
     }
     
     /**
-     * Place a tower on a cell
+     * Place a tower on a cell (delegates to TowerService)
      * @param {Cell} cell
      * @param {string} towerTypeId - Tower type ID from registry (default: 'basic')
      * @returns {boolean} - True if tower was placed successfully
      */
     placeTower(cell, towerTypeId = 'basic') {
-        const activePlayer = this.playerManager.getActivePlayer();
-        
-        if (!activePlayer) {
-            this.debug.error('Cannot place tower - no active player');
-            return false;
-        }
-
-        // Get tower blueprint
-        const towerBlueprint = this.towerTypes[towerTypeId];
-        if (!towerBlueprint) {
-            this.debug.error(`Unknown tower type: ${towerTypeId}`);
-            return false;
-        }
-
-        // Check if player can afford the tower
-        const cost = towerBlueprint.cost;
-        if (!activePlayer.wallet.has('money', cost)) {
-            this.debug.warning('Cannot place tower - insufficient funds', {
-                required: cost,
-                available: activePlayer.wallet.get('money')
-            });
-            return false;
-        }
-        
-        // Deduct cost
-        activePlayer.wallet.spend('money', cost);
-        this.debug.info(`Tower purchased for ${cost} gold`, {
-            remaining: activePlayer.wallet.get('money')
-        });
-        
-        // Create and place tower from blueprint
-        const tower = new Tower(
-            cell, 
-            activePlayer.id,
-            this.container,
-            this,
-            towerBlueprint
-        );
-        
-        // Emit tower created event (SOURCEABLE: business event)
-        this.events.emit('towerCreated', {
-            sourceable: true,
-            metadata: {
-                towerId: tower.id,
-                towerType: towerTypeId,
-                playerId: activePlayer.id,
-                cost: cost,
-                stats: {
-                    damage: tower.attributes.damage,
-                    range: tower.attributes.range,
-                    fireRate: tower.attributes.fireRate,
-                    critChance: tower.attributes.critChance,
-                    critMultiplier: tower.attributes.critMultiplier
-                },
-                timestamp: Date.now()
-            }
-        });
-        
-        cell.setTower(tower);
-        this.entityManager.addEntity(tower);
-        activePlayer.addTower(tower);
-        
-        // Emit tower placed event (SOURCEABLE: business event)
-        const event = new TowerPlacedEvent(tower, cell, {
-            towerType: towerTypeId,
-            cost: cost,
-            playerId: activePlayer.id,
-            cellPosition: { row: cell.row, col: cell.col },
-            timestamp: Date.now()
-        });
-        this.events.emit('towerPlaced', event);
-        
-        this.debug.success('Tower placed', {
-            player: activePlayer.name,
-            totalTowers: activePlayer.towers.length
-        });
-        
-        return true;
+        return this.towerService.placeTower(cell, towerTypeId);
     }
     
     /**
-     * Place N towers randomly on empty cells (for testing)
+     * Place N towers randomly on empty cells (delegates to TowerService)
      * @param {number} count
      * @returns {Array<Cell>} - Array of cells where towers were placed
      */
     placeRandomTowers(count) {
-        const emptyCells = this.gridModel.getEmptyCells();
-        
-        if (emptyCells.length < count) {
-            this.debug.warning(`Not enough empty cells for ${count} towers, placing ${emptyCells.length}`);
-            count = emptyCells.length;
-        }
-        
-        const shuffled = emptyCells.sort(() => Math.random() - 0.5);
-        const selectedCells = shuffled.slice(0, count);
-        
-        const activePlayer = this.playerManager.getActivePlayer();
-        if (!activePlayer) {
-            this.debug.error('Cannot place towers - no active player');
-            return [];
-        }
-        
-        // For random placement (testing), give free towers
-        selectedCells.forEach(cell => {
-            // Choose random tower type for architecture testing
-            const towerTypeIds = ['basic', 'sniper', 'artillery'];
-            const towerTypeId = towerTypeIds[Math.floor(Math.random() * towerTypeIds.length)];
-            const towerBlueprint = this.towerTypes[towerTypeId];
-            
-            const tower = new Tower(
-                cell, 
-                activePlayer.id,
-                this.container,
-                this,
-                towerBlueprint
-            );
-            
-            // Emit tower created event (SOURCEABLE: business event)
-            this.events.emit('towerCreated', {
-                sourceable: true,
-                metadata: {
-                    towerId: tower.id,
-                    towerType: towerTypeId,
-                    playerId: activePlayer.id,
-                    cost: 0, // Free tower for testing
-                    stats: {
-                        damage: tower.attributes.damage,
-                        range: tower.attributes.range,
-                        fireRate: tower.attributes.fireRate,
-                        critChance: tower.attributes.critChance,
-                        critMultiplier: tower.attributes.critMultiplier
-                    },
-                    timestamp: Date.now()
-                }
-            });
-            
-            cell.setTower(tower);
-            this.entityManager.addEntity(tower);
-            activePlayer.addTower(tower);
-            
-            // Emit tower placed event (SOURCEABLE: business event)
-            const event = new TowerPlacedEvent(tower, cell, {
-                towerType: towerTypeId,
-                cost: 0, // Free tower for testing
-                playerId: activePlayer.id,
-                cellPosition: { row: cell.row, col: cell.col },
-                timestamp: Date.now()
-            });
-            this.events.emit('towerPlaced', event);
-        });
-        
-        this.debug.success(`Placed ${count} free towers for testing`, {
-            totalTowers: activePlayer.towers.length
-        });
-        
-        return selectedCells;
+        return this.towerService.placeRandomTowers(this.gridModel, count);
     }
     
     /**
-     * Move tower from one cell to another (business logic)
+     * Validate tower move (delegates to TowerService)
      * @param {Tower} tower
      * @param {Cell} fromCell
      * @param {Cell} toCell
-     * @returns {boolean} - True if move is allowed and executed
+     * @returns {boolean} - True if move is allowed
      */
     moveTower(tower, fromCell, toCell) {
-        // Validation: can't move to same cell
-        if (fromCell === toCell) {
-            this.debug.info('Cannot move to same cell');
-            return false;
-        }
-        
-        // Validation: can't move to path
-        if (toCell.isOnPath) {
-            this.debug.warning('Cannot move tower to path cell');
-            return false;
-        }
-        
-        // Validation: can't move to occupied cell
-        if (toCell.hasTower()) {
-            this.debug.warning('Target cell already occupied');
-            return false;
-        }
-        
-        // Optional: Apply movement cost (disabled for now)
-        // const moveCost = 50;
-        // const owner = this.playerManager.players.find(p => p.id === tower.playerId);
-        // if (owner && !owner.wallet.has('money', moveCost)) {
-        //     this.debug.warning('Insufficient funds to move tower');
-        //     return false;
-        // }
-        // owner.wallet.spend('money', moveCost);
-        
-        this.debug.success('Tower move validated', {
-            from: { row: fromCell.row, col: fromCell.col },
-            to: { row: toCell.row, col: toCell.col }
-        });
-        
-        return true;
+        return this.towerService.validateMove(tower, fromCell, toCell);
     }
     
     /**
-     * Handle enemy killed event
+     * Handle enemy killed event (delegates to RewardService)
      * @param {Enemy} enemy
      * @param {Tower} killer - Tower that killed the enemy
      * @returns {void}
      */
     handleEnemyKilled(enemy, killer) {
-        // Find tower owner
-        const owner = this.playerManager.players.find(p => p.id === killer.playerId);
-        
-        if (!owner) {
-            this.debug.warning('Enemy killed but no owner found for tower', { 
-                towerId: killer.id,
-                playerId: killer.playerId 
-            });
-            return;
-        }
-        
-        // Award gold
-        owner.wallet.add('money', enemy.attributes.goldReward);
-        
-        // Update stats
-        owner.stats.enemiesKilled++;
-        owner.score += enemy.attributes.goldReward;
-        
-        // Update global score
-        this.globalScore += enemy.attributes.goldReward;
-        
-        // Emit sourceable event (BUSINESS EVENT for Event Sourcing)
-        this.events.emit('enemyKilled', {
-            sourceable: true,
-            metadata: {
-                enemyId: enemy.id,
-                enemyType: enemy.attributes.type || 'basic',
-                killerId: killer.id,
-                killerType: killer.attributes?.type || 'unknown',
-                playerId: owner.id,
-                goldReward: enemy.attributes.goldReward,
-                position: { x: enemy.x, y: enemy.y },
-                timestamp: Date.now()
-            }
-        });
-        
-        this.debug.success(`💰 ${owner.name} earned ${enemy.attributes.goldReward} gold`, { 
-            total: owner.wallet.get('money'),
-            kills: owner.stats.enemiesKilled
-        });
+        this.rewardService.handleEnemyKilled(enemy, killer);
     }
     
     /**
-     * Handle enemy reached end of path
+     * Handle enemy reached end of path (delegates to GameStateService)
      * @param {Enemy} enemy
      * @returns {void}
      */
     handleEnemyReachedEnd(enemy) {
-        const activePlayer = this.playerManager.getActivePlayer();
-        
-        if (!activePlayer) {
-            return;
-        }
-        
-        // Deduct lives (emits PlayerDamagedEvent)
-        activePlayer.takeDamage(1);
-        this.debug.warning(`❤️ Enemy reached end! Lives: ${activePlayer.lives}/20`);
-        
-        // Check game over
-        if (activePlayer.lives <= 0) {
-            this.gameOver('All lives lost');
-        }
+        this.gameStateService.handleEnemyReachedEnd(enemy);
     }
     
     /**
-     * Create and fire missile from tower to target
+     * Create and fire missile from tower to target (delegates to CombatService)
      * @param {Tower} tower - Firing tower
      * @param {number} startX - Start X position
      * @param {number} startY - Start Y position
@@ -922,25 +693,7 @@ export class Game {
      * @returns {Missile}
      */
     createMissile(tower, startX, startY, targetX, targetY, missileBlueprint) {
-        const missile = new Missile(
-            tower,
-            startX, startY,
-            targetX, targetY,
-            missileBlueprint.speed,
-            missileBlueprint.lifetime,
-            missileBlueprint.splashRadius,
-            missileBlueprint.damage,
-            this.coordSystem,
-            missileBlueprint.visualFx
-        );
-        
-        this.entityManager.addEntity(missile);
-        this.debug.event('🚀 Missile created', { 
-            towerId: tower.id,
-            target: { x: targetX.toFixed(0), y: targetY.toFixed(0) }
-        });
-        
-        return missile;
+        return this.combatService.createMissile(tower, startX, startY, targetX, targetY, missileBlueprint);
     }
     
     /**
