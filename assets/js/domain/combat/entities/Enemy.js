@@ -1,4 +1,4 @@
-import { Entity } from '../../../models/core/Entity.js';
+import { Entity } from '../../shared/Entity.js';
 import { EnemyAttributes } from '../value-objects/EnemyAttributes.js';
 import { AttributesProxy } from '../../shared/AttributesProxy.js';
 import { EnemyHitEvent, EnemyDeathEvent, EnemyReachedEndEvent } from '../../../events/EnemyEvent.js';

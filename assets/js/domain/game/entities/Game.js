@@ -1,12 +1,12 @@
-import { GameState } from './GameState.js';
-import { Tower } from '../../domain/combat/entities/Tower.js';
+import { GameState } from '../value-objects/GameState.js';
+import { Tower } from '../../combat/entities/Tower.js';
 import { Wave } from './Wave.js';
-import { PathFactory } from '../core/PathFactory.js';
-import { Missile } from '../../domain/combat/entities/Missile.js';
-import { GameStateChangedEvent, GameOverEvent } from '../../events/GameEvent.js';
-import { EventBus } from '../../services/core/EventBus.js';
-import { missileTypes } from './MissileTypeRegistry.js';
-import { towerTypes } from './TowerTypeRegistry.js';
+import { PathFactory } from '../../map/PathFactory.js';
+import { Missile } from '../../combat/entities/Missile.js';
+import { GameStateChangedEvent, GameOverEvent } from '../../../events/GameEvent.js';
+import { EventBus } from '../../../services/core/EventBus.js';
+import { missileTypes } from '../registries/MissileTypeRegistry.js';
+import { towerTypes } from '../registries/TowerTypeRegistry.js';
 
 /**
  * Game - Core game logic and state management

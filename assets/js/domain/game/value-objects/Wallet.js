@@ -1,5 +1,5 @@
-import { ResourceRegistry } from './Resource.js';
-import { PlayerResourceChangedEvent } from '../../events/PlayerEvent.js';
+import { ResourceRegistry } from '../registries/Resource.js';
+import { PlayerResourceChangedEvent } from '../../../events/PlayerEvent.js';
 
 /**
  * Wallet - Manages player's resource inventory

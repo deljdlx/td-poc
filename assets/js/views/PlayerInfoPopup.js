@@ -1,4 +1,4 @@
-import { ResourceRegistry } from '../models/gameplay/Resource.js';
+import { ResourceRegistry } from '../domain/game/registries/Resource.js';
 
 /**
  * PlayerInfoPopup - Displays player information and wallet

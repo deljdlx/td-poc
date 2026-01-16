@@ -1,6 +1,6 @@
-import { Wallet } from './Wallet.js';
-import { PlayerDamagedEvent } from '../../events/PlayerEvent.js';
-import { EventBus } from '../../services/core/EventBus.js';
+import { Wallet } from '../value-objects/Wallet.js';
+import { PlayerDamagedEvent } from '../../../events/PlayerEvent.js';
+import { EventBus } from '../../../services/core/EventBus.js';
 
 /**
  * Player - Represents a player in the game

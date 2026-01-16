@@ -1,4 +1,4 @@
-import { Entity } from '../../../models/core/Entity.js';
+import { Entity } from '../../shared/Entity.js';
 import { TowerAttributes } from '../value-objects/TowerAttributes.js';
 import { AttributesProxy } from '../../shared/AttributesProxy.js';
 import { TowerFiredEvent } from '../../../events/TowerEvent.js';

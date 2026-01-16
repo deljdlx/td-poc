@@ -65,7 +65,8 @@ export class Application {
         this.debug = this.container.createDebug('Application', true);
         
         this.debug.info('🚀 Initializing Application...');
-        
+
+
         // 2. Create AppController (owned instance)
         this.controller = new AppController(this.container);
         this.controller.init();

@@ -1,4 +1,4 @@
-import { GridModel } from '../../models/core/GridModel.js';
+import { GridModel } from '../../domain/map/GridModel.js';
 import { GridView } from '../../views/GridView.js';
 
 /**

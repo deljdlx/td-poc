@@ -1,4 +1,4 @@
-import { Player } from '../../domain/game/Player.js';
+import { Player } from '../entities/Player.js';
 
 /**
  * PlayerManager - Manages players in the game

@@ -2,13 +2,13 @@ import { DIContainer } from './services/core/DIContainer.js';
 import { Debug } from './services/core/Debug.js';
 import { CoordinateSystem } from './services/engine/CoordinateSystem.js';
 import { GameClock } from './services/engine/GameClock.js';
-import { EntityManager } from './models/core/EntityManager.js';
+import { EntityManager } from './services/engine/EntityManager.js';
 import { PopupManager } from './services/ui/PopupManager.js';
 import { TowerStatsPopup } from './views/TowerStatsPopup.js';
 import { PlayerInfoPopup } from './views/PlayerInfoPopup.js';
 import { UIUpdateManager } from './services/ui/UIUpdateManager.js';
-import { PlayerManager } from './models/core/PlayerManager.js';
-import { Game } from './models/gameplay/Game.js';
+import { PlayerManager } from './domain/game/managers/PlayerManager.js';
+import { Game } from './domain/game/entities/Game.js';
 import { WaveManager } from './services/wave/WaveManager.js';
 import { TowerDragHandler } from './ux/TowerDragHandler.js';
 

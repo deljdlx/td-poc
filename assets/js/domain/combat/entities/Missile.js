@@ -1,4 +1,4 @@
-import { Entity } from '../../../models/core/Entity.js';
+import { Entity } from '../../shared/Entity.js';
 import { MissileAttributes } from '../value-objects/MissileAttributes.js';
 import { AttributesProxy } from '../../shared/AttributesProxy.js';
 import { EventBus } from '../../../services/core/EventBus.js';

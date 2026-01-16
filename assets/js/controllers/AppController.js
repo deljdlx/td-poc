@@ -2,7 +2,7 @@ import { GridSystem } from '../services/grid/GridSystem.js';
 import { CanvasView } from '../views/CanvasView.js';
 import { TowerRangeView } from '../views/TowerRangeView.js';
 import { TowerDragHandler } from '../ux/TowerDragHandler.js';
-import { Game } from '../models/gameplay/Game.js';
+import { Game } from '../domain/game/entities/Game.js';
 import { DebugPanel } from '../views/DebugPanel.js';
 import { EventBus } from '../services/core/EventBus.js';
 
@@ -24,7 +24,7 @@ export class AppController {
     
     /** @type {DIContainer} */
     container = null;
-    
+
     /** @type {GameClock} */
     gameClock = null;
     
@@ -397,3 +397,4 @@ export class AppController {
         this.debug.success('✅ AppController destroyed');
     }
 }
+// Cache buster: 1768587927
