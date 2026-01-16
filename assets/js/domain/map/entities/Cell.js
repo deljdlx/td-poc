@@ -72,6 +72,24 @@ export class Cell {
      */
     setTower(tower) {
         this.tower = tower;
+        
+        // Update DOM to show tower visually
+        if (this.element) {
+            this.element.classList.add('has-tower');
+        }
+    }
+    
+    /**
+     * Remove tower from this cell
+     * @returns {void}
+     */
+    removeTower() {
+        this.tower = null;
+        
+        // Update DOM to remove tower visual
+        if (this.element) {
+            this.element.classList.remove('has-tower');
+        }
     }
     
     /**

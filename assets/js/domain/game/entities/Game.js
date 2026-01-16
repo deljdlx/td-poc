@@ -909,7 +909,16 @@ export class Game {
         this.canvasView.updateAndRenderEffects(deltaTime);
         
         // Render game entities
-        this.canvasView.renderEntities(this.entityManager.getEntities(), deltaTime);
+        const entities = this.entityManager.getEntities();
+        
+        // Debug: log entity types once
+        if (!this._loggedEntities && entities.length > 0) {
+            const types = entities.map(e => e.getType());
+            this.debug.info('Rendering entities:', { count: entities.length, types });
+            this._loggedEntities = true;
+        }
+        
+        this.canvasView.renderEntities(entities, deltaTime);
         
         // Update gold display in header
         this.updateGoldDisplay();
