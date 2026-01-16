@@ -1,7 +1,9 @@
 import { CellAttributes } from '../value-objects/CellAttributes.js';
+import { EventBus } from '../../../services/core/EventBus.js';
 
 /**
- * Entity - Cellule de la carte
+ * Entity - Cellule de la carte (PURE DATA LAYER)
+ * Domain events: cell:towerChanged
  */
 export class Cell {
     /** @type {CellAttributes} */
@@ -66,30 +68,31 @@ export class Cell {
     }
     
     /**
-     * Set tower on this cell
+     * Set tower on this cell (PURE DATA - NO DOM)
+     * Emits: cell:towerChanged domain event
      * @param {Tower} tower
      * @returns {void}
      */
     setTower(tower) {
+        const oldTower = this.tower;
         this.tower = tower;
         
-        // Update DOM to show tower visually
-        if (this.element) {
-            this.element.classList.add('has-tower');
-        }
+        // Emit domain event for view layer to react
+        EventBus.emitGlobal('cell:towerChanged', {
+            cell: this,
+            oldTower,
+            newTower: tower
+        });
     }
     
     /**
-     * Remove tower from this cell
+     * Remove tower from this cell (PURE DATA - NO DOM)
+     * Emits: cell:towerChanged domain event via setTower()
      * @returns {void}
      */
     removeTower() {
-        this.tower = null;
-        
-        // Update DOM to remove tower visual
-        if (this.element) {
-            this.element.classList.remove('has-tower');
-        }
+        // Reuse setTower to ensure event emission
+        this.setTower(null);
     }
     
     /**

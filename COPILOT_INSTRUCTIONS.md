@@ -1,7 +1,9 @@
 # Tower Defense Game - Instructions Copilot
 
-## Insctructions Générales
+## Instructions Générales
 Avant de coder, toujours me demander confirmation.
+
+**Important** : Ne pas gérer le reload du serveur de développement. L'utilisateur gère lui-même le serveur HTTP (python -m http.server ou autre). Pas de tentative de lancement/arrêt de serveur.
 
 
 ## 🎯 Objectif

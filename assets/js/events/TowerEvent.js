@@ -48,6 +48,7 @@ export class TowerFiredEvent extends TowerEvent {
 
 /**
  * TowerPlacedEvent - Tower was placed on a cell
+ * SOURCEABLE: Business event for Event Sourcing
  */
 export class TowerPlacedEvent extends TowerEvent {
     /**
@@ -56,11 +57,24 @@ export class TowerPlacedEvent extends TowerEvent {
     cell;
     
     /**
+     * @type {boolean}
+     */
+    sourceable = true;
+    
+    /**
+     * @type {Object} - Event Sourcing metadata
+     */
+    metadata;
+    
+    /**
      * @param {Tower} tower
      * @param {Cell} cell
+     * @param {Object} [metadata={}] - Business metadata (towerType, cost, playerId, position)
      */
-    constructor(tower, cell) {
-        super('placed', tower, { cell });
+    constructor(tower, cell, metadata = {}) {
+        super('placed', tower, { cell, sourceable: true, metadata });
         this.cell = cell;
+        this.sourceable = true;
+        this.metadata = metadata;
     }
 }

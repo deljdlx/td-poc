@@ -48,6 +48,22 @@ export class TowerDragHandler {
             onDragEnd: this.handleDragEnd.bind(this),
             onCancel: this.handleCancel.bind(this)
         });
+        
+        // Listen to domain events for UI updates (EVENT-DRIVEN UI)
+        this.setupDomainEventListeners();
+    }
+    
+    /**
+     * Setup listeners for domain events (EVENT-DRIVEN UI UPDATES)
+     * @returns {void}
+     */
+    setupDomainEventListeners() {
+        // Listen to successful tower moves to re-enable drag
+        EventBus.onGlobal('tower:moved', (data) => {
+            const { toCell } = data;
+            this.enableTowerDrag(toCell);
+            this.debug.event('Tower moved - drag re-enabled on target cell');
+        });
     }
     
     /**
@@ -116,6 +132,7 @@ export class TowerDragHandler {
     /**
      * Callback appelé à la fin du drag
      * Valide le drop et retourne true si valide, false sinon
+     * COMMAND EMISSION: Emits tower:moveAttempt command event
      * @param {HTMLElement} element
      * @param {Object} data
      * @param {Object} endPos
@@ -155,12 +172,12 @@ export class TowerDragHandler {
             return false;
         }
         
-        // Drop valide : émettre event pour validation et logique métier
+        // Drop valide : émettre COMMAND EVENT pour validation et logique métier
+        // Game will validate, mutate data, and emit domain events
         EventBus.emitGlobal('tower:moveAttempt', {
             tower,
             fromCell: sourceCell,
-            toCell: targetCell,
-            uiHandler: this
+            toCell: targetCell
         });
         
         // Return true pour le drag/drop UI (la logique métier validera via event)
@@ -199,35 +216,19 @@ export class TowerDragHandler {
     }
     
     /**
-     * Update UI after tower movement (called by Game logic)
+     * Update UI after tower movement (DEPRECATED - EVENT-DRIVEN FLOW)
      * @param {Tower} tower
      * @param {Cell} sourceCell
      * @param {Cell} targetCell
      * @returns {void}
+     * @deprecated No longer needed - UI updates via cell:towerChanged events, drag re-enabled via tower:moved event
      */
     updateTowerUI(tower, sourceCell, targetCell) {
-        // Retirer la tour de la cellule source
-        sourceCell.setTower(null);
-        this.gridView.updateCell(sourceCell);
-        
-        // Ajouter la tour à la cellule cible
-        targetCell.setTower(tower);
-        this.gridView.updateCell(targetCell);
-        
-        // Mettre à jour les coordonnées de la tour (pour le canvas)
-        const targetCenter = this.coordSystem.getElementCenter(targetCell.element);
-        tower.x = targetCenter.x;
-        tower.y = targetCenter.y;
-        tower.cell = targetCell;
-        
-        // Réactiver le drag sur la nouvelle cellule
-        this.enableTowerDrag(targetCell);
-        
-        this.debug.success('Tower UI updated', {
-            from: { row: sourceCell.row, col: sourceCell.col },
-            to: { row: targetCell.row, col: targetCell.col },
-            newPos: { x: tower.x, y: tower.y }
-        });
+        this.debug.warning('updateTowerUI() is deprecated - using event-driven flow instead');
+        // This method is kept for backward compatibility but should not be called
+        // The event-driven flow handles everything:
+        // 1. Data mutation emits cell:towerChanged → GridView updates DOM
+        // 2. tower:moved event → TowerDragHandler re-enables drag
     }
     
     /**

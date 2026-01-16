@@ -249,25 +249,36 @@ export class Game {
     /**
      * Setup game event listeners for business logic (rewards, scoring, game over)
      * AND visual effects (explosions, animations)
+     * COMMAND/EVENT PATTERN: Commands trigger validation + data mutation + domain events
      * @returns {void}
      */
     setupGameEventListeners() {
-        this.debug.info('🎯 Setting up Game event listeners (business logic + visual effects)');
+        this.debug.info('🎯 Setting up Game event listeners (command/event pattern)');
         
-        // Tower move attempt → Validate and execute move
+        // COMMAND: Tower move attempt → Validate and execute move
         EventBus.onGlobal('tower:moveAttempt', (data) => {
-            const { tower, fromCell, toCell, uiHandler } = data;
+            const { tower, fromCell, toCell } = data;
             
             // Validate move (business logic)
             const isValid = this.moveTower(tower, fromCell, toCell);
             
             if (isValid) {
-                // Update cells (data layer)
+                // Update data layer (emits cell:towerChanged events)
                 fromCell.removeTower();
                 toCell.setTower(tower);
                 
-                // Update tower position and re-enable drag
-                uiHandler.updateTowerUI(tower, fromCell, toCell);
+                // Synchronize tower position for canvas rendering
+                tower.cell = toCell;
+                const center = this.coordSystem.getElementCenter(toCell.element);
+                tower.x = center.x;
+                tower.y = center.y;
+                
+                // Emit DOMAIN EVENT for UI layer to react
+                EventBus.emitGlobal('tower:moved', {
+                    tower,
+                    fromCell,
+                    toCell
+                });
                 
                 this.debug.success('Tower moved', {
                     from: { row: fromCell.row, col: fromCell.col },
@@ -664,8 +675,14 @@ export class Game {
         this.entityManager.addEntity(tower);
         activePlayer.addTower(tower);
         
-        // Emit tower placed event
-        const event = new TowerPlacedEvent(tower, cell);
+        // Emit tower placed event (SOURCEABLE: business event)
+        const event = new TowerPlacedEvent(tower, cell, {
+            towerType: towerTypeId,
+            cost: cost,
+            playerId: activePlayer.id,
+            cellPosition: { row: cell.row, col: cell.col },
+            timestamp: Date.now()
+        });
         this.events.emit('towerPlaced', event);
         
         this.debug.success('Tower placed', {
@@ -717,8 +734,14 @@ export class Game {
             this.entityManager.addEntity(tower);
             activePlayer.addTower(tower);
             
-            // Emit tower placed event
-            const event = new TowerPlacedEvent(tower, cell);
+            // Emit tower placed event (SOURCEABLE: business event)
+            const event = new TowerPlacedEvent(tower, cell, {
+                towerType: towerTypeId,
+                cost: 0, // Free tower for testing
+                playerId: activePlayer.id,
+                cellPosition: { row: cell.row, col: cell.col },
+                timestamp: Date.now()
+            });
             this.events.emit('towerPlaced', event);
         });
         

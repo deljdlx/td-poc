@@ -1,8 +1,11 @@
 import { CSSVariables } from '../services/ui/CSSVariables.js';
 import { PathRenderer } from './PathRenderer.js';
+import { EventBus } from '../services/core/EventBus.js';
 
 /**
- * Vue DOM pour la grille
+ * Vue DOM pour la grille (EVENT-DRIVEN VIEW LAYER)
+ * Listens to: cell:towerChanged domain events
+ * Renders: Pure function of data state
  */
 export class GridView {
     /** @type {HTMLElement} */
@@ -46,6 +49,86 @@ export class GridView {
         this.debug.info('GridView initialisée');
         this.calculateAndApplyCellDimensions();
         this.setupResizeListener();
+        this.setupDataEventListeners();
+    }
+    
+    /**
+     * Setup event listeners for data layer changes (EVENT-DRIVEN RENDERING)
+     * @returns {void}
+     */
+    setupDataEventListeners() {
+        this.debug.info('🎧 Setting up data event listeners...');
+        
+        // Listen to cell tower changes and update DOM
+        EventBus.onGlobal('cell:towerChanged', (data) => {
+            const { cell, oldTower, newTower } = data;
+            this.updateCellVisual(cell, oldTower, newTower);
+        });
+        
+        this.debug.success('✅ Data event listeners configured');
+    }
+    
+    /**
+     * Update cell visual based on data state (PURE RENDERING)
+     * @param {Cell} cell
+     * @param {Tower|null} oldTower
+     * @param {Tower|null} newTower
+     * @returns {void}
+     */
+    updateCellVisual(cell, oldTower, newTower) {
+        if (!cell.element) {
+            this.debug.warning('Cannot update cell visual - no DOM element', { 
+                row: cell.row, 
+                col: cell.col 
+            });
+            return;
+        }
+        
+        // Remove old tower visual
+        if (oldTower) {
+            cell.element.classList.remove('has-tower');
+            const oldIcon = cell.element.querySelector('.tower-icon');
+            if (oldIcon) {
+                oldIcon.remove();
+            }
+        }
+        
+        // Add new tower visual
+        if (newTower) {
+            cell.element.classList.add('has-tower');
+            this.renderTowerIcon(cell, newTower);
+        }
+        
+        this.debug.event('Cell visual updated', {
+            row: cell.row,
+            col: cell.col,
+            hadTower: !!oldTower,
+            hasTower: !!newTower
+        });
+    }
+    
+    /**
+     * Render tower icon in cell (PURE RENDERING)
+     * @param {Cell} cell
+     * @param {Tower} tower
+     * @returns {void}
+     */
+    renderTowerIcon(cell, tower) {
+        // Remove existing icon if any
+        const existing = cell.element.querySelector('.tower-icon');
+        if (existing) {
+            existing.remove();
+        }
+        
+        // Create new icon
+        const icon = document.createElement('div');
+        icon.className = 'tower-icon';
+        icon.textContent = '🗼';
+        icon.style.position = 'absolute';
+        icon.style.fontSize = '24px';
+        icon.style.pointerEvents = 'none';
+        
+        cell.element.appendChild(icon);
     }
     
     /**
@@ -246,17 +329,15 @@ export class GridView {
     }
     
     /**
+     * Update cell DOM classes (DEPRECATED - use updateCellVisual via events)
      * @param {Cell} cell
      * @returns {void}
+     * @deprecated Listen to cell:towerChanged events instead
      */
     updateCell(cell) {
-        if (cell.element) {
-            if (cell.hasTower()) {
-                cell.element.classList.add('has-tower');
-            } else {
-                cell.element.classList.remove('has-tower');
-            }
-        }
+        // Legacy method - kept for backward compatibility
+        // New code should listen to cell:towerChanged events
+        this.updateCellVisual(cell, null, cell.tower);
     }
     
     /**
