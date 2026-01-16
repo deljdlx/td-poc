@@ -50,19 +50,143 @@ export class DebugPanel {
      */
     constructor(container) {
         this.container = container;
-        this.panel = document.getElementById('debug-panel');
+        this.panel = null;
         
-        if (!this.panel) {
-            console.warn('Debug panel element not found');
-            return;
-        }
-        
+        this.render();
         this.bindEvents();
         this.initDraggable();
         this.initToggleButton();
         this.initTabs();
         this.loadPreferences();
         this.populateContextList();
+    }
+    
+    /**
+     * Render the debug panel and inject it into the DOM
+     * @returns {void}
+     */
+    render() {
+        this.panel = this.createPanelElement();
+        document.body.appendChild(this.panel);
+    }
+    
+    /**
+     * Create the debug panel DOM element
+     * @returns {HTMLElement}
+     */
+    createPanelElement() {
+        const panel = document.createElement('div');
+        panel.id = 'debug-panel';
+        panel.className = 'debug-panel';
+        panel.style.display = 'none';
+        panel.innerHTML = this.getTemplate();
+        return panel;
+    }
+    
+    /**
+     * Get the HTML template for the debug panel
+     * @returns {string}
+     */
+    getTemplate() {
+        return `
+            <div class="debug-panel-header">
+                <span class="debug-panel-title">🔍 Debug</span>
+                <button id="debug-panel-close" class="debug-panel-close">×</button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="debug-panel-tabs">
+                <button class="debug-tab active" data-tab="logs">📋 Logs</button>
+                <button class="debug-tab" data-tab="towers">🗼 Towers</button>
+                <button class="debug-tab" data-tab="tests">🧪 Tests</button>
+                <button class="debug-tab" data-tab="actions">⚡ Actions</button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="debug-tab-content">
+                <!-- Logs Tab -->
+                <div id="tab-logs" class="debug-tab-panel active">
+                    <div class="debug-section">
+                        <div class="debug-section-title">Log Level</div>
+                        <select id="debug-log-level" class="debug-select">
+                            <option value="0">ALL</option>
+                            <option value="1" selected>DEBUG</option>
+                            <option value="2">INFO</option>
+                            <option value="3">WARN</option>
+                            <option value="4">ERROR</option>
+                            <option value="5">NONE</option>
+                        </select>
+                    </div>
+                    <div class="debug-section">
+                        <div class="debug-section-title">Quick Actions</div>
+                        <button id="debug-clear-console" class="debug-button">Clear Console</button>
+                    </div>
+                    <div class="debug-section">
+                        <div class="debug-section-title">
+                            Context Filters
+                            <div class="debug-context-actions">
+                                <button id="debug-select-all" class="debug-mini-button">All</button>
+                                <button id="debug-clear-all" class="debug-mini-button">None</button>
+                            </div>
+                        </div>
+                        <div id="debug-context-list" class="debug-context-list">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="debug-section">
+                        <div class="debug-section-title">Info</div>
+                        <div class="debug-info">
+                            <div class="debug-info-item">
+                                <span class="debug-info-label">FPS:</span>
+                                <span class="debug-info-value" id="debug-fps">--</span>
+                            </div>
+                            <div class="debug-info-item">
+                                <span class="debug-info-label">Entities:</span>
+                                <span class="debug-info-value" id="debug-entities">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Towers Tab -->
+                <div id="tab-towers" class="debug-tab-panel">
+                    <div class="debug-section">
+                        <div class="debug-section-title">Active Towers</div>
+                        <div id="debug-towers-list" class="debug-towers-list">
+                            <div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">–</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tests Tab -->
+                <div id="tab-tests" class="debug-tab-panel">
+                    <div class="debug-section">
+                        <div class="debug-section-title">Unit Tests</div>
+                        <p style="color: #999; font-size: 11px;">Coming soon...</p>
+                    </div>
+                </div>
+                
+                <!-- Actions Tab -->
+                <div id="tab-actions" class="debug-tab-panel">
+                    <div class="debug-section">
+                        <div class="debug-section-title">Game Speed</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <label for="debug-time-scale" style="flex-shrink: 0;">Speed:</label>
+                            <input type="range" id="debug-time-scale" min="0" max="1000" value="100" step="25" style="flex: 1;">
+                            <span id="debug-time-scale-value" style="min-width: 60px; text-align: right;">100%</span>
+                        </div>
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            <button class="debug-mini-button" data-speed="0">⏸ 0%</button>
+                            <button class="debug-mini-button" data-speed="50">50%</button>
+                            <button class="debug-mini-button" data-speed="100">100%</button>
+                            <button class="debug-mini-button" data-speed="200">200%</button>
+                            <button class="debug-mini-button" data-speed="500">500%</button>
+                            <button class="debug-mini-button" data-speed="1000">⚡ 1000%</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     
     /**
