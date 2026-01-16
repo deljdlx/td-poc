@@ -1,11 +1,12 @@
-import { Debug } from '../services/core/Debug.js';
-import { EventBus } from '../services/core/EventBus.js';
+import { Debug } from '../../../services/core/Debug.js';
+import { EventBus } from '../../../services/core/EventBus.js';
 
 /**
- * DebugPanel - UI controller for debug panel
- * Manages log level selection and debug info display
+ * GameDebugPanel - Debug panel for Game entity
+ * Manages log level selection, debug info display, towers, and sourceable events
+ * This is owned by Game and displays Game-specific debug information
  */
-export class DebugPanel {
+export class GameDebugPanel {
     /**
      * @type {DIContainer}
      */
@@ -58,9 +59,11 @@ export class DebugPanel {
     
     /**
      * @param {DIContainer} container
+     * @param {Game} game - The Game instance this debug panel belongs to
      */
-    constructor(container) {
+    constructor(container, game) {
         this.container = container;
+        this.game = game;
         this.panel = null;
         
         this.render();
@@ -80,15 +83,6 @@ export class DebugPanel {
     setGameClock(gameClock) {
         this.gameClock = gameClock;
         this.bindTimeScaleControls();
-    }
-    
-    /**
-     * Set the game instance
-     * @param {Game} game
-     * @returns {void}
-     */
-    setGame(game) {
-        this.game = game;
     }
     
     /**
@@ -293,7 +287,7 @@ export class DebugPanel {
      */
     bindTimeScaleControls() {
         if (!this.gameClock) {
-            console.warn('DebugPanel: gameClock not set, time scale controls disabled');
+            console.warn('GameDebugPanel: gameClock not set, time scale controls disabled');
             return;
         }
         
@@ -765,5 +759,25 @@ export class DebugPanel {
                 </div>
             `;
         }).join('');
+    }
+    
+    /**
+     * Destroy the debug panel and cleanup
+     * @returns {void}
+     */
+    destroy() {
+        // Remove panel from DOM
+        if (this.panel && this.panel.parentNode) {
+            this.panel.parentNode.removeChild(this.panel);
+        }
+        
+        // Cleanup event listeners
+        this.onMouseUp();
+        this.onTouchEnd();
+        
+        // Null out references
+        this.panel = null;
+        this.game = null;
+        this.gameClock = null;
     }
 }

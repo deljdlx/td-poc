@@ -1,5 +1,4 @@
 import { Game } from '../domain/game/entities/Game.js';
-import { DebugPanel } from '../views/DebugPanel.js';
 
 /**
  * AppController - Main application controller (will become ScreenManager)
@@ -8,7 +7,7 @@ import { DebugPanel } from '../views/DebugPanel.js';
  * 1. Create and show Game
  * 2. Manage screen transitions (future: menu, options, etc.)
  * 
- * Game is now autonomous and creates all its own components.
+ * Game is now fully autonomous and creates all its own components including debug panel.
  */
 export class AppController {
     /** @type {DIContainer} */
@@ -19,9 +18,6 @@ export class AppController {
     
     /** @type {Game} */
     game = null;
-    
-    /** @type {DebugPanel} */
-    debugPanel = null;
     
     /**
      * @param {DIContainer} container
@@ -39,16 +35,8 @@ export class AppController {
     init() {
         this.debug.info('🚀 Initializing application');
         
-        // Create autonomous Game
+        // Create fully autonomous Game (includes its own debug panel)
         this.game = new Game(this.container);
-        
-        // Initialize Debug Panel
-        this.debugPanel = new DebugPanel(this.container);
-        
-        // Wire debug panel to game
-        this.debugPanel.setGameClock(this.game.gameClock);
-        this.debugPanel.setGame(this.game);
-        this.game.setDebugPanel(this.debugPanel);
         
         this.debug.success('✅ Application initialized');
     }
@@ -74,19 +62,13 @@ export class AppController {
     destroy() {
         this.debug.info('🧹 Destroying AppController...');
         
-        // Game owns and destroys its own resources
+        // Game owns and destroys its own resources (including debug panel)
         if (this.game?.destroy) {
             this.game.destroy();
         }
         
-        // Destroy debug panel
-        if (this.debugPanel?.destroy) {
-            this.debugPanel.destroy();
-        }
-        
         // Null out references
         this.game = null;
-        this.debugPanel = null;
         this.container = null;
         
         this.debug.success('✅ AppController destroyed');

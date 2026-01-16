@@ -18,6 +18,7 @@ import { TowerRangeView } from '../../../views/TowerRangeView.js';
 import { TowerDragHandler } from '../../../ux/TowerDragHandler.js';
 import { TowerStatsPopup } from '../../../views/TowerStatsPopup.js';
 import { PlayerInfoPopup } from '../../../views/PlayerInfoPopup.js';
+import { GameDebugPanel } from '../debug/GameDebugPanel.js';
 
 /**
  * Game - Autonomous tower defense game instance
@@ -110,9 +111,9 @@ export class Game {
     playerInfoPopup;
     
     /**
-     * @type {DebugPanel|null}
+     * @type {GameDebugPanel}
      */
-    debugPanel = null;
+    debugPanel;
     
     /**
      * @type {Object} - Event handler from EventBus
@@ -186,16 +187,11 @@ export class Game {
         this.towerStatsPopup = new TowerStatsPopup(container);
         this.playerInfoPopup = new PlayerInfoPopup(this.playerManager, container);
         
+        // Create debug panel owned by Game
+        this.debugPanel = new GameDebugPanel(container, this);
+        this.debugPanel.setGameClock(this.gameClock);
+        
         this.debug.success('✅ Game components created');
-    }
-    
-    /**
-     * Set debug panel for FPS/entity count updates
-     * @param {DebugPanel} debugPanel
-     * @returns {void}
-     */
-    setDebugPanel(debugPanel) {
-        this.debugPanel = debugPanel;
     }
     
     /**
@@ -1133,6 +1129,10 @@ export class Game {
             this.playerInfoPopup.destroy();
         }
         
+        if (this.debugPanel?.destroy) {
+            this.debugPanel.destroy();
+        }
+        
         // 4. Null out references
         this.gameClock = null;
         this.entityManager = null;
@@ -1145,6 +1145,7 @@ export class Game {
         this.towerDragHandler = null;
         this.towerStatsPopup = null;
         this.playerInfoPopup = null;
+        this.debugPanel = null;
         this.coordSystem = null;
         this.container = null;
         
