@@ -1,4 +1,4 @@
-import { ResourceRegistry } from '../registries/Resource.js';
+import { ResourceRegistry } from '../../game/registries/Resource.js';
 import { PlayerResourceChangedEvent } from '../../../events/PlayerEvent.js';
 
 /**

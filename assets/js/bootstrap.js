@@ -7,7 +7,7 @@ import { PopupManager } from './services/ui/PopupManager.js';
 import { TowerStatsPopup } from './views/TowerStatsPopup.js';
 import { PlayerInfoPopup } from './views/PlayerInfoPopup.js';
 import { UIUpdateManager } from './services/ui/UIUpdateManager.js';
-import { PlayerManager } from './domain/game/managers/PlayerManager.js';
+import { PlayerManager } from './domain/player/managers/PlayerManager.js';
 import { Game } from './domain/game/entities/Game.js';
 import { WaveManager } from './services/wave/WaveManager.js';
 import { TowerDragHandler } from './ux/TowerDragHandler.js';
