@@ -103,7 +103,6 @@ export class Tower extends Entity {
     constructor(cell, playerId, diContainer, game, towerBlueprint) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
-        const entityManager = diContainer.get('entityManager');
         
         // Get cell center position
         const center = coordSystem.getElementCenter(cell.element);
@@ -115,7 +114,7 @@ export class Tower extends Entity {
         this.coordSystem = coordSystem;
         this.container = diContainer;
         this.game = game;
-        this.entityManager = entityManager;
+        this.entityManager = game.entityManager; // Use game's entityManager
         this.currentCooldown = 0.0; // Start ready to shoot
         this.events = EventBus.createHandler(this);
         

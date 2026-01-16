@@ -13,9 +13,11 @@ window.addEventListener('load', async () => {
     await app.init();
     app.start();
     
-    // Expose globally for debugging (console access: app.pause(), app.restart(), etc.)
+    // Expose globally for debugging (console access)
     window.app = app;
     
     // Debug info
-    console.log('🎮 Application ready! Try: app.pause(), app.resume(), app.restart()');
+    console.log('🎮 Application ready!');
+    console.log('Game controls: app.game.pause(), app.game.resume()');
+    console.log('Or directly: app.pause(), app.resume()');
 });

@@ -46,6 +46,11 @@ export class DebugPanel {
     boundOnTouchEnd = null;
     
     /**
+     * @type {GameClock|null}
+     */
+    gameClock = null;
+    
+    /**
      * @param {DIContainer} container
      */
     constructor(container) {
@@ -59,6 +64,16 @@ export class DebugPanel {
         this.initTabs();
         this.loadPreferences();
         this.populateContextList();
+    }
+    
+    /**
+     * Set the game clock for time scale controls
+     * @param {GameClock} gameClock
+     * @returns {void}
+     */
+    setGameClock(gameClock) {
+        this.gameClock = gameClock;
+        this.bindTimeScaleControls();
     }
     
     /**
@@ -231,8 +246,7 @@ export class DebugPanel {
             clearAllBtn.addEventListener('click', () => this.clearAllContexts());
         }
         
-        // Time scale controls
-        this.bindTimeScaleControls();
+        // Time scale controls will be bound when setGameClock() is called
     }
     
     /**
@@ -240,7 +254,12 @@ export class DebugPanel {
      * @returns {void}
      */
     bindTimeScaleControls() {
-        const gameClock = this.container.get('gameClock');
+        if (!this.gameClock) {
+            console.warn('DebugPanel: gameClock not set, time scale controls disabled');
+            return;
+        }
+        
+        const gameClock = this.gameClock;
         
         // Slider
         const slider = document.getElementById('debug-time-scale');

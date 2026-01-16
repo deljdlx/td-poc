@@ -35,11 +35,12 @@ export class PlayerInfoPopup {
     resourceElements = {};
     
     /**
+     * @param {PlayerManager} playerManager
      * @param {DIContainer} diContainer
      */
-    constructor(diContainer) {
+    constructor(playerManager, diContainer) {
+        this.playerManager = playerManager;
         this.popupManager = diContainer.get('popupManager');
-        this.playerManager = diContainer.get('playerManager');
         this.uiUpdateManager = diContainer.get('uiUpdateManager');
         this.debug = diContainer.createDebug('PlayerInfoPopup', true);
     }

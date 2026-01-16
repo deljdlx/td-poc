@@ -7,10 +7,20 @@ import { GameStateChangedEvent, GameOverEvent } from '../../../events/GameEvent.
 import { EventBus } from '../../../services/core/EventBus.js';
 import { missileTypes } from '../registries/MissileTypeRegistry.js';
 import { towerTypes } from '../registries/TowerTypeRegistry.js';
+import { GameClock } from '../../../services/engine/GameClock.js';
+import { EntityManager } from '../../../services/engine/EntityManager.js';
+import { PlayerManager } from '../../player/managers/PlayerManager.js';
+import { WaveManager } from '../../../services/wave/WaveManager.js';
+import { GridSystem } from '../../../services/grid/GridSystem.js';
+import { CanvasView } from '../../../views/CanvasView.js';
+import { TowerRangeView } from '../../../views/TowerRangeView.js';
+import { TowerDragHandler } from '../../../ux/TowerDragHandler.js';
+import { TowerStatsPopup } from '../../../views/TowerStatsPopup.js';
+import { PlayerInfoPopup } from '../../../views/PlayerInfoPopup.js';
 
 /**
- * Game - Core game logic and state management
- * Centralizes gameplay rules, economy, combat, and progression
+ * Game - Autonomous tower defense game instance
+ * Creates and manages all game-specific components independently
  */
 export class Game {
     /**
@@ -29,9 +39,24 @@ export class Game {
     globalScore = 0;
     
     /**
-     * @type {GridModel}
+     * @type {DIContainer}
      */
-    gridModel;
+    container;
+    
+    /**
+     * @type {Debug}
+     */
+    debug;
+    
+    /**
+     * @type {CoordinateSystem}
+     */
+    coordSystem;
+    
+    /**
+     * @type {GameClock}
+     */
+    gameClock;
     
     /**
      * @type {EntityManager}
@@ -49,19 +74,44 @@ export class Game {
     waveManager;
     
     /**
-     * @type {CoordinateSystem}
+     * @type {GridSystem}
      */
-    coordSystem;
+    gridSystem;
     
     /**
-     * @type {DIContainer}
+     * @type {GridModel}
      */
-    container;
+    gridModel;
     
     /**
-     * @type {Debug}
+     * @type {CanvasView}
      */
-    debug;
+    canvasView;
+    
+    /**
+     * @type {TowerRangeView}
+     */
+    towerRangeView;
+    
+    /**
+     * @type {TowerDragHandler}
+     */
+    towerDragHandler;
+    
+    /**
+     * @type {TowerStatsPopup}
+     */
+    towerStatsPopup;
+    
+    /**
+     * @type {PlayerInfoPopup}
+     */
+    playerInfoPopup;
+    
+    /**
+     * @type {DebugPanel|null}
+     */
+    debugPanel = null;
     
     /**
      * @type {Object} - Event handler from EventBus
@@ -96,27 +146,55 @@ export class Game {
     towerTypes = towerTypes;
     
     /**
-     * @param {GridModel} gridModel
-     * @param {EntityManager} entityManager
-     * @param {PlayerManager} playerManager
-     * @param {WaveManager} waveManager
-     * @param {CoordinateSystem} coordSystem
-     * @param {CanvasView} canvasView
-     * @param {DIContainer} container
+     * Create autonomous game instance
+     * @param {DIContainer} container - Only for global services
      */
-    constructor(gridModel, entityManager, playerManager, waveManager, coordSystem, canvasView, container) {
-        this.gridModel = gridModel;
-        this.entityManager = entityManager;
-        this.playerManager = playerManager;
-        this.waveManager = waveManager;
-        this.coordSystem = coordSystem;
-        this.canvasView = canvasView;
+    constructor(container) {
         this.container = container;
         this.debug = container.createDebug('Game', true);
         this.events = EventBus.createHandler(this);
         
-        // Give WaveManager access to Game events
+        // Get global services from DI
+        this.coordSystem = container.get('coordinateSystem');
+        
+        // Create game-specific instances
+        this.debug.info('🎮 Creating game components...');
+        
+        this.gameClock = new GameClock(container);
+        this.entityManager = new EntityManager(container);
+        this.playerManager = new PlayerManager(container);
+        this.playerManager.createPlayer('player1', 'Player 1', '#6366f1');
+        
+        this.waveManager = new WaveManager(this.entityManager, this.coordSystem, container);
         this.waveManager.setGameEvents(this.events);
+        
+        this.gridSystem = new GridSystem(15, 10, 'grid-container', container);
+        this.gridModel = this.gridSystem.getModel();
+        
+        this.canvasView = new CanvasView('canvas-layer', this.coordSystem, container);
+        this.towerRangeView = new TowerRangeView(container);
+        
+        this.towerDragHandler = new TowerDragHandler(
+            this.gridModel,
+            this.gridSystem.getView(),
+            this.coordSystem,
+            this.entityManager,
+            container
+        );
+        
+        this.towerStatsPopup = new TowerStatsPopup(container);
+        this.playerInfoPopup = new PlayerInfoPopup(this.playerManager, container);
+        
+        this.debug.success('✅ Game components created');
+    }
+    
+    /**
+     * Set debug panel for FPS/entity count updates
+     * @param {DebugPanel} debugPanel
+     * @returns {void}
+     */
+    setDebugPanel(debugPanel) {
+        this.debugPanel = debugPanel;
     }
     
     /**
@@ -125,6 +203,9 @@ export class Game {
      */
     init() {
         this.debug.info('🎮 Initializing game...');
+        
+        // Initialize grid (render DOM elements)
+        this.gridSystem.init();
         
         // Create perimeter path
         const perimeterPath = PathFactory.createPerimeter(
@@ -135,8 +216,21 @@ export class Game {
         this.gridModel.addPath(perimeterPath);
         this.debug.success('Perimeter path created');
         
+        // Render paths in DOM
+        this.gridSystem.renderPaths();
+        
+        // Place initial towers for testing
+        this.placeRandomTowers(5);
+        this.debug.success('Initial towers placed');
+        
         // Setup game event listeners for business logic
         this.setupGameEventListeners();
+        
+        // Setup GameClock callbacks
+        this.setupGameClock();
+        
+        // Setup grid interaction events
+        this.setupGridEvents();
         
         this.state = GameState.READY;
         this.debug.success('Game initialized - Ready to start');
@@ -228,6 +322,139 @@ export class Game {
     }
     
     /**
+     * Setup GameClock callbacks and configure game loop
+     * @returns {void}
+     */
+    setupGameClock() {
+        this.debug.info('⏰ Setting up GameClock...');
+        
+        const uiUpdateManager = this.container.get('uiUpdateManager');
+        
+        // Update gameplay (fixed timestep)
+        this.gameClock.setUpdateCallback(this.update.bind(this));
+        
+        // Render callback (includes UI updates)
+        this.gameClock.setRenderCallback((deltaTime) => {
+            this.render(deltaTime);
+            // Update UI components after render
+            uiUpdateManager.update(deltaTime);
+            // Update debug panel if available
+            if (this.debugPanel) {
+                this.debugPanel.update({
+                    fps: this.gameClock.getFPS(),
+                    entityCount: this.entityManager.getEntities().length
+                });
+            }
+        });
+        
+        this.debug.success('✅ GameClock configured');
+    }
+    
+    /**
+     * Setup grid interaction events (clicks, hovers)
+     * @returns {void}
+     */
+    setupGridEvents() {
+        this.debug.info('🎯 Setting up grid events...');
+        
+        const container = document.getElementById('grid-container');
+        
+        // Store bound references for cleanup
+        this.boundHandleCellClick = this.handleCellClick.bind(this);
+        this.boundHandleCellHover = this.handleCellHover.bind(this);
+        this.boundHandleCellLeave = this.handleCellLeave.bind(this);
+        
+        container.addEventListener('click', this.boundHandleCellClick);
+        container.addEventListener('contextmenu', this.boundHandleCellClick);
+        
+        // Grid hover detection for tower range display
+        container.addEventListener('mousemove', this.boundHandleCellHover);
+        container.addEventListener('mouseleave', this.boundHandleCellLeave);
+        
+        // Player info button
+        const playerInfoBtn = document.getElementById('player-info-btn');
+        if (playerInfoBtn) {
+            this.boundHandlePlayerInfoClick = () => {
+                this.playerInfoPopup.show();
+            };
+            playerInfoBtn.addEventListener('click', this.boundHandlePlayerInfoClick);
+        }
+        
+        this.debug.success('✅ Grid events configured');
+    }
+    
+    /**
+     * Handle cell click
+     * @param {MouseEvent} event
+     * @returns {void}
+     */
+    handleCellClick(event) {
+        const target = event.target;
+        
+        if (!target.classList.contains('grid-cell')) {
+            return;
+        }
+        
+        const row = parseInt(target.dataset.row);
+        const col = parseInt(target.dataset.col);
+        const cell = this.gridSystem.getCell(row, col);
+        
+        if (!cell) {
+            return;
+        }
+        
+        // Check if cell has a tower
+        if (cell.hasTower()) {
+            this.debug.event(`Tower clicked at [${row}, ${col}]`);
+            
+            const tower = cell.getTower();
+            
+            // Click on tower to show stats
+            event.preventDefault();
+            this.debug.info('Opening tower stats popup');
+            this.towerStatsPopup.show(tower);
+        } else {
+            // Empty cell clicked
+            this.debug.event(`Empty cell clicked [${row}, ${col}]`);
+        }
+    }
+    
+    /**
+     * Handle cell hover to show tower range
+     * @param {MouseEvent} event
+     * @returns {void}
+     */
+    handleCellHover(event) {
+        const target = event.target;
+        
+        if (!target.classList.contains('grid-cell')) {
+            this.towerRangeView.hide();
+            return;
+        }
+        
+        const row = parseInt(target.dataset.row);
+        const col = parseInt(target.dataset.col);
+        const cell = this.gridSystem.getCell(row, col);
+        
+        if (!cell || !cell.hasTower()) {
+            this.towerRangeView.hide();
+            return;
+        }
+        
+        // Show range for this tower
+        const tower = cell.getTower();
+        this.towerRangeView.show(tower);
+    }
+    
+    /**
+     * Handle cell mouse leave
+     * @returns {void}
+     */
+    handleCellLeave() {
+        this.towerRangeView.hide();
+    }
+    
+    /**
      * Start the game
      * @returns {void}
      */
@@ -243,6 +470,9 @@ export class Game {
         // Emit state changed event
         const event = new GameStateChangedEvent(this, oldState, this.state);
         this.events.emit('stateChanged', event);
+        
+        // Start game clock
+        this.gameClock.start();
         
         this.debug.success('🎮 Game started!');
         
@@ -670,6 +900,36 @@ export class Game {
     }
     
     /**
+     * Render game (called every frame)
+     * @param {number} deltaTime - in seconds
+     * @returns {void}
+     */
+    render(deltaTime) {
+        // Update and render effects (clears canvas)
+        this.canvasView.updateAndRenderEffects(deltaTime);
+        
+        // Render game entities
+        this.canvasView.renderEntities(this.entityManager.getEntities(), deltaTime);
+        
+        // Update gold display in header
+        this.updateGoldDisplay();
+    }
+    
+    /**
+     * Update gold display in header
+     * @returns {void}
+     */
+    updateGoldDisplay() {
+        const activePlayer = this.playerManager.getActivePlayer();
+        if (activePlayer) {
+            const goldElement = document.getElementById('gold-amount');
+            if (goldElement) {
+                goldElement.textContent = activePlayer.wallet.get('money');
+            }
+        }
+    }
+    
+    /**
      * Get current game state
      * @returns {GameState}
      */
@@ -683,6 +943,87 @@ export class Game {
      */
     isRunning() {
         return this.state === GameState.RUNNING;
+    }
+    
+    /**
+     * Destroy game and cleanup all resources
+     * @returns {void}
+     */
+    destroy() {
+        this.debug.info('🧹 Destroying Game...');
+        
+        // 1. Stop game clock
+        if (this.gameClock) {
+            this.gameClock.stop();
+        }
+        
+        // 2. Remove event listeners
+        const container = document.getElementById('grid-container');
+        if (container) {
+            if (this.boundHandleCellClick) {
+                container.removeEventListener('click', this.boundHandleCellClick);
+                container.removeEventListener('contextmenu', this.boundHandleCellClick);
+            }
+            if (this.boundHandleCellHover) {
+                container.removeEventListener('mousemove', this.boundHandleCellHover);
+            }
+            if (this.boundHandleCellLeave) {
+                container.removeEventListener('mouseleave', this.boundHandleCellLeave);
+            }
+        }
+        
+        const playerInfoBtn = document.getElementById('player-info-btn');
+        if (playerInfoBtn && this.boundHandlePlayerInfoClick) {
+            playerInfoBtn.removeEventListener('click', this.boundHandlePlayerInfoClick);
+        }
+        
+        // Clear bound references
+        this.boundHandleCellClick = null;
+        this.boundHandleCellHover = null;
+        this.boundHandleCellLeave = null;
+        this.boundHandlePlayerInfoClick = null;
+        
+        // 3. Destroy owned instances
+        if (this.gridSystem?.destroy) {
+            this.gridSystem.destroy();
+        }
+        
+        if (this.canvasView?.destroy) {
+            this.canvasView.destroy();
+        }
+        
+        if (this.towerRangeView?.destroy) {
+            this.towerRangeView.destroy();
+        }
+        
+        if (this.towerDragHandler?.destroy) {
+            this.towerDragHandler.destroy();
+        }
+        
+        if (this.towerStatsPopup?.destroy) {
+            this.towerStatsPopup.destroy();
+        }
+        
+        if (this.playerInfoPopup?.destroy) {
+            this.playerInfoPopup.destroy();
+        }
+        
+        // 4. Null out references
+        this.gameClock = null;
+        this.entityManager = null;
+        this.playerManager = null;
+        this.waveManager = null;
+        this.gridSystem = null;
+        this.gridModel = null;
+        this.canvasView = null;
+        this.towerRangeView = null;
+        this.towerDragHandler = null;
+        this.towerStatsPopup = null;
+        this.playerInfoPopup = null;
+        this.coordSystem = null;
+        this.container = null;
+        
+        this.debug.success('✅ Game destroyed');
     }
     
     /**

@@ -26,11 +26,6 @@ export class Application {
      */
     debug = null;
     
-    /**
-     * @type {string} - 'uninitialized' | 'ready' | 'running' | 'paused' | 'stopped'
-     */
-    state = 'uninitialized';
-    
     constructor() {
         if (Application.instance) {
             return Application.instance;
@@ -50,99 +45,56 @@ export class Application {
     }
     
     /**
-     * Initialize application (bootstrap DI, create services)
+     * Initialize application (bootstrap DI, create controller and game)
      * @returns {Promise<void>}
      */
     async init() {
-        if (this.state !== 'uninitialized') {
-            console.warn('Application already initialized');
-            return;
-        }
-        
-        // 1. Bootstrap DI Container
+        // Bootstrap DI Container
         bootstrapDI();
         this.container = container;
         this.debug = this.container.createDebug('Application', true);
         
         this.debug.info('🚀 Initializing Application...');
 
-
-        // 2. Create AppController (owned instance)
+        // Create AppController (which creates Game)
         this.controller = new AppController(this.container);
         this.controller.init();
         
-        this.state = 'ready';
         this.debug.success('✅ Application initialized');
     }
     
     /**
-     * Start the application (game loop)
+     * Start the game (delegates to controller)
      * @returns {void}
      */
     start() {
-        if (this.state !== 'ready' && this.state !== 'paused') {
-            this.debug.warning('Cannot start: state is', this.state);
-            return;
-        }
-        
         this.debug.info('▶️  Starting application...');
-        
-        // AppController already starts the game in init()
-        // But we track the running state here
-        
-        this.state = 'running';
+        this.controller.start();
         this.debug.success('Application running');
     }
     
     /**
-     * Pause the application
+     * Pause the game (delegates to game)
      * @returns {void}
      */
     pause() {
-        if (this.state !== 'running') {
-            return;
-        }
-        
-        this.debug.info('⏸️  Pausing application...');
-        
-        const gameClock = this.container.get('gameClock');
-        gameClock.stop();
-        
-        this.state = 'paused';
+        this.controller.game.pause();
     }
     
     /**
-     * Resume the application
+     * Resume the game (delegates to game)
      * @returns {void}
      */
     resume() {
-        if (this.state !== 'paused') {
-            return;
-        }
-        
-        this.debug.info('▶️  Resuming application...');
-        
-        const gameClock = this.container.get('gameClock');
-        gameClock.start();
-        
-        this.state = 'running';
+        this.controller.game.resume();
     }
     
     /**
-     * Stop the application (can be restarted)
+     * Stop the game (delegates to game.pause)
      * @returns {void}
      */
     stop() {
-        if (this.state === 'stopped' || this.state === 'uninitialized') {
-            return;
-        }
-        
-        this.debug.info('⏹️  Stopping application...');
-        
-        const gameClock = this.container.get('gameClock');
-        gameClock.stop();
-        
-        this.state = 'stopped';
+        this.controller.game.pause();
     }
     
     /**
@@ -164,43 +116,20 @@ export class Application {
     async destroy() {
         this.debug.info('🧹 Destroying application...');
         
-        // 1. Stop game loop
-        this.stop();
-        
-        // 2. Destroy AppController (owned)
+        // Destroy AppController (which destroys Game)
         if (this.controller?.destroy) {
             this.controller.destroy();
         }
         this.controller = null;
         
-        // 3. Clear DI Container services (optional - for complete restart)
-        // Note: We don't clear the container itself, just reset to allow re-init
-        
-        this.state = 'uninitialized';
         this.debug.success('✅ Application destroyed');
     }
     
     /**
-     * Get current application state
-     * @returns {string}
+     * Get game instance (shortcut)
+     * @returns {Game}
      */
-    getState() {
-        return this.state;
-    }
-    
-    /**
-     * Check if application is running
-     * @returns {boolean}
-     */
-    isRunning() {
-        return this.state === 'running';
-    }
-    
-    /**
-     * Check if application is paused
-     * @returns {boolean}
-     */
-    isPaused() {
-        return this.state === 'paused';
+    get game() {
+        return this.controller?.game;
     }
 }
