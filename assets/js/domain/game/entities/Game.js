@@ -4,7 +4,7 @@ import { Wave } from './Wave.js';
 import { PathFactory } from '../../map/PathFactory.js';
 import { Missile } from '../../combat/entities/Missile.js';
 import { GameStateChangedEvent, GameOverEvent } from '../../../events/GameEvent.js';
-import { TowerPlacedEvent } from '../../../events/TowerEvent.js';
+import { TowerPlacedEvent, TowerMovedEvent } from '../../../events/TowerEvent.js';
 import { EventBus } from '../../../services/core/EventBus.js';
 import { missileTypes } from '../registries/MissileTypeRegistry.js';
 import { towerTypes } from '../registries/TowerTypeRegistry.js';
@@ -268,6 +268,17 @@ export class Game {
                 const center = this.coordSystem.getElementCenter(toCell.element);
                 tower.x = center.x;
                 tower.y = center.y;
+                
+                // Emit SOURCEABLE business event for Event Sourcing
+                const movedEvent = new TowerMovedEvent(tower, fromCell, toCell, {
+                    towerId: tower.id,
+                    towerType: tower.type,
+                    playerId: tower.playerId || 'player1',
+                    fromPosition: { row: fromCell.row, col: fromCell.col },
+                    toPosition: { row: toCell.row, col: toCell.col },
+                    timestamp: Date.now()
+                });
+                this.events.emit('moved', movedEvent);
                 
                 // Emit DOMAIN EVENT for UI layer to react
                 EventBus.emitGlobal('tower:moved', {

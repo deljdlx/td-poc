@@ -78,3 +78,43 @@ export class TowerPlacedEvent extends TowerEvent {
         this.metadata = metadata;
     }
 }
+
+/**
+ * TowerMovedEvent - Tower was moved from one cell to another
+ * SOURCEABLE: Business event for Event Sourcing
+ */
+export class TowerMovedEvent extends TowerEvent {
+    /**
+     * @type {Cell}
+     */
+    fromCell;
+    
+    /**
+     * @type {Cell}
+     */
+    toCell;
+    
+    /**
+     * @type {boolean}
+     */
+    sourceable = true;
+    
+    /**
+     * @type {Object} - Event Sourcing metadata
+     */
+    metadata;
+    
+    /**
+     * @param {Tower} tower
+     * @param {Cell} fromCell
+     * @param {Cell} toCell
+     * @param {Object} [metadata={}] - Business metadata (towerId, towerType, playerId, fromPosition, toPosition)
+     */
+    constructor(tower, fromCell, toCell, metadata = {}) {
+        super('moved', tower, { fromCell, toCell, sourceable: true, metadata });
+        this.fromCell = fromCell;
+        this.toCell = toCell;
+        this.sourceable = true;
+        this.metadata = metadata;
+    }
+}
