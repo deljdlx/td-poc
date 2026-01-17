@@ -1,5 +1,5 @@
 import { Missile } from "../../combat/entities/Missile.js";
-
+import { HitEvent } from "../../../events/CombatEvent.js";
 /**
  * Combat service
  * Handles missile creation and damage application
@@ -115,6 +115,12 @@ export class CombatService {
         const wasAlive = enemy.alive;
         enemy.takeDamage(finalDamage, tower);
         hitCount++;
+
+        // Emit hit event
+        const hitEvent = new HitEvent(tower, enemy, finalDamage, isCrit);
+        console.group('%cCombatService.js :: 121 =============================', 'color: #822375; font-size: 1rem');
+        console.log(hitEvent);
+        console.groupEnd();
 
         // Track hit & kill on the tower
         try {
