@@ -9,32 +9,32 @@ export class Entity {
      * @private
      */
     static _nextId = 1;
-    
+
     /**
      * @type {number}
      */
     id;
-    
+
     /**
      * @type {string}
      */
     type;
-    
+
     /**
      * @type {number}
      */
     x;
-    
+
     /**
      * @type {number}
      */
     y;
-    
+
     /**
      * @type {boolean}
      */
     alive;
-    
+
     /**
      * @param {string} type - Entity type identifier
      * @param {number} x - X position
@@ -47,7 +47,7 @@ export class Entity {
         this.y = y;
         this.alive = true;
     }
-    
+
     /**
      * Update entity logic (must be implemented by subclasses)
      * @param {number} deltaTime - Time delta in seconds
@@ -56,7 +56,7 @@ export class Entity {
     update(deltaTime) {
         throw new Error('Entity.update() must be implemented by subclass');
     }
-    
+
     /**
      * Check if entity is still alive
      * @returns {boolean}
@@ -64,7 +64,7 @@ export class Entity {
     isAlive() {
         return this.alive;
     }
-    
+
     /**
      * Get entity type
      * @returns {string}
@@ -72,7 +72,7 @@ export class Entity {
     getType() {
         return this.type;
     }
-    
+
     /**
      * Mark entity as dead for cleanup
      * @returns {void}

@@ -75,7 +75,7 @@ export const towerTypes = {
 
 /**
  * Get tower type blueprint by ID
- * @param {string} typeId 
+ * @param {string} typeId
  * @returns {Object|null}
  */
 export function getTowerType(typeId) {

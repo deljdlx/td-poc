@@ -9,7 +9,7 @@ export class TowerRenderer {
      * @type {SpriteRenderer}
      */
     spriteRenderer;
-    
+
     /**
      * @param {SpriteRenderer} spriteRenderer - Sprite rendering strategy
      */
@@ -29,7 +29,7 @@ export class TowerRenderer {
         if (this.spriteRenderer.update && typeof this.spriteRenderer.update === 'function') {
             this.spriteRenderer.update(deltaTime);
         }
-        
+
         // Delegate sprite rendering to spriteRenderer
         this.spriteRenderer.draw(ctx, tower);
     }

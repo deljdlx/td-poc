@@ -7,27 +7,27 @@ export class Event {
      * @type {string}
      */
     type;
-    
+
     /**
      * @type {Object}
      */
     source;
-    
+
     /**
      * @type {Object}
      */
     payload;
-    
+
     /**
      * @type {number|null}
      */
     gameTime = null;
-    
+
     /**
      * @type {number}
      */
     timestamp;
-    
+
     /**
      * @param {string} type - Event type (e.g., 'enemy:hit', 'tower:fired')
      * @param {Object} source - Source entity that emitted the event
@@ -39,7 +39,7 @@ export class Event {
         this.payload = payload;
         this.timestamp = Date.now();
     }
-    
+
     /**
      * String representation for debugging
      * @returns {string}
@@ -49,7 +49,7 @@ export class Event {
         const sourceType = this.source?.type || 'unknown';
         return `[${this.type}] from ${sourceType}#${sourceId}`;
     }
-    
+
     /**
      * Serialize event to JSON (for replay/network)
      * @returns {Object}

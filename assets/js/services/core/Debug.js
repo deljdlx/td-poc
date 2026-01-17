@@ -16,21 +16,21 @@ export class Debug {
         ERROR: 4,    // Erreurs
         NONE: 5      // Aucun log
     };
-    
+
     /**
      * Niveau de log global (peut être modifié pour filtrer tous les debugs)
      * @type {number}
      * @static
      */
     static globalLevel = Debug.LEVELS.DEBUG;
-    
+
     /**
      * Registre de tous les contextes Debug créés
      * @type {Map<string, Debug>}
      * @static
      */
     static registeredContexts = new Map();
-    
+
     /**
      * Set des contextes activés (whitelist)
      * Si vide, tous sont activés
@@ -38,23 +38,23 @@ export class Debug {
      * @static
      */
     static enabledContexts = new Set();
-    
+
     /**
      * Mode de filtrage: 'all' (tous actifs) ou 'whitelist' (seulement enabledContexts)
      * @type {string}
      * @static
      */
     static filterMode = 'all';
-    
+
     /** @type {boolean} */
     enabled = true;
-    
+
     /** @type {string} */
     context = 'App';
-    
+
     /** @type {number} - Niveau minimum pour ce contexte */
     minLevel = Debug.LEVELS.ALL;
-    
+
     /** @type {Object} */
     colors = {
         info: '#3b82f6',      // Bleu
@@ -65,7 +65,7 @@ export class Debug {
         event: '#ec4899',     // Rose
         data: '#06b6d4',      // Cyan
     };
-    
+
     /** @type {Object} */
     icons = {
         info: 'ℹ️',
@@ -108,7 +108,7 @@ export class Debug {
             fontWeight: 'bold',
         },
     };
-    
+
     /** @type {Object} - Mapping des types vers les niveaux */
     typeLevels = {
         debug: Debug.LEVELS.DEBUG,
@@ -119,10 +119,10 @@ export class Debug {
         warning: Debug.LEVELS.WARN,
         error: Debug.LEVELS.ERROR,
     };
-    
+
     /** @type {Console} - Interface de logging injectable */
     logger = console;
-    
+
     /**
      * @param {string} context - Nom du contexte (classe, module, etc.)
      * @param {boolean} enabled - Active/désactive le debug
@@ -132,11 +132,11 @@ export class Debug {
         this.context = context;
         this.enabled = enabled;
         this.logger = logger;
-        
+
         // Auto-register this context
         Debug.registeredContexts.set(context, this);
     }
-    
+
     /**
      * Active le debug
      * @returns {void}
@@ -144,7 +144,7 @@ export class Debug {
     enable() {
         this.enabled = true;
     }
-    
+
     /**
      * Désactive le debug
      * @returns {void}
@@ -152,7 +152,7 @@ export class Debug {
     disable() {
         this.enabled = false;
     }
-    
+
     /**
      * Définit le niveau minimum pour ce contexte
      * @param {number} level - Niveau minimum (Debug.LEVELS.*)
@@ -161,7 +161,7 @@ export class Debug {
     setLevel(level) {
         this.minLevel = level;
     }
-    
+
     /**
      * Définit le niveau global pour tous les debugs
      * @param {number} level - Niveau minimum (Debug.LEVELS.*)
@@ -171,7 +171,7 @@ export class Debug {
     static setGlobalLevel(level) {
         Debug.globalLevel = level;
     }
-    
+
     /**
      * Vérifie si un log doit être affiché selon le niveau ET le contexte
      * @param {string} type - Type de log
@@ -182,21 +182,21 @@ export class Debug {
         if (!this.enabled) {
             return false;
         }
-        
+
         const typeLevel = this.typeLevels[type] || Debug.LEVELS.INFO;
         const levelCheck = typeLevel >= this.minLevel && typeLevel >= Debug.globalLevel;
         if (!levelCheck) return false;
-        
+
         // Vérifier le filtre de contexte
         if (Debug.filterMode === 'whitelist') {
             // En mode whitelist, le contexte doit être explicitement dans la liste
             // Si la liste est vide, rien n'est autorisé
             return Debug.enabledContexts.has(this.context);
         }
-        
+
         return true;
     }
-    
+
     /**
      * Log générique avec style
      * @param {string} type - Type de log (info, success, warning, error, debug, event, data)
@@ -208,11 +208,11 @@ export class Debug {
         if (!this._shouldLog(type)) {
             return;
         }
-        
+
         const color = this.colors[type] || this.colors.info;
         const icon = this.icons[type] || this.icons.info;
         const timestamp = new Date().toLocaleTimeString('fr-FR');
-        
+
         // Style pour le badge du contexte
         const contextStyle = `
             background: ${color};
@@ -221,19 +221,19 @@ export class Debug {
             border-radius: ${this.theme.contextBadge.borderRadius};
             font-weight: ${this.theme.contextBadge.fontWeight};
         `;
-        
+
         // Style pour le timestamp
         const timeStyle = `
             color: ${this.theme.timestamp.color};
             font-size: ${this.theme.timestamp.fontSize};
         `;
-        
+
         // Style pour le message
         const messageStyle = `
             color: ${color};
             font-weight: ${this.theme.message.fontWeight};
         `;
-        
+
         // Affichage
         this.logger.log(
             `%c${this.context}%c ${timestamp} %c${icon} ${message}`,
@@ -241,13 +241,13 @@ export class Debug {
             timeStyle,
             messageStyle
         );
-        
+
         // Afficher les données si présentes
         if (data !== null && data !== undefined) {
             this.logger.log('%c└─ Data:', `color: ${color}; font-style: ${this.theme.data.fontStyle};`, data);
         }
     }
-    
+
     /**
      * Log d'information
      * @param {string} message
@@ -257,7 +257,7 @@ export class Debug {
     info(message, data = null) {
         this.log('info', message, data);
     }
-    
+
     /**
      * Log de succès
      * @param {string} message
@@ -267,7 +267,7 @@ export class Debug {
     success(message, data = null) {
         this.log('success', message, data);
     }
-    
+
     /**
      * Log d'avertissement
      * @param {string} message
@@ -277,7 +277,7 @@ export class Debug {
     warning(message, data = null) {
         this.log('warning', message, data);
     }
-    
+
     /**
      * Log d'erreur
      * @param {string} message
@@ -287,7 +287,7 @@ export class Debug {
     error(message, data = null) {
         this.log('error', message, data);
     }
-    
+
     /**
      * Log de debug technique
      * @param {string} message
@@ -297,7 +297,7 @@ export class Debug {
     debug(message, data = null) {
         this.log('debug', message, data);
     }
-    
+
     /**
      * Log d'événement
      * @param {string} message
@@ -307,7 +307,7 @@ export class Debug {
     event(message, data = null) {
         this.log('event', message, data);
     }
-    
+
     /**
      * Log de données
      * @param {string} message
@@ -317,7 +317,7 @@ export class Debug {
     data(message, data = null) {
         this.log('data', message, data);
     }
-    
+
     /**
      * Crée un groupe de logs repliable
      * @param {string} label
@@ -328,12 +328,12 @@ export class Debug {
         if (!this.enabled) {
             return;
         }
-        
+
         this.logger.group(`🔽 ${this.context} - ${label}`);
         callback();
         this.logger.groupEnd();
     }
-    
+
     /**
      * Crée un groupe de logs repliable (fermé par défaut)
      * @param {string} label
@@ -344,12 +344,12 @@ export class Debug {
         if (!this.enabled) {
             return;
         }
-        
+
         this.logger.groupCollapsed(`▶️ ${this.context} - ${label}`);
         callback();
         this.logger.groupEnd();
     }
-    
+
     /**
      * Affiche un tableau formaté
      * @param {Array<Object>} data
@@ -359,11 +359,11 @@ export class Debug {
         if (!this.enabled) {
             return;
         }
-        
+
         this.logger.log(`%c${this.context} 📊 Table:`, `color: ${this.colors.data}; font-weight: ${this.theme.table.fontWeight};`);
         this.logger.table(data);
     }
-    
+
     /**
      * Mesure le temps d'exécution d'une fonction
      * @param {string} label
@@ -374,14 +374,14 @@ export class Debug {
         if (!this.enabled) {
             return callback();
         }
-        
+
         const timerLabel = `⏱️ ${this.context} - ${label}`;
         this.logger.time(timerLabel);
         const result = callback();
         this.logger.timeEnd(timerLabel);
         return result;
     }
-    
+
     /**
      * Trace la pile d'appels
      * @param {string} message
@@ -391,11 +391,11 @@ export class Debug {
         if (!this.enabled) {
             return;
         }
-        
+
         this.logger.log(`%c${this.context} 🔍 ${message}`, `color: ${this.colors.debug}; font-weight: ${this.theme.trace.fontWeight};`);
         this.logger.trace();
     }
-    
+
     /**
      * Affiche un séparateur visuel
      * @param {string} label
@@ -405,7 +405,7 @@ export class Debug {
         if (!this.enabled) {
             return;
         }
-        
+
         const line = '═'.repeat(50);
         this.logger.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
         if (label) {
@@ -413,7 +413,7 @@ export class Debug {
             this.logger.log(`%c${line}`, `color: ${this.theme.separator.lineColor};`);
         }
     }
-    
+
     /**
      * Obtient la liste de tous les contextes enregistrés
      * @returns {string[]}
@@ -422,7 +422,7 @@ export class Debug {
     static getRegisteredContexts() {
         return Array.from(Debug.registeredContexts.keys()).sort();
     }
-    
+
     /**
      * Active un contexte spécifique
      * @param {string} context
@@ -433,7 +433,7 @@ export class Debug {
         Debug.enabledContexts.add(context);
         Debug.filterMode = 'whitelist';
     }
-    
+
     /**
      * Désactive un contexte spécifique
      * @param {string} context
@@ -443,7 +443,7 @@ export class Debug {
     static disableContext(context) {
         Debug.enabledContexts.delete(context);
     }
-    
+
     /**
      * Active tous les contextes (désactive le filtre)
      * @returns {void}
@@ -453,7 +453,7 @@ export class Debug {
         Debug.filterMode = 'all';
         Debug.enabledContexts.clear();
     }
-    
+
     /**
      * Désactive tous les contextes
      * @returns {void}
@@ -463,7 +463,7 @@ export class Debug {
         Debug.filterMode = 'whitelist';
         Debug.enabledContexts.clear();
     }
-    
+
     /**
      * Définit les contextes actifs
      * @param {string[]} contexts
@@ -474,7 +474,7 @@ export class Debug {
         Debug.enabledContexts = new Set(contexts);
         Debug.filterMode = contexts.length > 0 ? 'whitelist' : 'all';
     }
-    
+
     /**
      * Vérifie si un contexte est activé
      * @param {string} context

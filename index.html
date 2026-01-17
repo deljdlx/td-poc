@@ -20,23 +20,23 @@
 <body>
     <!-- Canvas Layer (fullscreen, non-interactif, overlay) -->
     <canvas id="canvas-layer"></canvas>
-    
+
     <!-- Path Layer (overlay pour les chemins statiques) -->
     <div id="path-layer"></div>
-    
+
     <!-- Enemy Layer (overlay pour les ennemis en DOM) -->
     <div id="enemy-layer"></div>
-    
+
     <!-- Layout Structure -->
     <header class="game-header">
         <h1 id="player-gold">💰 Gold: <span id="gold-amount">0</span></h1>
     </header>
-    
+
     <main class="game-main">
         <aside class="sidebar-left">
             <!-- Sidebar gauche -->
         </aside>
-        
+
 
         <div class="game-area">
             <!-- Grid Container (DOM interactif) -->
@@ -60,7 +60,7 @@
             🔍 Debug Panel
         </button>
     </footer>
-    
+
     <!-- Application - ES6 Module -->
     <script type="module" src="assets/js/main.js"></script>
     <!-- TowerShopToolbar UI Test removed: toolbar is now instantiated by Game -->

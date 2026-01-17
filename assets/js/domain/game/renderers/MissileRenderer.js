@@ -15,12 +15,12 @@ export class MissileRenderer {
      * @type {TrailRenderer}
      */
     trailRenderer;
-    
+
     /**
      * @type {Map<string, SpriteRenderer>} - Cache sprite renderers per missile
      */
     spriteCache;
-    
+
     /**
      * @param {TrailRenderer} trailRenderer - Trail rendering strategy
      */
@@ -28,7 +28,7 @@ export class MissileRenderer {
         this.trailRenderer = trailRenderer || new ParticleTrailRenderer();
         this.spriteCache = new Map();
     }
-    
+
     /**
      * Get or create sprite renderer for a missile based on visualFx config
      * @param {Missile} missile
@@ -39,7 +39,7 @@ export class MissileRenderer {
         if (this.spriteCache.has(missile.id)) {
             return this.spriteCache.get(missile.id);
         }
-        
+
         // Create sprite based on visualFx config
         const spriteConfig = missile.visualFx?.sprite;
         if (!spriteConfig) {
@@ -48,7 +48,7 @@ export class MissileRenderer {
             this.spriteCache.set(missile.id, sprite);
             return sprite;
         }
-        
+
         let sprite;
         switch(spriteConfig.type) {
             case 'star':
@@ -72,11 +72,11 @@ export class MissileRenderer {
             default:
                 sprite = new CircleSpriteRenderer();
         }
-        
+
         this.spriteCache.set(missile.id, sprite);
         return sprite;
     }
-    
+
     /**
      * Render missile on canvas
      * @param {CanvasRenderingContext2D} ctx
@@ -87,15 +87,15 @@ export class MissileRenderer {
     render(ctx, missile, deltaTime = 0) {
         // Get sprite renderer for this missile
         const spriteRenderer = this.getSpriteRenderer(missile);
-        
+
         // Update sprite animation if it has an update method
         if (spriteRenderer.update && typeof spriteRenderer.update === 'function') {
             spriteRenderer.update(deltaTime);
         }
-        
+
         // Delegate trail rendering to trailRenderer
         this.trailRenderer.draw(ctx, missile.trail, missile);
-        
+
         // Delegate sprite rendering to spriteRenderer
         spriteRenderer.draw(ctx, missile);
     }

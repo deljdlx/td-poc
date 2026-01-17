@@ -23,22 +23,22 @@ export class CanvasView {
 
     /** @type {CoordinateSystem} */
     coordSystem = null;
-    
+
     /** @type {Debug} */
     debug = null;
-    
+
     /** @type {Array<FireworkEffect>} */
     effects = [];
-    
+
     /** @type {Object<string, Object>} */
     renderers = {};
-    
+
     /** @type {DOMEnemyRenderer} */
     domEnemyRenderer = null;
-    
+
     /** @type {Function|null} */
     boundHandleResize = null;
-    
+
     /**
      * @param {string} canvasId
      * @param {CoordinateSystem} coordSystem
@@ -57,7 +57,7 @@ export class CanvasView {
             height: this.canvas.height
         });
     }
-    
+
     /**
      * @returns {void}
      */
@@ -67,7 +67,7 @@ export class CanvasView {
         this.boundHandleResize = this.handleResize.bind(this);
         window.addEventListener('resize', this.boundHandleResize);
     }
-    
+
     /**
      * Setup entity renderers
      * @returns {void}
@@ -75,18 +75,18 @@ export class CanvasView {
     setupRenderers() {
         // Missiles - sprite will be created per-missile based on visualFx
         this.renderers['missile'] = new MissileRenderer();
-        
+
         // Towers - diamond sprite
         const towerSprite = new DiamondSpriteRenderer(1.5);
         this.renderers['tower'] = new TowerRenderer(towerSprite);
-        
+
         // Enemies - circle sprite (red)
         const enemySprite = new CircleSpriteRenderer(false);
         this.renderers['enemy'] = new EnemyRenderer(enemySprite);
-        
+
         this.debug.success('Renderers configured', { missile: 'Star', tower: 'Diamond', enemy: 'Circle' });
     }
-    
+
     /**
      * @returns {void}
      */
@@ -94,14 +94,14 @@ export class CanvasView {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
     }
-    
+
     /**
      * @returns {void}
      */
     clear() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    
+
     /**
      * Ajoute un effet feu d'artifice avec configuration aléatoire
      * @param {number} x
@@ -126,12 +126,12 @@ export class CanvasView {
                 max: 1.5 + Math.random() * 1.0          // 1.5-2.5s
             }
         };
-        
+
         const firework = new FireworkEffect(x, y, config);
         this.effects.push(firework);
         this.debug.debug('Feu d\'artifice créé', { x, y, config });
     }
-    
+
     /**
      * Add splash zone visual effect
      * @param {number} x - Center X
@@ -144,7 +144,7 @@ export class CanvasView {
         this.effects.push(splash);
         this.debug.debug('Splash effect created', { x, y, radius });
     }
-    
+
     /**
      * Add simple explosion effect
      * @param {number} x
@@ -157,7 +157,7 @@ export class CanvasView {
         this.effects.push(explosion);
         this.debug.debug('Simple explosion created', { x, y, config });
     }
-    
+
     /**
      * Met à jour et dessine tous les effets autonomes
      * @param {number} deltaTime - en secondes
@@ -166,25 +166,25 @@ export class CanvasView {
     updateAndRenderEffects(deltaTime) {
         // Clear canvas
         this.clear();
-        
+
         // Dessiner les connexions de la grille
         const selectedCells = [];
         // TODO: récupérer les cellules sélectionnées si besoin
-        
+
         // Update effets
         this.effects.forEach(effect => effect.update(deltaTime));
-        
+
         // Supprimer les effets morts
         const beforeCount = this.effects.length;
         this.effects = this.effects.filter(effect => !effect.isDead);
         if (this.effects.length < beforeCount) {
             this.debug.debug(`${beforeCount - this.effects.length} effet(s) supprimé(s)`);
         }
-        
+
         // Dessiner les effets
         this.effects.forEach(effect => effect.draw(this.ctx));
     }
-    
+
     /**
      * Render game entities (missiles, towers, enemies, etc.)
      * @param {Array<Entity>} entities
@@ -194,13 +194,13 @@ export class CanvasView {
     renderEntities(entities, deltaTime = 0) {
         for (const entity of entities) {
             const type = entity.getType();
-            
+
             // Enemies are rendered in DOM
             if (type === 'enemy') {
                 this.domEnemyRenderer.render(entity);
                 continue;
             }
-            
+
             // Other entities rendered on canvas
             const renderer = this.renderers[type];
             if (renderer) {
@@ -210,7 +210,7 @@ export class CanvasView {
             }
         }
     }
-    
+
     /**
      * Destroy CanvasView and cleanup resources
      * @returns {void}
@@ -221,7 +221,7 @@ export class CanvasView {
             window.removeEventListener('resize', this.boundHandleResize);
             this.boundHandleResize = null;
         }
-        
+
         // Clear references
         this.canvas = null;
         this.ctx = null;

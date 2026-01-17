@@ -11,14 +11,14 @@
     --color-border: #334155;
     --color-text: #e2e8f0;
     --color-text-dim: #94a3b8;
-    
+
     /* Grille */
     --grid-cols: 8;
     --grid-rows: 6;
     --cell-size: 80px;
     --cell-gap: 8px;
     --cell-radius: 12px;
-    
+
     /* Animations */
     --transition-speed: 0.3s;
     --hover-scale: 1.05;
@@ -247,7 +247,7 @@ body {
         --grid-cols: 6;
         --grid-rows: 4;
     }
-    
+
     #info-panel {
         top: 10px;
         left: 10px;

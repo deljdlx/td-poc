@@ -7,12 +7,12 @@ export class UIUpdateManager {
      * @type {Set<Object>}
      */
     updateables = new Set();
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @param {DIContainer} diContainer
      */
@@ -20,7 +20,7 @@ export class UIUpdateManager {
         this.debug = diContainer.createDebug('UIUpdateManager', true);
         this.debug.success('UIUpdateManager initialized');
     }
-    
+
     /**
      * Register a UI component for updates
      * @param {Object} component - Component instance
@@ -30,12 +30,12 @@ export class UIUpdateManager {
     register(component, updateFn) {
         const entry = { component, updateFn };
         this.updateables.add(entry);
-        this.debug.info('Component registered for updates', { 
+        this.debug.info('Component registered for updates', {
             component: component.constructor.name,
-            total: this.updateables.size 
+            total: this.updateables.size
         });
     }
-    
+
     /**
      * Unregister a UI component
      * @param {Object} component - Component instance to unregister
@@ -49,15 +49,15 @@ export class UIUpdateManager {
                 removed = true;
             }
         });
-        
+
         if (removed) {
-            this.debug.info('Component unregistered', { 
+            this.debug.info('Component unregistered', {
                 component: component.constructor.name,
-                remaining: this.updateables.size 
+                remaining: this.updateables.size
             });
         }
     }
-    
+
     /**
      * Update all registered components
      * Called by GameClock on each tick
@@ -68,19 +68,19 @@ export class UIUpdateManager {
         if (this.updateables.size === 0) {
             return;
         }
-        
+
         this.updateables.forEach(({ component, updateFn }) => {
             try {
                 updateFn.call(component, deltaTime);
             } catch (error) {
-                this.debug.error('Error updating component', { 
+                this.debug.error('Error updating component', {
                     component: component.constructor.name,
-                    error: error.message 
+                    error: error.message
                 });
             }
         });
     }
-    
+
     /**
      * Clear all registered components
      * @returns {void}
@@ -90,7 +90,7 @@ export class UIUpdateManager {
         this.updateables.clear();
         this.debug.info('All components cleared', { count });
     }
-    
+
     /**
      * Get count of registered components
      * @returns {number}

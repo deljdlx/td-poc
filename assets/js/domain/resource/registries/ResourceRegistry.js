@@ -8,7 +8,7 @@ export class ResourceRegistry {
      * @type {Map<string, Resource>}
      */
     static resources = new Map();
-    
+
     /**
      * Register a resource type
      * @param {Resource} resource
@@ -17,7 +17,7 @@ export class ResourceRegistry {
     static register(resource) {
         this.resources.set(resource.type, resource);
     }
-    
+
     /**
      * Get a resource definition by type
      * @param {string} type
@@ -26,7 +26,7 @@ export class ResourceRegistry {
     static get(type) {
         return this.resources.get(type) || null;
     }
-    
+
     /**
      * Check if resource type exists
      * @param {string} type
@@ -35,7 +35,7 @@ export class ResourceRegistry {
     static has(type) {
         return this.resources.has(type);
     }
-    
+
     /**
      * Get all registered resources
      * @returns {Array<Resource>}

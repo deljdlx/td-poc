@@ -9,7 +9,7 @@ export class CircleSpriteRenderer extends SpriteRenderer {
      * @type {boolean}
      */
     withBrightCenter;
-    
+
     /**
      * @param {boolean} withBrightCenter - Add white center highlight (default: true)
      */
@@ -17,7 +17,7 @@ export class CircleSpriteRenderer extends SpriteRenderer {
         super();
         this.withBrightCenter = withBrightCenter;
     }
-    
+
     /**
      * Draw circular sprite with glow
      * @param {CanvasRenderingContext2D} ctx
@@ -26,17 +26,17 @@ export class CircleSpriteRenderer extends SpriteRenderer {
      */
     draw(ctx, entity) {
         ctx.save();
-        
+
         // Main circle with glow
         ctx.globalAlpha = 1.0;
         ctx.shadowBlur = 15;
         ctx.shadowColor = entity.color;
         ctx.fillStyle = entity.color;
-        
+
         ctx.beginPath();
         ctx.arc(entity.x, entity.y, entity.size, 0, Math.PI * 2);
         ctx.fill();
-        
+
         // Bright center
         if (this.withBrightCenter) {
             ctx.shadowBlur = 0;
@@ -45,7 +45,7 @@ export class CircleSpriteRenderer extends SpriteRenderer {
             ctx.arc(entity.x, entity.y, entity.size * 0.5, 0, Math.PI * 2);
             ctx.fill();
         }
-        
+
         ctx.restore();
     }
 }

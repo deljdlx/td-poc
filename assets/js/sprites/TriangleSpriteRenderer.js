@@ -8,12 +8,12 @@ export class TriangleSpriteRenderer extends SpriteRenderer {
      * @type {number}
      */
     rotation;
-    
+
     /**
      * @type {number}
      */
     rotationSpeed;
-    
+
     /**
      * @param {number} rotationSpeed - Rotation speed in radians/second (default: 2.5)
      */
@@ -22,7 +22,7 @@ export class TriangleSpriteRenderer extends SpriteRenderer {
         this.rotation = -Math.PI / 2; // Point upward
         this.rotationSpeed = rotationSpeed;
     }
-    
+
     /**
      * Update rotation (call from game loop if needed)
      * @param {number} deltaTime - Time delta in seconds
@@ -30,7 +30,7 @@ export class TriangleSpriteRenderer extends SpriteRenderer {
     update(deltaTime) {
         this.rotation += this.rotationSpeed * deltaTime;
     }
-    
+
     /**
      * Draw triangle sprite with rotation
      * @param {CanvasRenderingContext2D} ctx
@@ -40,15 +40,15 @@ export class TriangleSpriteRenderer extends SpriteRenderer {
     draw(ctx, entity) {
         const size = entity.size;
         const height = size * 1.5;
-        
+
         ctx.save();
         ctx.translate(entity.x, entity.y);
         ctx.rotate(this.rotation);
-        
+
         // Glow effect
         ctx.shadowBlur = 12;
         ctx.shadowColor = entity.color;
-        
+
         // Draw triangle
         ctx.globalAlpha = 1.0;
         ctx.fillStyle = entity.color;
@@ -58,7 +58,7 @@ export class TriangleSpriteRenderer extends SpriteRenderer {
         ctx.lineTo(-size, height);
         ctx.closePath();
         ctx.fill();
-        
+
         ctx.restore();
     }
 }

@@ -22,7 +22,7 @@ export class PopupEvent extends UIEvent {
      * @type {Object}
      */
     popup;
-    
+
     /**
      * @param {string} eventType - Specific popup event type
      * @param {Object} popup - Popup instance
@@ -42,7 +42,7 @@ export class PopupOpenedEvent extends PopupEvent {
      * @type {string}
      */
     popupType;
-    
+
     /**
      * @param {Object} popup
      * @param {string} popupType - 'towerStats', 'playerInfo', etc.
@@ -61,7 +61,7 @@ export class PopupClosedEvent extends PopupEvent {
      * @type {string}
      */
     popupType;
-    
+
     /**
      * @param {Object} popup
      * @param {string} popupType

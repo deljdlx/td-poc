@@ -8,32 +8,32 @@ export class PlayerInfoPopup {
      * @type {PopupManager}
      */
     popupManager;
-    
+
     /**
      * @type {PlayerManager}
      */
     playerManager;
-    
+
     /**
      * @type {UIUpdateManager}
      */
     uiUpdateManager;
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @type {Player|null}
      */
     currentPlayer = null;
-    
+
     /**
      * @type {Object}
      */
     resourceElements = {};
-    
+
     /**
      * @param {PlayerManager} playerManager
      * @param {DIContainer} diContainer
@@ -44,21 +44,21 @@ export class PlayerInfoPopup {
         this.uiUpdateManager = diContainer.get('uiUpdateManager');
         this.debug = diContainer.createDebug('PlayerInfoPopup', true);
     }
-    
+
     /**
      * Show player info popup
      * @returns {void}
      */
     show() {
         this.currentPlayer = this.playerManager.getActivePlayer();
-        
+
         if (!this.currentPlayer) {
             this.debug.warning('No active player to display');
             return;
         }
-        
+
         const content = this.renderPlayerInfo(this.currentPlayer);
-        
+
         this.popupManager.show({
             title: `👤 ${this.currentPlayer.name}`,
             content,
@@ -79,16 +79,16 @@ export class PlayerInfoPopup {
                 this.hide();
             }
         });
-        
+
         // Cache DOM elements for updates
         this.cacheResourceElements();
-        
+
         // Register for live updates
         this.uiUpdateManager.register(this, this.updateInfo);
-        
+
         this.debug.success('Player info shown (live updates enabled)');
     }
-    
+
     /**
      * Hide popup and unregister from updates
      * @returns {void}
@@ -99,7 +99,7 @@ export class PlayerInfoPopup {
         this.resourceElements = {};
         this.debug.info('Player info closed');
     }
-    
+
     /**
      * Cache DOM elements for efficient updates
      * @returns {void}
@@ -116,7 +116,7 @@ export class PlayerInfoPopup {
             waves: document.querySelector('[data-stat="waves"]')
         };
     }
-    
+
     /**
      * Update player info display (called by UIUpdateManager)
      * @param {number} deltaTime
@@ -126,7 +126,7 @@ export class PlayerInfoPopup {
         if (!this.currentPlayer || !this.popupManager.isPopupOpen()) {
             return;
         }
-        
+
         // Update wallet resources
         if (this.resourceElements.money) {
             this.resourceElements.money.textContent = this.currentPlayer.wallet.get('money').toLocaleString();
@@ -137,7 +137,7 @@ export class PlayerInfoPopup {
         if (this.resourceElements.gems) {
             this.resourceElements.gems.textContent = this.currentPlayer.wallet.get('gems');
         }
-        
+
         // Update stats
         if (this.resourceElements.lives) {
             this.resourceElements.lives.textContent = this.currentPlayer.lives;
@@ -155,7 +155,7 @@ export class PlayerInfoPopup {
             this.resourceElements.waves.textContent = this.currentPlayer.stats.wavesCompleted;
         }
     }
-    
+
     /**
      * Render player information HTML
      * @param {Player} player
@@ -165,7 +165,7 @@ export class PlayerInfoPopup {
         const moneyResource = ResourceRegistry.get('money');
         const manaResource = ResourceRegistry.get('mana');
         const gemsResource = ResourceRegistry.get('gems');
-        
+
         return `
             <div class="player-info">
                 <!-- Wallet Section -->
@@ -190,7 +190,7 @@ export class PlayerInfoPopup {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Player Status -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">
@@ -208,7 +208,7 @@ export class PlayerInfoPopup {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Statistics -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">
@@ -234,7 +234,7 @@ export class PlayerInfoPopup {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Player Info -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">

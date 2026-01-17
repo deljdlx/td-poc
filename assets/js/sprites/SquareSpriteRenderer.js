@@ -8,12 +8,12 @@ export class SquareSpriteRenderer extends SpriteRenderer {
      * @type {number}
      */
     rotation;
-    
+
     /**
      * @type {number}
      */
     rotationSpeed;
-    
+
     /**
      * @param {number} rotationSpeed - Rotation speed in radians/second (default: 3)
      */
@@ -22,7 +22,7 @@ export class SquareSpriteRenderer extends SpriteRenderer {
         this.rotation = Math.PI / 4; // Start at 45°
         this.rotationSpeed = rotationSpeed;
     }
-    
+
     /**
      * Update rotation (call from game loop if needed)
      * @param {number} deltaTime - Time delta in seconds
@@ -30,7 +30,7 @@ export class SquareSpriteRenderer extends SpriteRenderer {
     update(deltaTime) {
         this.rotation += this.rotationSpeed * deltaTime;
     }
-    
+
     /**
      * Draw square sprite with rotation
      * @param {CanvasRenderingContext2D} ctx
@@ -39,20 +39,20 @@ export class SquareSpriteRenderer extends SpriteRenderer {
      */
     draw(ctx, entity) {
         const halfSize = entity.size;
-        
+
         ctx.save();
         ctx.translate(entity.x, entity.y);
         ctx.rotate(this.rotation);
-        
+
         // Glow effect
         ctx.shadowBlur = 12;
         ctx.shadowColor = entity.color;
-        
+
         // Draw square
         ctx.globalAlpha = 1.0;
         ctx.fillStyle = entity.color;
         ctx.fillRect(-halfSize, -halfSize, halfSize * 2, halfSize * 2);
-        
+
         ctx.restore();
     }
 }

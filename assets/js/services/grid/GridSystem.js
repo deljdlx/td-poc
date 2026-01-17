@@ -9,19 +9,19 @@ import { GridView } from '../../views/GridView.js';
 export class GridSystem {
     /** @type {Grid} */
     model = null;
-    
+
     /** @type {GridView} */
     view = null;
-    
+
     /** @type {CoordinateSystem} */
     coordSystem = null;
-    
+
     /** @type {Debug} */
     debug = null;
-    
+
     /** @type {DIContainer} */
     container = null;
-    
+
     /**
      * @param {number} rows - Number of rows
      * @param {number} cols - Number of columns
@@ -32,14 +32,14 @@ export class GridSystem {
         this.container = diContainer;
         this.debug = diContainer.createDebug('GridSystem', true);
         this.coordSystem = diContainer.get('coordinateSystem');  // SHARED service
-        
+
         // Create OWNED instances
         this.model = new Grid(rows, cols, diContainer);
         this.view = new GridView(containerId, this.model, diContainer);
-        
+
         this.debug.success('GridSystem created', { rows, cols });
     }
-    
+
     /**
      * Initialize grid (render initial state)
      * @returns {void}
@@ -48,7 +48,7 @@ export class GridSystem {
         this.view.render();
         this.debug.info('GridSystem initialized');
     }
-    
+
     /**
      * Render paths on grid
      * @returns {void}
@@ -56,7 +56,7 @@ export class GridSystem {
     renderPaths() {
         this.view.renderPaths();
     }
-    
+
     /**
      * Get grid model
      * @returns {Grid}
@@ -64,7 +64,7 @@ export class GridSystem {
     getModel() {
         return this.model;
     }
-    
+
     /**
      * Get grid view
      * @returns {GridView}
@@ -72,7 +72,7 @@ export class GridSystem {
     getView() {
         return this.view;
     }
-    
+
     /**
      * Get cell at position
      * @param {number} row
@@ -82,7 +82,7 @@ export class GridSystem {
     getCell(row, col) {
         return this.model.getCell(row, col);
     }
-    
+
     /**
      * Get all paths
      * @returns {Array<Path>}
@@ -90,28 +90,28 @@ export class GridSystem {
     getPaths() {
         return this.model.getPaths();
     }
-    
+
     /**
      * Destroy grid system and cleanup all resources
      * @returns {void}
      */
     destroy() {
         this.debug.info('🧹 Destroying GridSystem...');
-        
+
         // Destroy OWNED instances
         if (this.view?.destroy) {
             this.view.destroy();
         }
-        
+
         // Note: coordSystem is SHARED (DI service), don't destroy it
         // Note: model has no destroy() (no listeners, pure data)
-        
+
         // Null references
         this.model = null;
         this.view = null;
         this.coordSystem = null;
         this.container = null;
-        
+
         this.debug.success('✅ GridSystem destroyed');
     }
 }

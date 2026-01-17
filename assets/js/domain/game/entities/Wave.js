@@ -16,7 +16,7 @@ export class Wave {
 
     /** @type {Path} */
     path = null;
-    
+
     /** @type {Object} EventBus handler */
     events;
 
@@ -43,7 +43,7 @@ export class Wave {
             }
         });
     }
-    
+
     /**
      * Get next enemy config to spawn
      * @returns {Object|null}
@@ -56,7 +56,7 @@ export class Wave {
         }
         return null;
     }
-    
+
     /**
      * Check if all enemies have been spawned
      * @returns {boolean}
@@ -64,7 +64,7 @@ export class Wave {
     isComplete() {
         return this.spawnedCount >= this.enemies.length;
     }
-    
+
     /**
      * Get total enemy count
      * @returns {number}
@@ -72,7 +72,7 @@ export class Wave {
     getTotalCount() {
         return this.enemies.length;
     }
-    
+
     /**
      * Get remaining enemy count
      * @returns {number}
@@ -80,7 +80,7 @@ export class Wave {
     getRemainingCount() {
         return this.enemies.length - this.spawnedCount;
     }
-    
+
     /**
      * Reset wave (for restart)
      * @returns {void}
@@ -88,5 +88,5 @@ export class Wave {
     reset() {
         this.spawnedCount = 0;
     }
-    
+
 }

@@ -6,10 +6,10 @@ import { PathAttributes } from '../value-objects/PathAttributes.js';
 export class Path {
     /** @type {PathAttributes} */
     attributes = null;
-    
+
     /** @type {Debug} */
     debug = null;
-    
+
     /**
      * @param {PathElement[]} elements - Séquence ordonnée de PathElement
      * @param {boolean} isClosed - true si boucle fermée
@@ -18,7 +18,7 @@ export class Path {
     constructor(elements, isClosed, diContainer) {
         this.attributes = new PathAttributes(elements, isClosed);
         this.debug = diContainer.createDebug('Path', true);
-        
+
         this.debug.info('Path created', {
             length: elements.length,
             isClosed,
@@ -26,17 +26,17 @@ export class Path {
             end: elements[elements.length - 1]?.cell.getLabel()
         });
     }
-    
+
     /** @returns {PathElement[]} */
     get elements() {
         return this.attributes.elements;
     }
-    
+
     /** @returns {boolean} */
     get isClosed() {
         return this.attributes.isClosed;
     }
-    
+
     /**
      * Retourne le premier élément du path
      * @returns {PathElement|null}
@@ -44,7 +44,7 @@ export class Path {
     getStartElement() {
         return this.elements.length > 0 ? this.elements[0] : null;
     }
-    
+
     /**
      * Retourne le dernier élément du path
      * @returns {PathElement|null}
@@ -52,7 +52,7 @@ export class Path {
     getEndElement() {
         return this.elements.length > 0 ? this.elements[this.elements.length - 1] : null;
     }
-    
+
     /**
      * Retourne l'élément à un index donné
      * @param {number} index
@@ -64,7 +64,7 @@ export class Path {
         }
         return this.elements[index];
     }
-    
+
     /**
      * Retourne l'élément suivant dans le path
      * @param {PathElement} currentElement
@@ -72,7 +72,7 @@ export class Path {
      */
     getNextElement(currentElement) {
         const nextIndex = currentElement.index + 1;
-        
+
         // Si on dépasse la fin
         if (nextIndex >= this.elements.length) {
             // Si boucle fermée, retour au début
@@ -82,10 +82,10 @@ export class Path {
             // Sinon, fin du path
             return null;
         }
-        
+
         return this.elements[nextIndex];
     }
-    
+
     /**
      * Retourne l'élément précédent dans le path
      * @param {PathElement} currentElement
@@ -93,7 +93,7 @@ export class Path {
      */
     getPreviousElement(currentElement) {
         const prevIndex = currentElement.index - 1;
-        
+
         // Si on est au début
         if (prevIndex < 0) {
             // Si boucle fermée, aller à la fin
@@ -103,10 +103,10 @@ export class Path {
             // Sinon, pas de précédent
             return null;
         }
-        
+
         return this.elements[prevIndex];
     }
-    
+
     /**
      * Retourne la longueur du path
      * @returns {number}
@@ -114,7 +114,7 @@ export class Path {
     getLength() {
         return this.elements.length;
     }
-    
+
     /**
      * Retourne la longueur totale en pixels du path
      * @returns {number}
@@ -122,7 +122,7 @@ export class Path {
     getTotalDistance() {
         return this.elements.reduce((sum, element) => sum + element.distanceToNext, 0);
     }
-    
+
     /**
      * Vérifie si une cellule fait partie du path
      * @param {Cell} cell
@@ -131,7 +131,7 @@ export class Path {
     containsCell(cell) {
         return this.elements.some(element => element.cell === cell);
     }
-    
+
     /**
      * Retourne le PathElement correspondant à une cellule
      * @param {Cell} cell
@@ -140,7 +140,7 @@ export class Path {
     getElementByCell(cell) {
         return this.elements.find(element => element.cell === cell) || null;
     }
-    
+
     /**
      * Itère sur tous les éléments du path
      * @param {Function} callback - (element, index) => void

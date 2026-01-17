@@ -6,19 +6,19 @@ import { Cell } from './Cell.js';
 export class Grid {
     /** @type {number} */
     rows = 6;
-    
+
     /** @type {number} */
     cols = 8;
-    
+
     /** @type {Cell[][]} */
     cells = [];
-    
+
     /** @type {Path[]} */
     paths = [];
 
     /** @type {Debug} */
     debug = null;
-    
+
     /**
      * @param {number} rows
      * @param {number} cols
@@ -31,7 +31,7 @@ export class Grid {
         this.initCells();
         this.debug.success(`Grille créée : ${rows}x${cols} = ${rows * cols} cellules`);
     }
-    
+
     /**
      * @returns {void}
      */
@@ -43,7 +43,7 @@ export class Grid {
             }
         }
     }
-    
+
     /**
      * @param {number} row
      * @param {number} col
@@ -55,22 +55,22 @@ export class Grid {
         }
         return null;
     }
-    
+
     /**
      * @param {Path} path
      * @returns {void}
      */
     addPath(path) {
         this.paths.push(path);
-        
+
         // Marquer les cellules du path comme occupées
         path.forEach(pathElement => {
             pathElement.cell.setOnPath(true);
         });
-        
+
         this.debug.info(`Path ajouté (${this.paths.length} paths au total)`);
     }
-    
+
     /**
      * @param {Path} path
      * @returns {boolean}
@@ -82,21 +82,21 @@ export class Grid {
             path.forEach(pathElement => {
                 pathElement.cell.setOnPath(false);
             });
-            
+
             this.paths.splice(index, 1);
             this.debug.info(`Path supprimé (${this.paths.length} paths restants)`);
             return true;
         }
         return false;
     }
-    
+
     /**
      * @returns {Path[]}
      */
     getPaths() {
         return this.paths;
     }
-    
+
     /**
      * Set a random cell as target
      * @returns {Cell}
@@ -106,19 +106,19 @@ export class Grid {
         if (this.targetCell) {
             this.targetCell.setTarget(false);
         }
-        
+
         // Pick random cell
         const randomRow = Math.floor(Math.random() * this.rows);
         const randomCol = Math.floor(Math.random() * this.cols);
-        
+
         this.targetCell = this.getCell(randomRow, randomCol);
         this.targetCell.setTarget(true);
-        
+
         this.debug.info(`Target cell set to [${randomRow}, ${randomCol}]`);
-        
+
         return this.targetCell;
     }
-    
+
     /**
      * Get the current target cell
      * @returns {Cell|null}
@@ -126,7 +126,7 @@ export class Grid {
     getTargetCell() {
         return this.targetCell;
     }
-    
+
     /**
      * Get all empty cells (no tower, not target, not on path)
      * @returns {Cell[]}
@@ -143,7 +143,7 @@ export class Grid {
         }
         return empty;
     }
-    
+
     /**
      * Get all cells with towers
      * @returns {Cell[]}

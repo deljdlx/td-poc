@@ -26,7 +26,7 @@
     -webkit-backdrop-filter: blur(20px);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
+    box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.6),
         0 0 0 1px rgba(255, 255, 255, 0.05) inset,
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -192,24 +192,24 @@
     .popup-container {
         border-radius: 12px;
     }
-    
+
     .popup-header {
         padding: 18px 20px;
     }
-    
+
     .popup-title {
         font-size: 18px;
     }
-    
+
     .popup-content {
         padding: 20px;
     }
-    
+
     .popup-buttons {
         padding: 16px 20px;
         flex-direction: column;
     }
-    
+
     .popup-btn {
         width: 100%;
     }

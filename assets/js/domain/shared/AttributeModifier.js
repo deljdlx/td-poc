@@ -1,9 +1,9 @@
 /**
  * AttributeModifier - Generic modifier for entity attributes
- * 
+ *
  * Represents any modification to an attribute (buff, debuff, upgrade, etc.)
  * Uses closure-based compute function for maximum flexibility.
- * 
+ *
  * Value Object (Domain Shared Context)
  */
 export class AttributeModifier {
@@ -11,27 +11,27 @@ export class AttributeModifier {
      * @type {string} - Unique identifier
      */
     id;
-    
+
     /**
      * @type {string} - Target attribute name (e.g., 'damage', 'range', 'speed')
      */
     targetAttribute;
-    
+
     /**
      * @type {Function} - Computation function: (baseValue, context) => finalValue
      */
     compute;
-    
+
     /**
      * @type {number} - Priority for stacking (higher = applied later)
      */
     priority;
-    
+
     /**
      * @type {string} - Source/reason for this modifier
      */
     source;
-    
+
     /**
      * @param {Object} config - Configuration object
      * @param {string} config.id - Unique identifier
@@ -47,7 +47,7 @@ export class AttributeModifier {
         this.priority = priority;
         this.source = source;
     }
-    
+
     /**
      * Apply this modifier to a base value
      * @param {number} baseValue - Base attribute value

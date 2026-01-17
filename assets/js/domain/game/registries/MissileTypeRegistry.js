@@ -76,7 +76,7 @@ export const missileTypes = {
 
 /**
  * Get missile type blueprint by ID
- * @param {string} typeId 
+ * @param {string} typeId
  * @returns {Object|null}
  */
 export function getMissileType(typeId) {

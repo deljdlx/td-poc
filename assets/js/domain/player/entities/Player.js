@@ -10,37 +10,37 @@ export class Player {
      * @type {string}
      */
     id;
-    
+
     /**
      * @type {string}
      */
     name;
-    
+
     /**
      * @type {string}
      */
     color;
-    
+
     /**
      * @type {Wallet}
      */
     wallet;
-    
+
     /**
      * @type {number}
      */
     lives = 20;
-    
+
     /**
      * @type {number}
      */
     score = 0;
-    
+
     /**
      * @type {Array<Tower>}
      */
     towers = [];
-    
+
     /**
      * @type {Object}
      */
@@ -50,12 +50,12 @@ export class Player {
         totalDamage: 0,
         wavesCompleted: 0
     };
-    
+
     /**
      * @type {Object} EventBus handler
      */
     events;
-    
+
     /**
      * @param {string} id - Unique player identifier
      * @param {string} name - Player name
@@ -68,11 +68,11 @@ export class Player {
         this.color = color;
         this.events = EventBus.createHandler(this);
         this.wallet = new Wallet(this, debug);
-        
+
         // Initialize with starting resources
         this.wallet.set('money', 1000);
     }
-    
+
     /**
      * Add a tower to this player's collection
      * @param {Tower} tower
@@ -82,7 +82,7 @@ export class Player {
         this.towers.push(tower);
         this.stats.towersPlaced++;
     }
-    
+
     /**
      * Remove a tower from this player's collection
      * @param {Tower} tower
@@ -96,7 +96,7 @@ export class Player {
         }
         return false;
     }
-    
+
     /**
      * Check if player owns a specific tower
      * @param {Tower} tower
@@ -105,7 +105,7 @@ export class Player {
     ownsTower(tower) {
         return this.towers.includes(tower);
     }
-    
+
     /**
      * Get all towers owned by this player
      * @returns {Array<Tower>}
@@ -113,7 +113,7 @@ export class Player {
     getTowers() {
         return this.towers;
     }
-    
+
     /**
      * Check if player is still alive
      * @returns {boolean}
@@ -121,7 +121,7 @@ export class Player {
     isAlive() {
         return this.lives > 0;
     }
-    
+
     /**
      * Player takes damage (loses lives)
      * @param {number} livesLost
@@ -130,10 +130,10 @@ export class Player {
     takeDamage(livesLost = 1) {
         const previousLives = this.lives;
         this.lives = Math.max(0, this.lives - livesLost);
-        
+
         // Emit damaged event
         const event = new PlayerDamagedEvent(this, livesLost, this.lives);
         this.events.emit('damaged', event);
     }
-    
+
 }

@@ -8,57 +8,57 @@ export class Particle {
      * @type {number}
      */
     x;
-    
+
     /**
      * @type {number}
      */
     y;
-    
+
     /**
      * @type {number}
      */
     vx;
-    
+
     /**
      * @type {number}
      */
     vy;
-    
+
     /**
      * @type {number}
      */
     life;
-    
+
     /**
      * @type {number}
      */
     maxLife;
-    
+
     /**
      * @type {string}
      */
     color;
-    
+
     /**
      * @type {number}
      */
     size;
-    
+
     /**
      * @type {number}
      */
     rotation;
-    
+
     /**
      * @type {number}
      */
     rotationSpeed;
-    
+
     /**
      * @type {Function|number|null}
      */
     fadeConfig;
-    
+
     /**
      * @param {number} x - Initial X position
      * @param {number} y - Initial Y position
@@ -85,7 +85,7 @@ export class Particle {
         this.rotationSpeed = (Math.random() - 0.5) * 4; // radians per second
         this.fadeConfig = fadeConfig;
     }
-    
+
     /**
      * Update particle physics
      * @param {number} deltaTime - Time delta in seconds
@@ -96,24 +96,24 @@ export class Particle {
     update(deltaTime, gravity, friction) {
         // Apply gravity
         this.vy += gravity * deltaTime;
-        
+
         // Apply air friction
         this.vx *= Math.pow(friction, deltaTime);
         this.vy *= Math.pow(friction, deltaTime);
-        
+
         // Update position
         this.x += this.vx * deltaTime;
         this.y += this.vy * deltaTime;
-        
+
         // Update rotation
         this.rotation += this.rotationSpeed * deltaTime;
-        
+
         // Decrease life
         this.life -= deltaTime;
-        
+
         return this.life > 0;
     }
-    
+
     /**
      * Get current opacity based on lifetime and fadeConfig
      * @returns {number} - Opacity (0-1)
@@ -123,23 +123,23 @@ export class Particle {
         if (typeof this.fadeConfig === 'function') {
             return Math.max(0, Math.min(1, this.fadeConfig(this.life, this.maxLife)));
         }
-        
+
         // Fade duration in milliseconds (fade on last X ms)
         if (typeof this.fadeConfig === 'number') {
             const fadeDuration = this.fadeConfig / 1000; // convert to seconds
             const lifeRemaining = this.life;
-            
+
             if (lifeRemaining > fadeDuration) {
                 return 1.0; // No fade yet
             } else {
                 return Math.max(0, lifeRemaining / fadeDuration); // Linear fade
             }
         }
-        
+
         // Default: linear fade over entire lifetime
         return Math.max(0, this.life / this.maxLife);
     }
-    
+
     /**
      * Draw the particle (to be implemented by subclasses)
      * @param {CanvasRenderingContext2D} ctx

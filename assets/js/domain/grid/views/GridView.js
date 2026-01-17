@@ -13,7 +13,7 @@ export class GridView {
 
     /** @type {GridModel} */
     model = null;
-    
+
     /** @type {Debug} */
     debug = null;
 
@@ -25,16 +25,16 @@ export class GridView {
 
     /** @type {number} */
     marginMobile = 10;
-    
+
     /** @type {PathRenderer} */
     pathRenderer = null;
-    
+
     /** @type {CoordinateSystem} */
     coordSystem = null;
-    
+
     /** @type {Function|null} */
     boundHandleResize = null;
-    
+
     /**
      * @param {string} containerId
      * @param {GridModel} model
@@ -87,9 +87,9 @@ export class GridView {
      */
     updateCellVisual(cell, oldTower, newTower) {
         if (!cell.element) {
-            this.debug.warning('Cannot update cell visual - no DOM element', { 
-                row: cell.row, 
-                col: cell.col 
+            this.debug.warning('Cannot update cell visual - no DOM element', {
+                row: cell.row,
+                col: cell.col
             });
             return;
         }

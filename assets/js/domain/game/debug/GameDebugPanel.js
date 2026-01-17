@@ -11,52 +11,52 @@ export class GameDebugPanel {
      * @type {DIContainer}
      */
     container;
-    
+
     /**
      * @type {HTMLElement}
      */
     panel;
-    
+
     /**
      * @type {boolean}
      */
     isDragging = false;
-    
+
     /**
      * @type {{x: number, y: number}}
      */
     dragOffset = { x: 0, y: 0 };
-    
+
     /**
      * @type {Function|null}
      */
     boundOnMouseMove = null;
-    
+
     /**
      * @type {Function|null}
      */
     boundOnMouseUp = null;
-    
+
     /**
      * @type {Function|null}
      */
     boundOnTouchMove = null;
-    
+
     /**
      * @type {Function|null}
      */
     boundOnTouchEnd = null;
-    
+
     /**
      * @type {GameClock|null}
      */
     gameClock = null;
-    
+
     /**
      * @type {Game|null}
      */
     game = null;
-    
+
     /**
      * @param {DIContainer} container
      * @param {Game} game - The Game instance this debug panel belongs to
@@ -65,7 +65,7 @@ export class GameDebugPanel {
         this.container = container;
         this.game = game;
         this.panel = null;
-        
+
         this.render();
         this.bindEvents();
         this.initDraggable();
@@ -74,7 +74,7 @@ export class GameDebugPanel {
         this.loadPreferences();
         this.populateContextList();
     }
-    
+
     /**
      * Set the game clock for time scale controls
      * @param {GameClock} gameClock
@@ -84,7 +84,7 @@ export class GameDebugPanel {
         this.gameClock = gameClock;
         this.bindTimeScaleControls();
     }
-    
+
     /**
      * Render the debug panel and inject it into the DOM
      * @returns {void}
@@ -93,7 +93,7 @@ export class GameDebugPanel {
         this.panel = this.createPanelElement();
         document.body.appendChild(this.panel);
     }
-    
+
     /**
      * Create the debug panel DOM element
      * @returns {HTMLElement}
@@ -106,7 +106,7 @@ export class GameDebugPanel {
         panel.innerHTML = this.getTemplate();
         return panel;
     }
-    
+
     /**
      * Get the HTML template for the debug panel
      * @returns {string}
@@ -117,7 +117,7 @@ export class GameDebugPanel {
                 <span class="debug-panel-title">🔍 Debug</span>
                 <button id="debug-panel-close" class="debug-panel-close">×</button>
             </div>
-            
+
             <!-- Tabs -->
             <div class="debug-panel-tabs">
                 <button class="debug-tab active" data-tab="logs">📋 Logs</button>
@@ -126,7 +126,7 @@ export class GameDebugPanel {
                 <button class="debug-tab" data-tab="tests">🧪 Tests</button>
                 <button class="debug-tab" data-tab="actions">⚡ Actions</button>
             </div>
-            
+
             <!-- Tab Content -->
             <div class="debug-tab-content">
                 <!-- Logs Tab -->
@@ -172,7 +172,7 @@ export class GameDebugPanel {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Towers Tab -->
                 <div id="tab-towers" class="debug-tab-panel">
                     <div class="debug-section">
@@ -182,7 +182,7 @@ export class GameDebugPanel {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Events Tab -->
                 <div id="tab-events" class="debug-tab-panel">
                     <div class="debug-section">
@@ -195,7 +195,7 @@ export class GameDebugPanel {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Tests Tab -->
                 <div id="tab-tests" class="debug-tab-panel">
                     <div class="debug-section">
@@ -203,7 +203,7 @@ export class GameDebugPanel {
                         <p style="color: #999; font-size: 11px;">Coming soon...</p>
                     </div>
                 </div>
-                
+
                 <!-- Actions Tab -->
                 <div id="tab-actions" class="debug-tab-panel">
                     <div class="debug-section">
@@ -226,7 +226,7 @@ export class GameDebugPanel {
             </div>
         `;
     }
-    
+
     /**
      * Bind UI events
      * @returns {void}
@@ -237,7 +237,7 @@ export class GameDebugPanel {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hide());
         }
-        
+
         // Log level selector
         const logLevelSelect = document.getElementById('debug-log-level');
         if (logLevelSelect) {
@@ -247,7 +247,7 @@ export class GameDebugPanel {
                 console.log(`Debug level set to: ${this.getLevelName(level)}`);
             });
         }
-        
+
         // Clear console button
         const clearBtn = document.getElementById('debug-clear-console');
         if (clearBtn) {
@@ -256,19 +256,19 @@ export class GameDebugPanel {
                 console.log('🧹 Console cleared');
             });
         }
-        
+
         // Select all contexts
         const selectAllBtn = document.getElementById('debug-select-all');
         if (selectAllBtn) {
             selectAllBtn.addEventListener('click', () => this.selectAllContexts());
         }
-        
+
         // Clear all contexts
         const clearAllBtn = document.getElementById('debug-clear-all');
         if (clearAllBtn) {
             clearAllBtn.addEventListener('click', () => this.clearAllContexts());
         }
-        
+
         // Clear events button
         const clearEventsBtn = document.getElementById('debug-clear-events');
         if (clearEventsBtn) {
@@ -277,10 +277,10 @@ export class GameDebugPanel {
                 this.refreshEventsTab();
             });
         }
-        
+
         // Time scale controls will be bound when setGameClock() is called
     }
-    
+
     /**
      * Bind time scale controls
      * @returns {void}
@@ -290,13 +290,13 @@ export class GameDebugPanel {
             console.warn('GameDebugPanel: gameClock not set, time scale controls disabled');
             return;
         }
-        
+
         const gameClock = this.gameClock;
-        
+
         // Slider
         const slider = document.getElementById('debug-time-scale');
         const valueDisplay = document.getElementById('debug-time-scale-value');
-        
+
         if (slider && valueDisplay) {
             slider.addEventListener('input', (e) => {
                 const percentage = parseInt(e.target.value);
@@ -305,7 +305,7 @@ export class GameDebugPanel {
                 valueDisplay.textContent = `${percentage}%`;
             });
         }
-        
+
         // Quick buttons
         const speedButtons = document.querySelectorAll('[data-speed]');
         speedButtons.forEach(btn => {
@@ -318,7 +318,7 @@ export class GameDebugPanel {
             });
         });
     }
-    
+
     /**
      * Update debug info (FPS, entity count, etc.)
      * Call this from the render loop
@@ -330,28 +330,28 @@ export class GameDebugPanel {
     update(info) {
         const fpsElement = document.getElementById('debug-fps');
         const entitiesElement = document.getElementById('debug-entities');
-        
+
         if (fpsElement && info.fps !== undefined) {
             fpsElement.textContent = Math.round(info.fps);
         }
-        
+
         if (entitiesElement && info.entityCount !== undefined) {
             entitiesElement.textContent = info.entityCount;
         }
-        
+
         // Auto-refresh towers tab if visible
         const towersPanel = document.getElementById('tab-towers');
         if (towersPanel && towersPanel.classList.contains('active')) {
             this.refreshTowersTab();
         }
-        
+
         // Auto-refresh events tab if visible
         const eventsPanel = document.getElementById('tab-events');
         if (eventsPanel && eventsPanel.classList.contains('active')) {
             this.refreshEventsTab();
         }
     }
-    
+
     /**
      * Get level name from number
      * @param {number} level
@@ -362,7 +362,7 @@ export class GameDebugPanel {
         const names = ['ALL', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'NONE'];
         return names[level] || 'UNKNOWN';
     }
-    
+
     /**
      * Initialize toggle button in footer
      * @returns {void}
@@ -375,14 +375,14 @@ export class GameDebugPanel {
             });
         }
     }
-    
+
     /**
      * Initialize tabs system
      * @returns {void}
      */
     initTabs() {
         const tabs = this.panel.querySelectorAll('.debug-tab');
-        
+
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const targetTab = tab.dataset.tab;
@@ -390,7 +390,7 @@ export class GameDebugPanel {
             });
         });
     }
-    
+
     /**
      * Switch to a specific tab
      * @param {string} tabName
@@ -400,24 +400,24 @@ export class GameDebugPanel {
         // Remove active from all tabs
         const tabs = this.panel.querySelectorAll('.debug-tab');
         tabs.forEach(t => t.classList.remove('active'));
-        
+
         // Remove active from all panels
         const panels = this.panel.querySelectorAll('.debug-tab-panel');
         panels.forEach(p => p.classList.remove('active'));
-        
+
         // Add active to clicked tab
         const activeTab = this.panel.querySelector(`[data-tab="${tabName}"]`);
         if (activeTab) {
             activeTab.classList.add('active');
         }
-        
+
         // Add active to corresponding panel
         const activePanel = this.panel.querySelector(`#tab-${tabName}`);
         if (activePanel) {
             activePanel.classList.add('active');
         }
     }
-    
+
     /**
      * Toggle panel visibility
      * @returns {void}
@@ -429,7 +429,7 @@ export class GameDebugPanel {
             this.panel.style.display = 'none';
         }
     }
-    
+
     /**
      * Show panel
      * @returns {void}
@@ -437,7 +437,7 @@ export class GameDebugPanel {
     show() {
         this.panel.style.display = 'block';
     }
-    
+
     /**
      * Hide panel
      * @returns {void}
@@ -445,7 +445,7 @@ export class GameDebugPanel {
     hide() {
         this.panel.style.display = 'none';
     }
-    
+
     /**
      * Initialize draggable functionality
      * @returns {void}
@@ -453,43 +453,43 @@ export class GameDebugPanel {
     initDraggable() {
         const header = this.panel.querySelector('.debug-panel-header');
         if (!header) return;
-        
+
         header.style.cursor = 'move';
-        
+
         // Mouse events
         header.addEventListener('mousedown', (e) => {
             // Don't drag when clicking on buttons
             if (e.target.tagName === 'BUTTON') return;
-            
+
             this.startDrag(e.clientX, e.clientY);
-            
+
             // Add event listeners to document
             this.boundOnMouseMove = this.onMouseMove.bind(this);
             this.boundOnMouseUp = this.onMouseUp.bind(this);
             document.addEventListener('mousemove', this.boundOnMouseMove);
             document.addEventListener('mouseup', this.boundOnMouseUp);
-            
+
             e.preventDefault();
         });
-        
+
         // Touch events
         header.addEventListener('touchstart', (e) => {
             // Don't drag when touching buttons
             if (e.target.tagName === 'BUTTON') return;
-            
+
             const touch = e.touches[0];
             this.startDrag(touch.clientX, touch.clientY);
-            
+
             // Add event listeners to document
             this.boundOnTouchMove = this.onTouchMove.bind(this);
             this.boundOnTouchEnd = this.onTouchEnd.bind(this);
             document.addEventListener('touchmove', this.boundOnTouchMove);
             document.addEventListener('touchend', this.boundOnTouchEnd);
-            
+
             e.preventDefault();
         });
     }
-    
+
     /**
      * Start dragging
      * @param {number} clientX
@@ -502,7 +502,7 @@ export class GameDebugPanel {
         this.dragOffset.x = clientX - rect.left;
         this.dragOffset.y = clientY - rect.top;
     }
-    
+
     /**
      * Move panel to position
      * @param {number} clientX
@@ -511,22 +511,22 @@ export class GameDebugPanel {
      */
     movePanel(clientX, clientY) {
         if (!this.isDragging) return;
-        
+
         const x = clientX - this.dragOffset.x;
         const y = clientY - this.dragOffset.y;
-        
+
         // Keep panel within viewport bounds
         const maxX = window.innerWidth - this.panel.offsetWidth;
         const maxY = window.innerHeight - this.panel.offsetHeight;
-        
+
         const boundedX = Math.max(0, Math.min(x, maxX));
         const boundedY = Math.max(0, Math.min(y, maxY));
-        
+
         this.panel.style.left = boundedX + 'px';
         this.panel.style.top = boundedY + 'px';
         this.panel.style.right = 'auto'; // Remove right positioning
     }
-    
+
     /**
      * Handle mouse move during drag
      * @param {MouseEvent} e
@@ -535,7 +535,7 @@ export class GameDebugPanel {
     onMouseMove(e) {
         this.movePanel(e.clientX, e.clientY);
     }
-    
+
     /**
      * Handle touch move during drag
      * @param {TouchEvent} e
@@ -546,14 +546,14 @@ export class GameDebugPanel {
         this.movePanel(touch.clientX, touch.clientY);
         e.preventDefault();
     }
-    
+
     /**
      * Handle mouse up to end drag
      * @returns {void}
      */
     onMouseUp() {
         this.isDragging = false;
-        
+
         // Remove event listeners
         if (this.boundOnMouseMove) {
             document.removeEventListener('mousemove', this.boundOnMouseMove);
@@ -564,14 +564,14 @@ export class GameDebugPanel {
             this.boundOnMouseUp = null;
         }
     }
-    
+
     /**
      * Handle touch end to end drag
      * @returns {void}
      */
     onTouchEnd() {
         this.isDragging = false;
-        
+
         // Remove event listeners
         if (this.boundOnTouchMove) {
             document.removeEventListener('touchmove', this.boundOnTouchMove);
@@ -582,7 +582,7 @@ export class GameDebugPanel {
             this.boundOnTouchEnd = null;
         }
     }
-    
+
     /**
      * Populate context list with checkboxes
      * @returns {void}
@@ -590,30 +590,30 @@ export class GameDebugPanel {
     populateContextList() {
         const contextList = document.getElementById('debug-context-list');
         if (!contextList) return;
-        
+
         const contexts = Debug.getRegisteredContexts();
         contextList.innerHTML = '';
-        
+
         contexts.forEach(context => {
             const item = document.createElement('label');
             item.className = 'debug-context-item';
-            
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'debug-context-checkbox';
             checkbox.value = context;
             checkbox.checked = Debug.isContextEnabled(context);
             checkbox.addEventListener('change', (e) => this.onContextToggle(context, e.target.checked));
-            
+
             const label = document.createElement('span');
             label.textContent = context;
-            
+
             item.appendChild(checkbox);
             item.appendChild(label);
             contextList.appendChild(item);
         });
     }
-    
+
     /**
      * Handle context toggle
      * @param {string} context
@@ -628,7 +628,7 @@ export class GameDebugPanel {
         }
         this.savePreferences();
     }
-    
+
     /**
      * Select all contexts
      * @returns {void}
@@ -638,7 +638,7 @@ export class GameDebugPanel {
         this.populateContextList();
         this.savePreferences();
     }
-    
+
     /**
      * Clear all contexts
      * @returns {void}
@@ -648,7 +648,7 @@ export class GameDebugPanel {
         this.populateContextList();
         this.savePreferences();
     }
-    
+
     /**
      * Save preferences to localStorage
      * @returns {void}
@@ -661,7 +661,7 @@ export class GameDebugPanel {
         };
         localStorage.setItem('debug-preferences', JSON.stringify(preferences));
     }
-    
+
     /**
      * Load preferences from localStorage
      * @returns {void}
@@ -669,7 +669,7 @@ export class GameDebugPanel {
     loadPreferences() {
         const stored = localStorage.getItem('debug-preferences');
         if (!stored) return;
-        
+
         try {
             const preferences = JSON.parse(stored);
             Debug.filterMode = preferences.filterMode || 'all';
@@ -683,7 +683,7 @@ export class GameDebugPanel {
             console.error('Failed to load debug preferences:', e);
         }
     }
-    
+
     /**
      * Refresh towers tab with active towers
      * @returns {void}
@@ -691,25 +691,25 @@ export class GameDebugPanel {
     refreshTowersTab() {
         const towersList = document.getElementById('debug-towers-list');
         if (!towersList) return;
-        
+
         // Check if game instance is set
         if (!this.game || !this.game.entityManager) {
             towersList.innerHTML = '<div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No game instance</div>';
             return;
         }
-        
+
         const towers = this.game.entityManager.getTowers();
-        
+
         if (towers.length === 0) {
             towersList.innerHTML = '<div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No towers placed</div>';
             return;
         }
-        
+
         // Display tower info
         towersList.innerHTML = towers.map((tower, idx) => {
             const pos = tower.gridPosition || { row: '?', col: '?' };
             const stats = tower.stats || {};
-            
+
             return `
                 <div class="tower-item" style="margin-bottom: 8px; padding: 8px; background: #1a1a1a; border-radius: 4px; border-left: 3px solid #2196F3;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
@@ -728,7 +728,7 @@ export class GameDebugPanel {
             `;
         }).join('');
     }
-    
+
     /**
      * Refresh events tab with sourceable events
      * @returns {void}
@@ -736,19 +736,19 @@ export class GameDebugPanel {
     refreshEventsTab() {
         const eventsList = document.getElementById('debug-events-list');
         if (!eventsList) return;
-        
+
         const events = EventBus.getSourceableEvents();
-        
+
         if (events.length === 0) {
             eventsList.innerHTML = '<div style="color: #999; font-size: 11px; padding: 10px; text-align: center;">No events yet</div>';
             return;
         }
-        
+
         // Display in natural order (guaranteed by sequence number)
         eventsList.innerHTML = events.map((e, idx) => {
             const time = new Date(e.timestamp).toLocaleTimeString();
             const metadataJson = JSON.stringify(e.data.metadata || {}, null, 2);
-            
+
             return `
                 <div class="event-item" style="margin-bottom: 8px; padding: 8px; background: #1a1a1a; border-radius: 4px; border-left: 3px solid #4CAF50;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
@@ -760,7 +760,7 @@ export class GameDebugPanel {
             `;
         }).join('');
     }
-    
+
     /**
      * Destroy the debug panel and cleanup
      * @returns {void}
@@ -770,11 +770,11 @@ export class GameDebugPanel {
         if (this.panel && this.panel.parentNode) {
             this.panel.parentNode.removeChild(this.panel);
         }
-        
+
         // Cleanup event listeners
         this.onMouseUp();
         this.onTouchEnd();
-        
+
         // Null out references
         this.panel = null;
         this.game = null;

@@ -8,14 +8,14 @@ import { Application } from './Application.js';
 window.addEventListener('load', async () => {
     // Create singleton Application instance
     const app = Application.getInstance();
-    
+
     // Initialize and start
     await app.init();
     app.start();
-    
+
     // Expose globally for debugging (console access)
     window.app = app;
-    
+
     // Debug info
     console.log('🎮 Application ready!');
     console.log('Game controls: app.game.pause(), app.game.resume()');

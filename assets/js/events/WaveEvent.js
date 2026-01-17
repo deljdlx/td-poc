@@ -8,7 +8,7 @@ export class WaveEvent extends Event {
      * @type {Wave}
      */
     wave;
-    
+
     /**
      * @param {string} eventType - Specific wave event type
      * @param {Wave} wave - Wave that emitted the event
@@ -28,12 +28,12 @@ export class WaveStartedEvent extends WaveEvent {
      * @type {number}
      */
     waveNumber;
-    
+
     /**
      * @type {number}
      */
     totalEnemies;
-    
+
     /**
      * @param {Wave} wave
      * @param {number} waveNumber
@@ -54,12 +54,12 @@ export class WaveCompletedEvent extends WaveEvent {
      * @type {number}
      */
     waveNumber;
-    
+
     /**
      * @type {number}
      */
     totalEnemies;
-    
+
     /**
      * @param {Wave} wave
      * @param {number} waveNumber

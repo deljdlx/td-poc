@@ -2,7 +2,7 @@ import { Attributes } from '../../shared/Attributes.js';
 
 /**
  * EnemyAttributes - Enemy-specific stats
- * 
+ *
  * Attributes:
  * - health: Current health points
  * - maxHealth: Maximum health points
@@ -25,7 +25,7 @@ export class EnemyAttributes extends Attributes {
             goldReward
         });
     }
-    
+
     /**
      * Get final health value (base + modifiers)
      * @returns {number}
@@ -33,7 +33,7 @@ export class EnemyAttributes extends Attributes {
     get health() {
         return this._getFinalValue('health');
     }
-    
+
     /**
      * Get final max health value (base + modifiers)
      * @returns {number}
@@ -41,7 +41,7 @@ export class EnemyAttributes extends Attributes {
     get maxHealth() {
         return this._getFinalValue('maxHealth');
     }
-    
+
     /**
      * Get final speed value (base + modifiers)
      * @returns {number} - Speed in cells per second
@@ -49,7 +49,7 @@ export class EnemyAttributes extends Attributes {
     get speed() {
         return this._getFinalValue('speed');
     }
-    
+
     /**
      * Get final gold reward value (base + modifiers)
      * @returns {number}
@@ -57,7 +57,7 @@ export class EnemyAttributes extends Attributes {
     get goldReward() {
         return this._getFinalValue('goldReward');
     }
-    
+
     /**
      * Set health value (updates base)
      * @param {number} value

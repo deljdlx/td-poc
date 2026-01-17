@@ -8,12 +8,12 @@ export class DiamondSpriteRenderer extends SpriteRenderer {
      * @type {number}
      */
     rotation;
-    
+
     /**
      * @type {number}
      */
     rotationSpeed;
-    
+
     /**
      * @param {number} rotationSpeed - Rotation speed in radians/second (default: 2)
      */
@@ -22,7 +22,7 @@ export class DiamondSpriteRenderer extends SpriteRenderer {
         this.rotation = 0;
         this.rotationSpeed = rotationSpeed;
     }
-    
+
     /**
      * Update rotation (call from game loop if needed)
      * @param {number} deltaTime - Time delta in seconds
@@ -30,7 +30,7 @@ export class DiamondSpriteRenderer extends SpriteRenderer {
     update(deltaTime) {
         this.rotation += this.rotationSpeed * deltaTime;
     }
-    
+
     /**
      * Draw diamond sprite with rotation
      * @param {CanvasRenderingContext2D} ctx
@@ -39,15 +39,15 @@ export class DiamondSpriteRenderer extends SpriteRenderer {
      */
     draw(ctx, entity) {
         const size = entity.size;
-        
+
         ctx.save();
         ctx.translate(entity.x, entity.y);
         ctx.rotate(this.rotation);
-        
+
         // Glow effect
         ctx.shadowBlur = 12;
         ctx.shadowColor = entity.color;
-        
+
         // Draw diamond (square rotated 45°)
         ctx.globalAlpha = 1.0;
         ctx.fillStyle = entity.color;
@@ -58,7 +58,7 @@ export class DiamondSpriteRenderer extends SpriteRenderer {
         ctx.lineTo(-size, 0);
         ctx.closePath();
         ctx.fill();
-        
+
         ctx.restore();
     }
 }

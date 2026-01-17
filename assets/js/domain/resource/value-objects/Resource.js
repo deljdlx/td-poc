@@ -7,32 +7,32 @@ export class Resource {
      * @type {string}
      */
     type;
-    
+
     /**
      * @type {string}
      */
     name;
-    
+
     /**
      * @type {string}
      */
     icon;
-    
+
     /**
      * @type {number|null}
      */
     maxCapacity;
-    
+
     /**
      * @type {boolean}
      */
     tradeable;
-    
+
     /**
      * @type {string}
      */
     description;
-    
+
     /**
      * @param {string} type - Unique resource type identifier (e.g., 'money', 'mana')
      * @param {string} name - Display name (e.g., 'Gold', 'Mana')
@@ -50,7 +50,7 @@ export class Resource {
         this.tradeable = options.tradeable !== undefined ? options.tradeable : true;
         this.description = options.description || '';
     }
-    
+
     /**
      * Check if amount exceeds max capacity
      * @param {number} amount
@@ -62,7 +62,7 @@ export class Resource {
         }
         return amount > this.maxCapacity;
     }
-    
+
     /**
      * Get display string with icon
      * @returns {string}

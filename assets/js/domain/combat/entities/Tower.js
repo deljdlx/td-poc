@@ -7,7 +7,7 @@ import { EventBus } from '../../../services/core/EventBus.js';
 /**
  * Tower - Defensive tower entity that shoots missiles at targets
  * Placed on grid cells, shoots on demand (click)
- * 
+ *
  * Domain Entity (Combat Bounded Context)
  */
 export class Tower extends Entity {
@@ -20,79 +20,79 @@ export class Tower extends Entity {
      * @type {string}
      */
     color;
-    
+
     /**
      * @type {number}
      */
     size;
-    
+
     /**
      * @type {TowerAttributes} - Base attributes (internal storage)
      * @private
      */
     _attributes;
-    
+
     /**
      * @type {AttributesProxy} - Proxy for attribute access with modifiers
      * @private
      */
     _attributesProxy;
-    
+
     /**
      * @type {Object}
      */
     coordSystem;
-    
+
     /**
      * @type {DIContainer}
      */
     container;
-    
+
     /**
      * @type {Game}
      */
     game;
-    
+
     /**
      * @type {number}
      */
     currentCooldown;
-    
+
     /**
      * @type {EntityManager}
      */
     entityManager;
-    
+
     /**
      * @type {Object}
      */
     stats;
-    
+
     /**
      * @type {string}
      */
     playerId;
-    
+
     /**
      * @type {string} - Tower type ID (reference to blueprint)
      */
     towerTypeId;
-    
+
     /**
      * @type {string} - Missile type ID (reference to blueprint)
      */
     missileTypeId;
-    
+
     /**
      * @type {Object} - Missile configuration for this tower
      */
     missileConfig;
-    
+
     /**
      * @type {Object} EventBus handler
      */
     events;
-    
+
     /**
      * @param {Cell} cell - Grid cell where tower is placed
      * @param {string} playerId - ID of the player who owns this tower
@@ -103,12 +103,12 @@ export class Tower extends Entity {
     constructor(cell, playerId, diContainer, game, towerBlueprint) {
         const debug = diContainer.createDebug('Tower', true);
         const coordSystem = diContainer.get('coordinateSystem');
-        
+
         // Get cell center position
         const center = coordSystem.getElementCenter(cell.element);
-        
+
         super('tower', center.x, center.y);
-        
+
         this.cell = cell;
         this.playerId = playerId;
         this.coordSystem = coordSystem;
@@ -117,14 +117,14 @@ export class Tower extends Entity {
         this.entityManager = game.entityManager; // Use game's entityManager
         this.currentCooldown = 0.0; // Start ready to shoot
         this.events = EventBus.createHandler(this);
-        
+
         // Store tower type ID
         this.towerTypeId = towerBlueprint.id;
-        
+
         // Visual attributes from blueprint
         this.color = towerBlueprint.visualFx.color;
         this.size = towerBlueprint.visualFx.size;
-        
+
         // Gameplay attributes from blueprint
         const cooldown = 1.0 / towerBlueprint.stats.fireRate; // Convert fireRate to cooldown
         this._attributes = new TowerAttributes(
@@ -134,11 +134,11 @@ export class Tower extends Entity {
             towerBlueprint.stats.critMultiplier
         );
         this._attributesProxy = new AttributesProxy(this._attributes, this);
-        
+
         // Get missile blueprint from tower blueprint
         const missileBlueprint = game.missileTypes[towerBlueprint.missileTypeId];
         this.missileTypeId = missileBlueprint.id;
-        
+
         // Missile configuration (munition specs) - Initialize from blueprint
         this.missileConfig = {
             damage: missileBlueprint.damage,
@@ -146,7 +146,7 @@ export class Tower extends Entity {
             speed: missileBlueprint.speed,
             lifetime: missileBlueprint.lifetime
         };
-        
+
         // Stats tracking
         this.stats = {
             shotsFired: 0,
@@ -156,15 +156,15 @@ export class Tower extends Entity {
             criticalHits: 0
         };
 
-        debug.success('Tower created', { 
-            row: cell.row, 
-            col: cell.col, 
-            x: center.x, 
+        debug.success('Tower created', {
+            row: cell.row,
+            col: cell.col,
+            x: center.x,
             y: center.y,
             missileType: this.missileTypeId
         });
     }
-    
+
     /**
      * Get attributes with modifiers applied
      * @returns {AttributesProxy}
@@ -172,7 +172,7 @@ export class Tower extends Entity {
     get attributes() {
         return this._attributesProxy;
     }
-    
+
     /**
      * Get missile blueprint from Game registry (for introspection)
      * Allows dynamic lookup in case missile type changes
@@ -181,7 +181,7 @@ export class Tower extends Entity {
     getMissileBlueprint() {
         return this.game.missileTypes[this.missileTypeId] || null;
     }
-    
+
     /**
      * Shoot missile towards target position
      * @param {number} targetX
@@ -193,13 +193,13 @@ export class Tower extends Entity {
         if (!this.canShoot()) {
             return false;
         }
-        
+
         // Track shot
         this.stats.shotsFired++;
-        
+
         // Get full missile blueprint for visual effects
         const missileBlueprint = this.getMissileBlueprint();
-        
+
         // Emit shoot event with target coordinates and full blueprint
         this.events.emit('shoot', {
             tower: this,
@@ -210,16 +210,16 @@ export class Tower extends Entity {
             target,
             missileBlueprint: missileBlueprint
         });
-        
+
         // Emit typed event (legacy - can be deprecated later)
         const event = new TowerFiredEvent(this, target, null); // missile is null for now
         this.events.emit('fired', event);
-        
+
         // Reset cooldown
         this.currentCooldown = this.attributes.cooldown;
         return true;
     }
-    
+
     /**
      * Track a successful hit
      * @param {number} damage
@@ -233,7 +233,7 @@ export class Tower extends Entity {
             this.stats.criticalHits++;
         }
     }
-    
+
     /**
      * Track a kill
      * @returns {void}
@@ -241,7 +241,7 @@ export class Tower extends Entity {
     trackKill() {
         this.stats.kills++;
     }
-    
+
     /**
      * Update tower - manage cooldown and auto-targeting
      * @param {number} deltaTime
@@ -255,7 +255,7 @@ export class Tower extends Entity {
                 this.currentCooldown = 0;
             }
         }
-        
+
         // Auto-targeting: shoot closest enemy in range when cooldown ready
         if (this.canShoot()) {
             const enemy = this.getClosestEnemyInRange(this.entityManager);
@@ -264,7 +264,7 @@ export class Tower extends Entity {
             }
         }
     }
-    
+
     /**
      * Check if tower can shoot (cooldown ready)
      * @returns {boolean}
@@ -272,7 +272,7 @@ export class Tower extends Entity {
     canShoot() {
         return this.currentCooldown <= 0;
     }
-    
+
     /**
      * Get distance to another entity
      * @param {Entity} entity
@@ -283,7 +283,7 @@ export class Tower extends Entity {
         const dy = entity.y - this.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
-    
+
     /**
      * Get all enemies within tower range
      * @param {EntityManager} entityManager
@@ -291,16 +291,16 @@ export class Tower extends Entity {
      */
     getEnemiesInRange(entityManager) {
         const rangePixels = this.coordSystem.cellsToPixels(this.attributes.range);
-        const enemies = entityManager.getEntities().filter(e => 
+        const enemies = entityManager.getEntities().filter(e =>
             e.getType() === 'enemy' && e.alive
         );
-        
+
         return enemies.filter(enemy => {
             const distance = this.getDistanceTo(enemy);
             return distance <= rangePixels;
         });
     }
-    
+
     /**
      * Get closest enemy within tower range
      * @param {EntityManager} entityManager
@@ -308,14 +308,14 @@ export class Tower extends Entity {
      */
     getClosestEnemyInRange(entityManager) {
         const enemiesInRange = this.getEnemiesInRange(entityManager);
-        
+
         if (enemiesInRange.length === 0) {
             return null;
         }
-        
+
         let closest = enemiesInRange[0];
         let minDistance = this.getDistanceTo(closest);
-        
+
         for (let i = 1; i < enemiesInRange.length; i++) {
             const distance = this.getDistanceTo(enemiesInRange[i]);
             if (distance < minDistance) {
@@ -323,7 +323,7 @@ export class Tower extends Entity {
                 closest = enemiesInRange[i];
             }
         }
-        
+
         return closest;
     }
 }

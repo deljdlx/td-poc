@@ -70,7 +70,7 @@ class Tower {
     range = 100;
     damage = 10;
     target = null;
-    
+
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -155,18 +155,18 @@ class NomClasse {
     // 1. Propriétés publiques
     prop1 = value;
     prop2 = value;
-    
+
     // 2. Propriétés privées (si besoin)
     #private = value;
-    
+
     // 3. Constructeur (avec DI)
     constructor(container) {
         this.debug = container.createDebug('NomClasse');
     }
-    
+
     // 4. Méthodes publiques
     methodePublique() { }
-    
+
     // 5. Méthodes privées
     #methodePrivee() { }
 }

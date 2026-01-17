@@ -7,36 +7,36 @@
     --path-normal-color: #4A9EFF;
     --path-normal-width: 3;
     --path-normal-opacity: 0.8;
-    
+
     /* Zone de spawn (départ des ennemis) */
     --path-spawn-color: #00FF00;
     --path-spawn-width: 4;
     --path-spawn-opacity: 1.0;
-    
+
     /* Checkpoint (point de passage important) */
     --path-checkpoint-color: #FFD700;
     --path-checkpoint-width: 3;
     --path-checkpoint-opacity: 0.9;
-    
+
     /* Zone boss */
     --path-boss-color: #FF0000;
     --path-boss-width: 5;
     --path-boss-opacity: 1.0;
-    
+
     /* Zone ralentissement */
     --path-slow-color: #8A2BE2;
     --path-slow-width: 3;
     --path-slow-opacity: 0.8;
-    
+
     /* Zone accélération */
     --path-fast-color: #FF6B00;
     --path-fast-width: 3;
     --path-fast-opacity: 0.8;
-    
+
     /* Flèches directionnelles */
     --path-arrow-color: rgba(255, 255, 255, 0.7);
     --path-arrow-size: 8;
-    
+
     /* Debug (affichage des points) */
     --path-debug-point-color: #FF00FF;
     --path-debug-point-size: 4;

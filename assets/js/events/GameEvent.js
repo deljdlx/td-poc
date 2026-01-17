@@ -8,7 +8,7 @@ export class GameEvent extends Event {
      * @type {Game}
      */
     game;
-    
+
     /**
      * @param {string} eventType - Specific game event type
      * @param {Game} game - Game instance
@@ -28,12 +28,12 @@ export class GameStateChangedEvent extends GameEvent {
      * @type {string}
      */
     oldState;
-    
+
     /**
      * @type {string}
      */
     newState;
-    
+
     /**
      * @param {Game} game
      * @param {string} oldState
@@ -54,12 +54,12 @@ export class GameOverEvent extends GameEvent {
      * @type {string}
      */
     reason;
-    
+
     /**
      * @type {number}
      */
     finalScore;
-    
+
     /**
      * @param {Game} game
      * @param {string} reason

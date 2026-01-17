@@ -9,17 +9,17 @@ export class PlayerManager {
      * @type {Array<Player>}
      */
     players = [];
-    
+
     /**
      * @type {string|null}
      */
     activePlayerId = null;
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @param {DIContainer} diContainer
      */
@@ -27,7 +27,7 @@ export class PlayerManager {
         this.debug = diContainer.createDebug('PlayerManager', true);
         this.debug.success('PlayerManager initialized');
     }
-    
+
     /**
      * Create a new player
      * @param {string} id - Unique player ID
@@ -38,22 +38,22 @@ export class PlayerManager {
     createPlayer(id, name, color = '#6366f1') {
         const player = new Player(id, name, color, this.debug);
         this.players.push(player);
-        
+
         // First player created becomes active
         if (this.players.length === 1) {
             this.activePlayerId = player.id;
         }
-        
-        this.debug.success('Player created', { 
-            id: player.id, 
+
+        this.debug.success('Player created', {
+            id: player.id,
             name: player.name,
             money: player.wallet.get('money'),
             isActive: this.activePlayerId === player.id
         });
-        
+
         return player;
     }
-    
+
     /**
      * Get player by ID
      * @param {string} playerId
@@ -62,7 +62,7 @@ export class PlayerManager {
     getPlayerById(playerId) {
         return this.players.find(p => p.id === playerId) || null;
     }
-    
+
     /**
      * Get the currently active player
      * @returns {Player|null}
@@ -73,7 +73,7 @@ export class PlayerManager {
         }
         return this.getPlayerById(this.activePlayerId);
     }
-    
+
     /**
      * Set the active player
      * @param {string} playerId
@@ -85,15 +85,15 @@ export class PlayerManager {
             this.debug.warning('Cannot set active player - player not found', { playerId });
             return false;
         }
-        
+
         this.activePlayerId = playerId;
-        this.debug.info('Active player changed', { 
-            playerId: player.id, 
-            name: player.name 
+        this.debug.info('Active player changed', {
+            playerId: player.id,
+            name: player.name
         });
         return true;
     }
-    
+
     /**
      * Get all players
      * @returns {Array<Player>}
@@ -101,7 +101,7 @@ export class PlayerManager {
     getAllPlayers() {
         return this.players;
     }
-    
+
     /**
      * Get count of players
      * @returns {number}
@@ -109,7 +109,7 @@ export class PlayerManager {
     getPlayerCount() {
         return this.players.length;
     }
-    
+
     /**
      * Check if a player owns a tower
      * @param {string} playerId
@@ -120,7 +120,7 @@ export class PlayerManager {
         const player = this.getPlayerById(playerId);
         return player ? player.ownsTower(tower) : false;
     }
-    
+
     /**
      * Remove all players (reset)
      * @returns {void}

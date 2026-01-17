@@ -8,7 +8,7 @@ export class PlayerEvent extends Event {
      * @type {Player}
      */
     player;
-    
+
     /**
      * @param {string} eventType - Specific player event type
      * @param {Player} player - Player that emitted the event
@@ -28,17 +28,17 @@ export class PlayerResourceChangedEvent extends PlayerEvent {
      * @type {string}
      */
     resourceType;
-    
+
     /**
      * @type {number}
      */
     amount;
-    
+
     /**
      * @type {number}
      */
     total;
-    
+
     /**
      * @param {Player} player
      * @param {string} resourceType - 'money', 'mana', 'gems'
@@ -61,12 +61,12 @@ export class PlayerDamagedEvent extends PlayerEvent {
      * @type {number}
      */
     livesLost;
-    
+
     /**
      * @type {number}
      */
     livesRemaining;
-    
+
     /**
      * @param {Player} player
      * @param {number} livesLost

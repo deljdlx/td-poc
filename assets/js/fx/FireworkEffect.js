@@ -18,37 +18,37 @@ export class FireworkEffect {
 
     /** @type {Array<Particle>} */
     particles;
-    
+
     /** @type {number} */
     life;
-    
+
     /** @type {number} */
     maxLife;
-    
+
     /** @type {number} */
     gravity;
-    
+
     /** @type {number} */
     friction;
-    
+
     /** @type {number} */
     power;
-    
+
     /** @type {number} */
     spread;
-    
+
     /** @type {number} */
     angle;
-    
+
     /** @type {number} */
     particleCount;
-    
+
     /** @type {Object} */
     particleSize;
-    
+
     /** @type {Object} */
     particleLifetime;
-    
+
     /**
      * @param {number} x - Center X position
      * @param {number} y - Center Y position
@@ -67,7 +67,7 @@ export class FireworkEffect {
         this.x = x;
         this.y = y;
         this.particles = [];
-        
+
         // Default configuration
         const defaults = {
             power: 150,
@@ -80,7 +80,7 @@ export class FireworkEffect {
             lifetime: { min: 1.5, max: 2.0 },
             particles: null
         };
-        
+
         // Merge with provided config
         let config = defaults;
         if (particlesOrConfig) {
@@ -92,7 +92,7 @@ export class FireworkEffect {
                 config = { ...defaults, ...particlesOrConfig };
             }
         }
-        
+
         // Store configuration
         this.power = config.power;
         this.spread = config.spread;
@@ -102,17 +102,17 @@ export class FireworkEffect {
         this.particleCount = config.particleCount;
         this.particleSize = config.particleSize;
         this.particleLifetime = config.lifetime;
-        
+
         this.life = config.lifetime.max;
         this.maxLife = config.lifetime.max;
-        
+
         if (config.particles && config.particles.length > 0) {
             this.particles = config.particles;
         } else {
             this.createDefaultParticles();
         }
     }
-    
+
     /**
      * Create default particle mix (circles, squares, stars, triangles, diamonds)
      * Uses configuration parameters for power, spread, angle, etc.
@@ -130,7 +130,7 @@ export class FireworkEffect {
             '#fd79a8',
             '#fdcb6e'
         ];
-        
+
         const particleTypes = [
             CircleParticle,
             SquareParticle,
@@ -138,28 +138,28 @@ export class FireworkEffect {
             TriangleParticle,
             DiamondParticle
         ];
-        
+
         // Convert angles to radians
         const baseAngle = this.angle * (Math.PI / 180);
         const spreadAngle = this.spread * (Math.PI / 180);
-        
+
         for (let i = 0; i < this.particleCount; i++) {
             // Calculate particle angle with spread
             const angle = baseAngle + (Math.random() - 0.5) * spreadAngle;
-            
+
             // Random speed based on power (±50% variation)
             const speedVariation = 0.5 + Math.random();
             const speed = this.power * speedVariation;
             const vx = Math.cos(angle) * speed;
             const vy = Math.sin(angle) * speed;
-            
+
             const color = colors[Math.floor(Math.random() * colors.length)];
             const size = this.particleSize.min + Math.random() * (this.particleSize.max - this.particleSize.min);
             const maxLife = this.particleLifetime.min + Math.random() * (this.particleLifetime.max - this.particleLifetime.min);
-            
+
             // Randomly select particle type
             const ParticleClass = particleTypes[Math.floor(Math.random() * particleTypes.length)];
-            
+
             // Special handling for StarParticle (can have different spike counts)
             if (ParticleClass === StarParticle) {
                 const spikes = 4 + Math.floor(Math.random() * 3); // 4, 5, or 6 spikes
@@ -169,7 +169,7 @@ export class FireworkEffect {
             }
         }
     }
-    
+
     /**
      * Add a particle to the effect
      * @param {Particle} particle - Particle instance to add
@@ -177,7 +177,7 @@ export class FireworkEffect {
     addParticle(particle) {
         this.particles.push(particle);
     }
-    
+
     /**
      * Update particle physics
      * Delegates physics to individual particles
@@ -187,22 +187,22 @@ export class FireworkEffect {
     update(deltaTime) {
         // Update global lifetime
         this.life -= deltaTime;
-        
+
         // Update each particle (particles handle their own physics)
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const particle = this.particles[i];
             const isAlive = particle.update(deltaTime, this.gravity, this.friction);
-            
+
             // Remove dead particles
             if (!isAlive) {
                 this.particles.splice(i, 1);
             }
         }
-        
+
         // Effect dies when all particles are gone OR global lifetime expires
         return this.particles.length > 0 && this.life > 0;
     }
-    
+
     /**
      * Draw all particles
      * Delegates rendering to individual particles

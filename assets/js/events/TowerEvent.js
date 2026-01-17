@@ -8,7 +8,7 @@ export class TowerEvent extends Event {
      * @type {Tower}
      */
     tower;
-    
+
     /**
      * @param {string} eventType - Specific tower event type
      * @param {Tower} tower - Tower that emitted the event
@@ -28,12 +28,12 @@ export class TowerFiredEvent extends TowerEvent {
      * @type {Enemy}
      */
     target;
-    
+
     /**
      * @type {Missile}
      */
     missile;
-    
+
     /**
      * @param {Tower} tower
      * @param {Enemy} target
@@ -55,17 +55,17 @@ export class TowerPlacedEvent extends TowerEvent {
      * @type {Cell}
      */
     cell;
-    
+
     /**
      * @type {boolean}
      */
     sourceable = true;
-    
+
     /**
      * @type {Object} - Event Sourcing metadata
      */
     metadata;
-    
+
     /**
      * @param {Tower} tower
      * @param {Cell} cell
@@ -88,22 +88,22 @@ export class TowerMovedEvent extends TowerEvent {
      * @type {Cell}
      */
     fromCell;
-    
+
     /**
      * @type {Cell}
      */
     toCell;
-    
+
     /**
      * @type {boolean}
      */
     sourceable = true;
-    
+
     /**
      * @type {Object} - Event Sourcing metadata
      */
     metadata;
-    
+
     /**
      * @param {Tower} tower
      * @param {Cell} fromCell

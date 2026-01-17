@@ -8,7 +8,7 @@ export class EnemyEvent extends Event {
      * @type {Enemy}
      */
     enemy;
-    
+
     /**
      * @param {string} eventType - Specific enemy event type (hit, death, reachedEnd)
      * @param {Enemy} enemy - Enemy that emitted the event
@@ -28,17 +28,17 @@ export class EnemyHitEvent extends EnemyEvent {
      * @type {number}
      */
     damage;
-    
+
     /**
      * @type {number}
      */
     previousHealth;
-    
+
     /**
      * @type {number}
      */
     currentHealth;
-    
+
     /**
      * @param {Enemy} enemy
      * @param {number} damage
@@ -61,12 +61,12 @@ export class EnemyDeathEvent extends EnemyEvent {
      * @type {Object}
      */
     position;
-    
+
     /**
      * @type {Tower|null}
      */
     killer;
-    
+
     /**
      * @param {Enemy} enemy
      * @param {Object} position - {x, y}
@@ -87,7 +87,7 @@ export class EnemyReachedEndEvent extends EnemyEvent {
      * @type {Object}
      */
     position;
-    
+
     /**
      * @param {Enemy} enemy
      * @param {Object} position - {x, y}
@@ -106,7 +106,7 @@ export class EnemySpawnedEvent extends EnemyEvent {
      * @type {Object}
      */
     position;
-    
+
     /**
      * @param {Enemy} enemy
      * @param {Object} position - {x, y}

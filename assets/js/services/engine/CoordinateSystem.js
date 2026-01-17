@@ -4,18 +4,18 @@
 export class CoordinateSystem {
     /** @type {number} */
     viewportWidth = window.innerWidth;
-    
+
     /** @type {number} */
     viewportHeight = window.innerHeight;
-    
+
     /** @type {Function|null} */
     boundUpdateViewportSize = null;
-    
+
     constructor() {
         this.updateViewportSize();
         this.handleResize();
     }
-    
+
     /**
      * @returns {void}
      */
@@ -23,7 +23,7 @@ export class CoordinateSystem {
         this.viewportWidth = window.innerWidth;
         this.viewportHeight = window.innerHeight;
     }
-    
+
     /**
      * @returns {void}
      */
@@ -31,7 +31,7 @@ export class CoordinateSystem {
         this.boundUpdateViewportSize = this.updateViewportSize.bind(this);
         window.addEventListener('resize', this.boundUpdateViewportSize);
     }
-    
+
     /**
      * Obtient la position absolue d'un élément dans le viewport
      * @param {HTMLElement} element
@@ -46,7 +46,7 @@ export class CoordinateSystem {
             height: rect.height
         };
     }
-    
+
     /**
      * Obtient le centre absolu d'un élément
      * @param {HTMLElement} element
@@ -59,7 +59,7 @@ export class CoordinateSystem {
             y: rect.top + rect.height / 2
         };
     }
-    
+
     /**
      * Get the size of a cell in pixels by reading from DOM
      * @returns {number}
@@ -71,17 +71,17 @@ export class CoordinateSystem {
             console.warn('Grid container not found, returning default cell size');
             return 50; // Fallback
         }
-        
+
         const firstCell = gridContainer.querySelector('.grid-cell');
         if (!firstCell) {
             console.warn('No grid cell found in DOM, returning default cell size');
             return 50;
         }
-        
+
         const rect = firstCell.getBoundingClientRect();
         return rect.width; // Assuming square cells
     }
-    
+
     /**
      * Convert cells to pixels
      * @param {number} cells - Number of cells
@@ -90,7 +90,7 @@ export class CoordinateSystem {
     cellsToPixels(cells) {
         return cells * this.getCellSize();
     }
-    
+
     /**
      * Convert pixels to cells
      * @param {number} pixels - Number of pixels
@@ -100,7 +100,7 @@ export class CoordinateSystem {
         const cellSize = this.getCellSize();
         return cellSize > 0 ? pixels / cellSize : 0;
     }
-    
+
     /**
      * Destroy CoordinateSystem and cleanup
      * @returns {void}

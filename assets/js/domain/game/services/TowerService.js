@@ -10,37 +10,37 @@ export class TowerService {
      * @type {DIContainer}
      */
     container;
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @type {EntityManager}
      */
     entityManager;
-    
+
     /**
      * @type {PlayerManager}
      */
     playerManager;
-    
+
     /**
      * @type {Object} - Tower type blueprints
      */
     towerTypes;
-    
+
     /**
      * @type {Object} - Event handler
      */
     events;
-    
+
     /**
      * @type {Game} - Reference to game for tower creation
      */
     game;
-    
+
     /**
      * @param {DIContainer} container
      * @param {EntityManager} entityManager
@@ -58,7 +58,7 @@ export class TowerService {
         this.events = events;
         this.game = game;
     }
-    
+
     /**
      * Place a tower on a cell
      * @param {Cell} cell
@@ -67,7 +67,7 @@ export class TowerService {
      */
     placeTower(cell, towerTypeId = 'basic') {
         const activePlayer = this.playerManager.getActivePlayer();
-        
+
         if (!activePlayer) {
             this.debug.error('Cannot place tower - no active player');
             return false;
@@ -89,22 +89,22 @@ export class TowerService {
             });
             return false;
         }
-        
+
         // Deduct cost
         activePlayer.wallet.spend('money', cost);
         this.debug.info(`Tower purchased for ${cost} gold`, {
             remaining: activePlayer.wallet.get('money')
         });
-        
+
         // Create and place tower from blueprint
         const tower = new Tower(
-            cell, 
+            cell,
             activePlayer.id,
             this.container,
             this.game,
             towerBlueprint
         );
-        
+
         // Emit tower created event (SOURCEABLE: business event)
         this.events.emit('towerCreated', {
             sourceable: true,
@@ -123,11 +123,11 @@ export class TowerService {
                 timestamp: Date.now()
             }
         });
-        
+
         cell.setTower(tower);
         this.entityManager.addEntity(tower);
         activePlayer.addTower(tower);
-        
+
         // Emit tower placed event (SOURCEABLE: business event)
         const event = new TowerPlacedEvent(tower, cell, {
             towerType: towerTypeId,
@@ -137,15 +137,15 @@ export class TowerService {
             timestamp: Date.now()
         });
         this.events.emit('towerPlaced', event);
-        
+
         this.debug.success('Tower placed', {
             player: activePlayer.name,
             totalTowers: activePlayer.towers.length
         });
-        
+
         return true;
     }
-    
+
     /**
      * Place N towers randomly on empty cells (for testing)
      * @param {GridModel} gridModel
@@ -154,36 +154,36 @@ export class TowerService {
      */
     placeRandomTowers(gridModel, count) {
         const emptyCells = gridModel.getEmptyCells();
-        
+
         if (emptyCells.length < count) {
             this.debug.warning(`Not enough empty cells for ${count} towers, placing ${emptyCells.length}`);
             count = emptyCells.length;
         }
-        
+
         const shuffled = emptyCells.sort(() => Math.random() - 0.5);
         const selectedCells = shuffled.slice(0, count);
-        
+
         const activePlayer = this.playerManager.getActivePlayer();
         if (!activePlayer) {
             this.debug.error('Cannot place towers - no active player');
             return [];
         }
-        
+
         // For random placement (testing), give free towers
         selectedCells.forEach(cell => {
             // Choose random tower type for architecture testing
             const towerTypeIds = ['basic', 'sniper', 'artillery'];
             const towerTypeId = towerTypeIds[Math.floor(Math.random() * towerTypeIds.length)];
             const towerBlueprint = this.towerTypes[towerTypeId];
-            
+
             const tower = new Tower(
-                cell, 
+                cell,
                 activePlayer.id,
                 this.container,
                 this.game,
                 towerBlueprint
             );
-            
+
             // Emit tower created event (SOURCEABLE: business event)
             this.events.emit('towerCreated', {
                 sourceable: true,
@@ -202,11 +202,11 @@ export class TowerService {
                     timestamp: Date.now()
                 }
             });
-            
+
             cell.setTower(tower);
             this.entityManager.addEntity(tower);
             activePlayer.addTower(tower);
-            
+
             // Emit tower placed event (SOURCEABLE: business event)
             const event = new TowerPlacedEvent(tower, cell, {
                 towerType: towerTypeId,
@@ -217,14 +217,14 @@ export class TowerService {
             });
             this.events.emit('towerPlaced', event);
         });
-        
+
         this.debug.success(`Placed ${count} free towers for testing`, {
             totalTowers: activePlayer.towers.length
         });
-        
+
         return selectedCells;
     }
-    
+
     /**
      * Validate tower move (business logic)
      * @param {Tower} tower
@@ -238,19 +238,19 @@ export class TowerService {
             this.debug.info('Cannot move to same cell');
             return false;
         }
-        
+
         // Validation: can't move to path
         if (toCell.isOnPath) {
             this.debug.warning('Cannot move tower to path cell');
             return false;
         }
-        
+
         // Validation: can't move to occupied cell
         if (toCell.hasTower()) {
             this.debug.warning('Target cell already occupied');
             return false;
         }
-        
+
         // Optional: Apply movement cost (disabled for now)
         // const moveCost = 50;
         // const owner = this.playerManager.players.find(p => p.id === tower.playerId);
@@ -259,12 +259,12 @@ export class TowerService {
         //     return false;
         // }
         // owner.wallet.spend('money', moveCost);
-        
+
         this.debug.success('Tower move validated', {
             from: { row: fromCell.row, col: fromCell.col },
             to: { row: toCell.row, col: toCell.col }
         });
-        
+
         return true;
     }
 }

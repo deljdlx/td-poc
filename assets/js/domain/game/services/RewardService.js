@@ -7,27 +7,27 @@ export class RewardService {
      * @type {DIContainer}
      */
     container;
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @type {PlayerManager}
      */
     playerManager;
-    
+
     /**
      * @type {Object} - Event handler
      */
     events;
-    
+
     /**
      * @type {Object} - Reference to game state (for globalScore)
      */
     gameState;
-    
+
     /**
      * @param {DIContainer} container
      * @param {PlayerManager} playerManager
@@ -41,7 +41,7 @@ export class RewardService {
         this.events = events;
         this.gameState = gameState;
     }
-    
+
     /**
      * Handle enemy killed event
      * @param {Enemy} enemy
@@ -51,25 +51,25 @@ export class RewardService {
     handleEnemyKilled(enemy, killer) {
         // Find tower owner
         const owner = this.playerManager.players.find(p => p.id === killer.playerId);
-        
+
         if (!owner) {
-            this.debug.warning('Enemy killed but no owner found for tower', { 
+            this.debug.warning('Enemy killed but no owner found for tower', {
                 towerId: killer.id,
-                playerId: killer.playerId 
+                playerId: killer.playerId
             });
             return;
         }
-        
+
         // Award gold
         owner.wallet.add('money', enemy.attributes.goldReward);
-        
+
         // Update stats
         owner.stats.enemiesKilled++;
         owner.score += enemy.attributes.goldReward;
-        
+
         // Update global score
         this.gameState.globalScore += enemy.attributes.goldReward;
-        
+
         // Emit sourceable event (BUSINESS EVENT for Event Sourcing)
         this.events.emit('enemyKilled', {
             sourceable: true,
@@ -84,8 +84,8 @@ export class RewardService {
                 timestamp: Date.now()
             }
         });
-        
-        this.debug.success(`💰 ${owner.name} earned ${enemy.attributes.goldReward} gold`, { 
+
+        this.debug.success(`💰 ${owner.name} earned ${enemy.attributes.goldReward} gold`, {
             total: owner.wallet.get('money'),
             kills: owner.stats.enemiesKilled
         });

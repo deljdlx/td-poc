@@ -6,10 +6,10 @@ import { UIUpdateManager } from './services/ui/UIUpdateManager.js';
 
 /**
  * Bootstrap - DI Container configuration
- * 
+ *
  * Registers ONLY global application-wide services.
  * Game-specific services (GameClock, EntityManager, etc.) are created by Game itself.
- * 
+ *
  * Global services registered here:
  * - debug.factory: Debug instance factory
  * - coordinateSystem: Singleton coordinate conversion system
@@ -29,17 +29,17 @@ export function bootstrapDI() {
     container.registerFactory('debug.factory', () => {
         return (context, enabled = true, logger = console) => new Debug(context, enabled, logger);
     });
-    
+
     // CoordinateSystem (singleton)
     container.registerFactory('coordinateSystem', () => {
         return new CoordinateSystem();
     });
-    
+
     // UIUpdateManager (singleton)
     container.registerFactory('uiUpdateManager', (container) => {
         return new UIUpdateManager(container);
     });
-    
+
     // PopupManager (singleton)
     container.registerFactory('popupManager', (container) => {
         return new PopupManager(container);

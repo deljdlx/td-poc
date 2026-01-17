@@ -7,17 +7,17 @@ export class TowerRangeView {
      * @type {HTMLElement}
      */
     element;
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @type {CoordinateSystem}
      */
     coordSystem;
-    
+
     /**
      * @param {DIContainer} diContainer
      */
@@ -26,7 +26,7 @@ export class TowerRangeView {
         this.coordSystem = diContainer.get('coordinateSystem');
         this.createElement();
     }
-    
+
     /**
      * Create the DOM element for range indicator
      * @returns {void}
@@ -37,7 +37,7 @@ export class TowerRangeView {
         document.body.appendChild(this.element);
         this.debug.success('Tower range indicator created');
     }
-    
+
     /**
      * Show range for a specific tower
      * @param {Tower} tower
@@ -47,25 +47,25 @@ export class TowerRangeView {
         // Convert range from cells to pixels
         const rangePixels = this.coordSystem.cellsToPixels(tower.attributes.range);
         const diameter = rangePixels * 2;
-        
+
         // Position at tower center
         this.element.style.left = tower.x + 'px';
         this.element.style.top = tower.y + 'px';
         this.element.style.width = diameter + 'px';
         this.element.style.height = diameter + 'px';
-        
+
         // Show with animation
         requestAnimationFrame(() => {
             this.element.classList.add('visible');
         });
-        
-        // this.debug.debug('Tower range shown', { 
+
+        // this.debug.debug('Tower range shown', {
         //     range: tower.range,
         //     rangePixels,
         //     position: { x: tower.x, y: tower.y }
         // });
     }
-    
+
     /**
      * Hide the range indicator
      * @returns {void}

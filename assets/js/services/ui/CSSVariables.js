@@ -13,7 +13,7 @@ export class CSSVariables {
                 .getPropertyValue(varName)
         );
     }
-    
+
     /**
      * Lit une variable CSS et retourne un nombre flottant
      * @param {string} varName - Nom de la variable
@@ -25,7 +25,7 @@ export class CSSVariables {
                 .getPropertyValue(varName)
         );
     }
-    
+
     /**
      * Lit une variable CSS et retourne la valeur brute
      * @param {string} varName - Nom de la variable
@@ -36,7 +36,7 @@ export class CSSVariables {
             .getPropertyValue(varName)
             .trim();
     }
-    
+
     /**
      * Définit une variable CSS
      * @param {string} varName - Nom de la variable

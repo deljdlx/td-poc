@@ -6,27 +6,27 @@ export class TowerStatsPopup {
      * @type {PopupManager}
      */
     popupManager;
-    
+
     /**
      * @type {UIUpdateManager}
      */
     uiUpdateManager;
-    
+
     /**
      * @type {Debug}
      */
     debug;
-    
+
     /**
      * @type {Tower|null}
      */
     currentTower = null;
-    
+
     /**
      * @type {Object}
      */
     statElements = {};
-    
+
     /**
      * @param {DIContainer} diContainer
      */
@@ -35,7 +35,7 @@ export class TowerStatsPopup {
         this.uiUpdateManager = diContainer.get('uiUpdateManager');
         this.debug = diContainer.createDebug('TowerStatsPopup', true);
     }
-    
+
     /**
      * Show stats for a specific tower
      * @param {Tower} tower
@@ -44,7 +44,7 @@ export class TowerStatsPopup {
     show(tower) {
         this.currentTower = tower;
         const content = this.renderStats(tower);
-        
+
         this.popupManager.show({
             title: '🗼 Tower Statistics',
             content,
@@ -65,16 +65,16 @@ export class TowerStatsPopup {
                 this.hide();
             }
         });
-        
+
         // Cache DOM elements for updates
         this.cacheStatElements();
-        
+
         // Register for live updates
         this.uiUpdateManager.register(this, this.updateStats);
-        
+
         this.debug.success('Tower stats shown (live updates enabled)', { towerId: tower.id });
     }
-    
+
     /**
      * Hide popup and unregister from updates
      * @returns {void}
@@ -85,7 +85,7 @@ export class TowerStatsPopup {
         this.statElements = {};
         this.debug.info('Tower stats closed');
     }
-    
+
     /**
      * Cache DOM elements for efficient updates
      * @returns {void}
@@ -102,7 +102,7 @@ export class TowerStatsPopup {
             avgDamage: document.querySelector('[data-stat="avgDamage"]')
         };
     }
-    
+
     /**
      * Update stats display (called by UIUpdateManager)
      * @param {number} deltaTime
@@ -112,12 +112,12 @@ export class TowerStatsPopup {
         if (!this.currentTower || !this.popupManager.isPopupOpen()) {
             return;
         }
-        
+
         const stats = this.currentTower.stats;
         const accuracy = stats.shotsFired > 0 ? ((stats.hits / stats.shotsFired) * 100).toFixed(1) : 0;
         const critRate = stats.hits > 0 ? ((stats.criticalHits / stats.hits) * 100).toFixed(1) : 0;
         const avgDamage = stats.hits > 0 ? (stats.totalDamage / stats.hits).toFixed(1) : 0;
-        
+
         // Update only changed values
         if (this.statElements.shotsFired) {
             this.statElements.shotsFired.textContent = stats.shotsFired.toLocaleString();
@@ -128,7 +128,7 @@ export class TowerStatsPopup {
         if (this.statElements.accuracy) {
             this.statElements.accuracy.textContent = accuracy + '%';
             // Update color class based on accuracy
-            this.statElements.accuracy.className = 'stat-value ' + 
+            this.statElements.accuracy.className = 'stat-value ' +
                 (accuracy >= 70 ? 'stat-success' : accuracy >= 40 ? 'stat-warning' : 'stat-danger');
         }
         if (this.statElements.totalDamage) {
@@ -147,7 +147,7 @@ export class TowerStatsPopup {
             this.statElements.avgDamage.textContent = avgDamage;
         }
     }
-    
+
     /**
      * Render tower statistics HTML
      * @param {Tower} tower
@@ -158,7 +158,7 @@ export class TowerStatsPopup {
         const accuracy = stats.shotsFired > 0 ? ((stats.hits / stats.shotsFired) * 100).toFixed(1) : 0;
         const critRate = stats.hits > 0 ? ((stats.criticalHits / stats.hits) * 100).toFixed(1) : 0;
         const avgDamage = stats.hits > 0 ? (stats.totalDamage / stats.hits).toFixed(1) : 0;
-        
+
         return `
             <div class="tower-stats">
                 <!-- Tower Stats (Shooter) -->
@@ -190,7 +190,7 @@ export class TowerStatsPopup {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Missile Stats (Munitions) -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">
@@ -216,7 +216,7 @@ export class TowerStatsPopup {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Combat Stats -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">
@@ -254,7 +254,7 @@ export class TowerStatsPopup {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Location -->
                 <div class="stats-section">
                     <h3 class="stats-section-title">

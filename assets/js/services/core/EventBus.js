@@ -8,27 +8,27 @@ export class EventBus {
      * @type {Map<Object, Map<string, Set<Function>>>}
      */
     static handlers = new Map();
-    
+
     /**
      * @type {Map<string, Set<Function>>}
      */
     static globalListeners = new Map();
-    
+
     /**
      * @type {Array<{event: Event, callbacks: Set<Function>}>}
      */
     static eventQueue = [];
-    
+
     /**
      * @type {Array<{sequence: number, eventName: string, timestamp: number, data: Object}>}
      */
     static sourceableEvents = [];
-    
+
     /**
      * @type {number}
      */
     static sequenceNumber = 0;
-    
+
     /**
      * Create event handler for an entity
      * @param {Object} entity - Entity that will emit/listen to events
@@ -38,7 +38,7 @@ export class EventBus {
         if (!EventBus.handlers.has(entity)) {
             EventBus.handlers.set(entity, new Map());
         }
-        
+
         return {
             /**
              * Add event listener
@@ -52,7 +52,7 @@ export class EventBus {
                 }
                 entityListeners.get(eventName).add(callback);
             },
-            
+
             /**
              * Remove event listener
              * @param {string} eventName
@@ -64,7 +64,7 @@ export class EventBus {
                     entityListeners.get(eventName).delete(callback);
                 }
             },
-            
+
             /**
              * Emit event
              * @param {string} eventName
@@ -80,7 +80,7 @@ export class EventBus {
                         data
                     });
                 }
-                
+
                 // Trigger local listeners (immediate)
                 const entityListeners = EventBus.handlers.get(entity);
                 if (entityListeners.has(eventName)) {
@@ -88,7 +88,7 @@ export class EventBus {
                         callback(data);
                     });
                 }
-                
+
                 // Trigger global listeners (immediate for now, can be queued later)
                 if (EventBus.globalListeners.has(eventName)) {
                     EventBus.globalListeners.get(eventName).forEach(callback => {
@@ -98,7 +98,7 @@ export class EventBus {
             }
         };
     }
-    
+
     /**
      * Add global event listener (listens to all entities)
      * @param {string} eventName
@@ -110,7 +110,7 @@ export class EventBus {
         }
         EventBus.globalListeners.get(eventName).add(callback);
     }
-    
+
     /**
      * Remove global event listener
      * @param {string} eventName
@@ -121,7 +121,7 @@ export class EventBus {
             EventBus.globalListeners.get(eventName).delete(callback);
         }
     }
-    
+
     /**
      * Clear all listeners for an entity (cleanup on destroy)
      * @param {Object} entity
@@ -129,14 +129,14 @@ export class EventBus {
     static clearEntity(entity) {
         EventBus.handlers.delete(entity);
     }
-    
+
     /**
      * Clear all global listeners
      */
     static clearGlobal() {
         EventBus.globalListeners.clear();
     }
-    
+
     /**
      * Emit a global event (without entity source)
      * @param {string} eventName
@@ -152,14 +152,14 @@ export class EventBus {
                 data
             });
         }
-        
+
         if (EventBus.globalListeners.has(eventName)) {
             EventBus.globalListeners.get(eventName).forEach(callback => {
                 callback(data);
             });
         }
     }
-    
+
     /**
      * Get statistics for debugging
      * @returns {Object}
@@ -173,7 +173,7 @@ export class EventBus {
             }))
         };
     }
-    
+
     /**
      * Get all sourceable events (for Event Sourcing)
      * @returns {Array<{eventName: string, timestamp: number, data: Object}>}
@@ -181,7 +181,7 @@ export class EventBus {
     static getSourceableEvents() {
         return EventBus.sourceableEvents;
     }
-    
+
     /**
      * Clear sourceable events history
      * @returns {void}

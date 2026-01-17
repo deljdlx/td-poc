@@ -7,12 +7,12 @@ export class EntityManager {
      * @type {Array<Entity>}
      */
     entities;
-    
+
     /**
      * @type {Object}
      */
     debug;
-    
+
     /**
      * @param {Object} container - DI container
      */
@@ -20,7 +20,7 @@ export class EntityManager {
         this.entities = [];
         this.debug = container.createDebug('EntityManager', true);
     }
-    
+
     /**
      * Add an entity to the manager
      * @param {Entity} entity
@@ -32,7 +32,7 @@ export class EntityManager {
             count: this.entities.length
         });
     }
-    
+
     /**
      * Update all entities
      * @param {number} deltaTime - Time delta in seconds
@@ -44,11 +44,11 @@ export class EntityManager {
                 entity.update(deltaTime);
             }
         }
-        
+
         // Cleanup dead entities
         this.removeDeadEntities();
     }
-    
+
     /**
      * Remove dead entities from the list
      * @returns {void}
@@ -56,7 +56,7 @@ export class EntityManager {
     removeDeadEntities() {
         const initialCount = this.entities.length;
         this.entities = this.entities.filter(entity => entity.isAlive());
-        
+
         const removedCount = initialCount - this.entities.length;
         if (removedCount > 0) {
             this.debug.debug(`Removed ${removedCount} dead entities`, {
@@ -64,7 +64,7 @@ export class EntityManager {
             });
         }
     }
-    
+
     /**
      * Get all entities
      * @returns {Array<Entity>}
@@ -72,7 +72,7 @@ export class EntityManager {
     getEntities() {
         return this.entities;
     }
-    
+
     /**
      * Get entities by type
      * @param {string} type - Entity type
@@ -81,7 +81,7 @@ export class EntityManager {
     getEntitiesByType(type) {
         return this.entities.filter(entity => entity.getType() === type && entity.isAlive());
     }
-    
+
     /**
      * Get all towers
      * @returns {Array<Tower>}
@@ -89,7 +89,7 @@ export class EntityManager {
     getTowers() {
         return this.getEntitiesByType('tower');
     }
-    
+
     /**
      * Get entity count
      * @returns {number}
@@ -97,7 +97,7 @@ export class EntityManager {
     getEntityCount() {
         return this.entities.length;
     }
-    
+
     /**
      * Clear all entities
      * @returns {void}
