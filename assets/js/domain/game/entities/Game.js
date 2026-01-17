@@ -8,7 +8,7 @@ import { TowerPlacedEvent, TowerMovedEvent } from '../../../events/TowerEvent.js
 import { EventBus } from '../../../services/core/EventBus.js';
 import { missileTypes } from '../registries/MissileTypeRegistry.js';
 import { towerTypes } from '../registries/TowerTypeRegistry.js';
-import { GameClock } from '../../../services/engine/GameClock.js';
+import { GameClock } from '../services/GameClock.js';
 import { EntityManager } from '../../../services/engine/EntityManager.js';
 import { PlayerManager } from '../../player/managers/PlayerManager.js';
 import { WaveManager } from '../managers/WaveManager.js';
@@ -17,7 +17,7 @@ import { CanvasView } from '../../../views/CanvasView.js';
 import { TowerRangeView } from '../../combat/views/TowerRangeView.js';
 import { TowerDragHandler } from '../../../ux/TowerDragHandler.js';
 import { TowerStatsPopup } from '../../combat/views/TowerStatsPopup.js';
-import { PlayerInfoPopup } from '../../../views/PlayerInfoPopup.js';
+import { PlayerInfoPopup } from '../../player/views/PlayerInfoPopup.js';
 import { GameDebugPanel } from '../debug/GameDebugPanel.js';
 import { TowerService } from '../services/TowerService.js';
 import { CombatService } from '../services/CombatService.js';
