@@ -145,7 +145,7 @@ export class Enemy extends Entity {
       { x: this.x, y: this.y },
       this.killer,
     );
-    this.events.emit("death", event);
+    this.events.emit('death', event);
 
     super.kill();
   }

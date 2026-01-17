@@ -104,7 +104,8 @@ export class EventListenersConfiguration {
   handleEnnemySpawned(event) {
     const enemy = event.enemy;
     // Enemy death → Handle rewards (gold, score) and visual effects
-    enemy.events.on("death", (deathEvent) => {
+    //enemy.events.on("death", (deathEvent) => {
+    EventBus.onGlobal("death", (deathEvent) => {
       this.game.debug.event(
         `💀 Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`,
       );

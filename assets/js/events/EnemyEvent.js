@@ -73,7 +73,7 @@ export class EnemyDeathEvent extends EnemyEvent {
    * @param {Tower|null} killer - Tower that killed the enemy (null if other cause)
    */
   constructor(enemy, position, killer = null) {
-    super("death", enemy, { position, killer });
+    super("ennemy:death", enemy, { position, killer });
     this.position = position;
     this.killer = killer;
   }
