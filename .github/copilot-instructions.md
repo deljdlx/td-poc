@@ -24,19 +24,7 @@ Créer un jeu de tower defense complet utilisant **DOM pur + Canvas** avec une a
 
 ## 🏗️ Architecture
 
-### Structure MVC
-```
-assets/
-├── js/
-│   ├── utils/           # Services utilitaires (DI, Debug, Coordinates)
-│   ├── models/          # Logique métier pure (pas de DOM/Canvas)
-│   ├── views/           # Rendu Canvas + DOM (pas de logique)
-│   ├── controllers/     # Coordination models ↔ views
-│   ├── bootstrap.js     # Configuration DI
-│   └── main.js          # Point d'entrée
-├── css/
-└── (autres assets)
-```
+### Domain driven Design (DDD)
 
 ### Séparation des Responsabilités
 - **Models** : Logique métier, données, pas de manipulation DOM/Canvas

@@ -1,10 +1,7 @@
 import { GameState } from '../value-objects/GameState.js';
 import { Tower } from '../../combat/entities/Tower.js';
-import { Wave } from './Wave.js';
 import { PathFactory } from '../../map/PathFactory.js';
 import { Missile } from '../../combat/entities/Missile.js';
-import { GameStateChangedEvent, GameOverEvent } from '../../../events/GameEvent.js';
-import { TowerPlacedEvent, TowerMovedEvent } from '../../../events/TowerEvent.js';
 import { EventBus } from '../../../services/core/EventBus.js';
 import { missileTypes } from '../registries/MissileTypeRegistry.js';
 import { towerTypes } from '../registries/TowerTypeRegistry.js';
