@@ -470,8 +470,8 @@ export class Game {
       // Always show splash zone
       this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
 
-      // Combat logic: apply splash damage
-      this.applyDamage(event.missile, event.x, event.y);
+      // Combat logic: delegate splash damage to CombatService
+      this.combatService.applyDamage(event.missile, event.x, event.y);
     });
 
     // Listen to enemy spawned events to setup per-enemy listeners
@@ -767,75 +767,9 @@ export class Game {
     );
   }
 
-  /**
-   * Apply damage to enemies in splash zone
-   * @param {Missile} missile - Missile that exploded (contains tower + damage)
-   * @param {number} impactX - Impact X position
-   * @param {number} impactY - Impact Y position
-   * @returns {void}
-   * @private
-   */
-  applyDamage(missile, impactX, impactY) {
-    const tower = missile.tower;
-    const baseDamage = missile.attributes.damage;
-
-    // Calculate splash radius from missile attributes
-    const splashRadius =
-      missile.attributes.splashRadius * this.coordSystem.getCellSize();
-
-    const enemies = this.entityManager.getEntitiesByType("enemy");
-    let hitCount = 0;
-
-    this.debug.info(
-      `💥 Checking ${enemies.length} enemies for splash damage at (${impactX.toFixed(0)}, ${impactY.toFixed(0)}) radius: ${splashRadius.toFixed(0)}px`,
-    );
-
-    enemies.forEach((enemy) => {
-      const dx = enemy.x - impactX;
-      const dy = enemy.y - impactY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      // Check if enemy is in splash zone
-      if (distance <= splashRadius) {
-        // Calculate critical hit using tower stats (tireur)
-        const isCritical = Math.random() < tower.attributes.critChance;
-        const finalDamage = isCritical
-          ? Math.floor(baseDamage * tower.attributes.critMultiplier)
-          : baseDamage;
-
-        const wasAlive = enemy.alive;
-        enemy.takeDamage(finalDamage, tower); // Pass tower as attacker
-        hitCount++;
-
-        // Track hit and damage
-        tower.trackHit(finalDamage, isCritical);
-
-        // Track kill if enemy died (business logic handled by event listener)
-        if (wasAlive && !enemy.alive) {
-          tower.trackKill();
-          // handleEnemyKilled will be called by death event listener
-        }
-
-        if (isCritical) {
-          this.debug.success(
-            `💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.attributes.critMultiplier}x) - HP: ${enemy.attributes.health}/${enemy.attributes.maxHealth}`,
-          );
-        } else {
-          this.debug.debug(
-            `Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.attributes.health}/${enemy.attributes.maxHealth}`,
-          );
-        }
-      }
-    });
-
-    if (hitCount > 0) {
-      this.debug.success(
-        `🎯 Missile hit ${hitCount} enemy(ies) in splash zone (radius: ${splashRadius}px)`,
-      );
-    } else {
-      this.debug.warning("❌ Missile missed - no enemies in splash zone");
-    }
-  }
+  // NOTE: Damage application logic has been moved to CombatService.applyDamage()
+  // to avoid duplication and centralize combat rules (falloff, crits, tracking).
+  // The Game no longer implements applyDamage directly.
 
   /**
    * Update game logic

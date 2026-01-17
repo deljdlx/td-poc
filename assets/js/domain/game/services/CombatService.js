@@ -112,19 +112,40 @@ export class CombatService {
           baseDamage * falloffFactor * critMultiplier,
         );
 
+        const wasAlive = enemy.alive;
         enemy.takeDamage(finalDamage, tower);
         hitCount++;
 
-        this.debug.info(
-          `  Hit ${enemy.id} at ${distance.toFixed(0)}px: ${finalDamage} dmg${isCrit ? " (CRIT!)" : ""}`,
-        );
+        // Track hit & kill on the tower
+        try {
+          if (typeof tower.trackHit === 'function') {
+            tower.trackHit(finalDamage, isCrit);
+          }
+          if (wasAlive && !enemy.alive && typeof tower.trackKill === 'function') {
+            tower.trackKill();
+          }
+        } catch (err) {
+          // Defensive: don't break combat loop if tracking fails
+          this.debug.warning('Error tracking tower stats', { error: err });
+        }
+
+        // Debug messages
+        if (isCrit) {
+          this.debug.success(
+            `💥 CRITICAL HIT! Enemy ${enemy.id} hit for ${finalDamage} damage (${tower.attributes.critMultiplier}x) - HP: ${enemy.attributes.health}/${enemy.attributes.maxHealth}`,
+          );
+        } else {
+          this.debug.debug(
+            `Enemy ${enemy.id} hit for ${finalDamage} damage - HP: ${enemy.attributes.health}/${enemy.attributes.maxHealth}`,
+          );
+        }
       }
     });
 
     if (hitCount > 0) {
-      this.debug.success(`💥 Splash hit ${hitCount} enemies`);
+      this.debug.success(`🎯 Missile hit ${hitCount} enemy(ies) in splash zone (radius: ${splashRadius}px)`);
     } else {
-      this.debug.info("💨 Splash missed all enemies");
+      this.debug.info('❌ Missile missed - no enemies in splash zone');
     }
   }
 }
