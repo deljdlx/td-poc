@@ -1,16 +1,15 @@
-
 .game-main {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
 
 .game-area {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    height: 500px;
-    border: 2px dotted #f0f;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  height: 500px;
+  border: 2px dotted #f0f;
 }
 
 #tower-shop-container {

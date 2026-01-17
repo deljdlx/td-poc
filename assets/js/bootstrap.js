@@ -1,8 +1,8 @@
-import { DIContainer } from './services/core/DIContainer.js';
-import { Debug } from './services/core/Debug.js';
-import { CoordinateSystem } from './services/engine/CoordinateSystem.js';
-import { PopupManager } from './services/ui/PopupManager.js';
-import { UIUpdateManager } from './services/ui/UIUpdateManager.js';
+import { DIContainer } from "./services/core/DIContainer.js";
+import { Debug } from "./services/core/Debug.js";
+import { CoordinateSystem } from "./services/engine/CoordinateSystem.js";
+import { PopupManager } from "./services/ui/PopupManager.js";
+import { UIUpdateManager } from "./services/ui/UIUpdateManager.js";
 
 /**
  * Bootstrap - DI Container configuration
@@ -25,25 +25,26 @@ const container = new DIContainer();
  * @returns {void}
  */
 export function bootstrapDI() {
-    // Factory for creating Debug instances
-    container.registerFactory('debug.factory', () => {
-        return (context, enabled = true, logger = console) => new Debug(context, enabled, logger);
-    });
+  // Factory for creating Debug instances
+  container.registerFactory("debug.factory", () => {
+    return (context, enabled = true, logger = console) =>
+      new Debug(context, enabled, logger);
+  });
 
-    // CoordinateSystem (singleton)
-    container.registerFactory('coordinateSystem', () => {
-        return new CoordinateSystem();
-    });
+  // CoordinateSystem (singleton)
+  container.registerFactory("coordinateSystem", () => {
+    return new CoordinateSystem();
+  });
 
-    // UIUpdateManager (singleton)
-    container.registerFactory('uiUpdateManager', (container) => {
-        return new UIUpdateManager(container);
-    });
+  // UIUpdateManager (singleton)
+  container.registerFactory("uiUpdateManager", (container) => {
+    return new UIUpdateManager(container);
+  });
 
-    // PopupManager (singleton)
-    container.registerFactory('popupManager', (container) => {
-        return new PopupManager(container);
-    });
+  // PopupManager (singleton)
+  container.registerFactory("popupManager", (container) => {
+    return new PopupManager(container);
+  });
 }
 
 // Export container

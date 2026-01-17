@@ -5,66 +5,66 @@
    Only override in component files if absolutely necessary.
 */
 :root {
-    /* Colors */
-    --color-primary: #6366f1;
-    --color-primary-dark: #3730a3;
-    --color-secondary: #ec4899;
-    --color-surface: #1e293b;
-    --color-border: #334155;
-    --color-text: #f1f5f9;
-    --color-text-dim: #94a3b8;
+  /* Colors */
+  --color-primary: #6366f1;
+  --color-primary-dark: #3730a3;
+  --color-secondary: #ec4899;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-text: #f1f5f9;
+  --color-text-dim: #94a3b8;
 
-    /* Enemy Colors */
-    --enemy-basic-color: #dc2626;
-    --enemy-fast-color: #f59e0b;
-    --enemy-tank-color: #7c3aed;
-    --enemy-boss-color: #ef4444;
+  /* Enemy Colors */
+  --enemy-basic-color: #dc2626;
+  --enemy-fast-color: #f59e0b;
+  --enemy-tank-color: #7c3aed;
+  --enemy-boss-color: #ef4444;
 
-    /* Path Colors */
-    --path-normal-color: #4A9EFF;
-    --path-spawn-color: #00FF00;
-    --path-checkpoint-color: #FFD700;
-    --path-boss-color: #FF0000;
-    --path-slow-color: #8A2BE2;
-    --path-fast-color: #FF6B00;
-    --path-arrow-color: rgba(255, 255, 255, 0.7);
-    --path-debug-point-color: #FF00FF;
+  /* Path Colors */
+  --path-normal-color: #4a9eff;
+  --path-spawn-color: #00ff00;
+  --path-checkpoint-color: #ffd700;
+  --path-boss-color: #ff0000;
+  --path-slow-color: #8a2be2;
+  --path-fast-color: #ff6b00;
+  --path-arrow-color: rgba(255, 255, 255, 0.7);
+  --path-debug-point-color: #ff00ff;
 
-    /* Sizes */
-    --cell-size: 80px;
-    --cell-gap: 8px;
-    --cell-radius: 3px;
-    --cell-border-width: 2px;
-    --cell-border-style: solid;
-    --cell-color-border: var(--color-border);
-    --enemy-basic-size: 20px;
-    --enemy-fast-size: 16px;
-    --enemy-tank-size: 28px;
-    --enemy-boss-size: 40px;
-    --path-normal-width: 3;
-    --path-spawn-width: 4;
-    --path-checkpoint-width: 3;
-    --path-boss-width: 5;
-    --path-slow-width: 3;
-    --path-fast-width: 3;
-    --path-arrow-size: 8;
-    --path-debug-point-size: 4;
+  /* Sizes */
+  --cell-size: 80px;
+  --cell-gap: 8px;
+  --cell-radius: 3px;
+  --cell-border-width: 2px;
+  --cell-border-style: solid;
+  --cell-color-border: var(--color-border);
+  --enemy-basic-size: 20px;
+  --enemy-fast-size: 16px;
+  --enemy-tank-size: 28px;
+  --enemy-boss-size: 40px;
+  --path-normal-width: 3;
+  --path-spawn-width: 4;
+  --path-checkpoint-width: 3;
+  --path-boss-width: 5;
+  --path-slow-width: 3;
+  --path-fast-width: 3;
+  --path-arrow-size: 8;
+  --path-debug-point-size: 4;
 
-    /* Effects */
-    --transition-speed: 0.18s;
-    --hover-scale: 1.06;
+  /* Effects */
+  --transition-speed: 0.18s;
+  --hover-scale: 1.06;
 
-    /* Responsive Grid */
-    --grid-cols: 8;
-    --grid-rows: 6;
+  /* Responsive Grid */
+  --grid-cols: 8;
+  --grid-rows: 6;
 }
 
 /* Responsive overrides for mobile */
 @media (max-width: 768px) {
-    :root {
-        --cell-size: 60px;
-        --cell-gap: 6px;
-        --grid-cols: 6;
-        --grid-rows: 4;
-    }
+  :root {
+    --cell-size: 60px;
+    --cell-gap: 6px;
+    --grid-cols: 6;
+    --grid-rows: 4;
+  }
 }

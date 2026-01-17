@@ -6,5 +6,8 @@
         "activityBar.background": "#2A1C78",
         "titleBar.activeBackground": "#3B27A8",
         "titleBar.activeForeground": "#FAFAFE"
-    }
+    },
+    // set js indentation to 2 spaces
+    "editor.tabSize": 2
+
 }

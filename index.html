@@ -1,68 +1,68 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tower Defense POC - ES6 Modules + MVC Architecture</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/game.css">
-    <link rel="stylesheet" href="assets/css/grid.css">
-    <link rel="stylesheet" href="assets/css/cell.css">
-    <link rel="stylesheet" href="assets/css/path.css">
-    <link rel="stylesheet" href="assets/css/enemy.css">
-    <link rel="stylesheet" href="assets/css/tower.css">
-    <link rel="stylesheet" href="assets/css/tower-range.css">
-    <link rel="stylesheet" href="assets/css/popup.css">
-    <link rel="stylesheet" href="assets/css/tower-stats.css">
-    <link rel="stylesheet" href="assets/css/debug-panel.css">
-    <link rel="stylesheet" href="assets/css/tower-shop-toolbar.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tower Defense POC - ES6 Modules + MVC Architecture</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/game.css">
+  <link rel="stylesheet" href="assets/css/grid.css">
+  <link rel="stylesheet" href="assets/css/cell.css">
+  <link rel="stylesheet" href="assets/css/path.css">
+  <link rel="stylesheet" href="assets/css/enemy.css">
+  <link rel="stylesheet" href="assets/css/tower.css">
+  <link rel="stylesheet" href="assets/css/tower-range.css">
+  <link rel="stylesheet" href="assets/css/popup.css">
+  <link rel="stylesheet" href="assets/css/tower-stats.css">
+  <link rel="stylesheet" href="assets/css/debug-panel.css">
+  <link rel="stylesheet" href="assets/css/tower-shop-toolbar.css">
 </head>
 <body>
-    <!-- Canvas Layer (fullscreen, non-interactif, overlay) -->
-    <canvas id="canvas-layer"></canvas>
+  <!-- Canvas Layer (fullscreen, non-interactif, overlay) -->
+  <canvas id="canvas-layer"></canvas>
 
-    <!-- Path Layer (overlay pour les chemins statiques) -->
-    <div id="path-layer"></div>
+  <!-- Path Layer (overlay pour les chemins statiques) -->
+  <div id="path-layer"></div>
 
-    <!-- Enemy Layer (overlay pour les ennemis en DOM) -->
-    <div id="enemy-layer"></div>
+  <!-- Enemy Layer (overlay pour les ennemis en DOM) -->
+  <div id="enemy-layer"></div>
 
-    <!-- Layout Structure -->
-    <header class="game-header">
-        <h1 id="player-gold">💰 Gold: <span id="gold-amount">0</span></h1>
-    </header>
+  <!-- Layout Structure -->
+  <header class="game-header">
+  <h1 id="player-gold">💰 Gold: <span id="gold-amount">0</span></h1>
+  </header>
 
-    <main class="game-main">
-        <aside class="sidebar-left">
-            <!-- Sidebar gauche -->
-        </aside>
+  <main class="game-main">
+  <aside class="sidebar-left">
+    <!-- Sidebar gauche -->
+  </aside>
 
 
-        <div class="game-area">
-            <!-- Grid Container (DOM interactif) -->
-            <div id="grid-container"></div>
-        </div>
+  <div class="game-area">
+    <!-- Grid Container (DOM interactif) -->
+    <div id="grid-container"></div>
+  </div>
 
-        <section id="tower-shop-toolbar">
-            <!-- Container pour la boutique de tours -->
-        </section>
+  <section id="tower-shop-toolbar">
+    <!-- Container pour la boutique de tours -->
+  </section>
 
-        <aside class="sidebar-right">
-            <!-- Sidebar droite -->
-        </aside>
-    </main>
+  <aside class="sidebar-right">
+    <!-- Sidebar droite -->
+  </aside>
+  </main>
 
-    <footer class="game-footer">
-        <button id="player-info-btn" class="debug-btn" title="Player Info (Debug)">
-            👤 Player Info
-        </button>
-        <button id="debug-panel-toggle-btn" class="debug-btn" title="Toggle Debug Panel">
-            🔍 Debug Panel
-        </button>
-    </footer>
+  <footer class="game-footer">
+  <button id="player-info-btn" class="debug-btn" title="Player Info (Debug)">
+    👤 Player Info
+  </button>
+  <button id="debug-panel-toggle-btn" class="debug-btn" title="Toggle Debug Panel">
+    🔍 Debug Panel
+  </button>
+  </footer>
 
-    <!-- Application - ES6 Module -->
-    <script type="module" src="assets/js/main.js"></script>
-    <!-- TowerShopToolbar UI Test removed: toolbar is now instantiated by Game -->
+  <!-- Application - ES6 Module -->
+  <script type="module" src="assets/js/main.js"></script>
+  <!-- TowerShopToolbar UI Test removed: toolbar is now instantiated by Game -->
 </body>
 </html>

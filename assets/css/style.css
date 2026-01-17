@@ -2,44 +2,50 @@
    CSS VARIABLES
    ========================================== */
 :root {
-    /* Couleurs */
-    --color-primary: #6366f1;
-    --color-primary-dark: #4f46e5;
-    --color-secondary: #ec4899;
-    --color-background: #0f172a;
-    --color-surface: #1e293b;
-    --color-border: #334155;
-    --color-text: #e2e8f0;
-    --color-text-dim: #94a3b8;
+  /* Couleurs */
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-secondary: #ec4899;
+  --color-background: #0f172a;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-text: #e2e8f0;
+  --color-text-dim: #94a3b8;
 
-    /* Grille */
-    --grid-cols: 8;
-    --grid-rows: 6;
-    --cell-size: 80px;
-    --cell-gap: 8px;
-    --cell-radius: 12px;
+  /* Grille */
+  --grid-cols: 8;
+  --grid-rows: 6;
+  --cell-size: 80px;
+  --cell-gap: 8px;
+  --cell-radius: 12px;
 
-    /* Animations */
-    --transition-speed: 0.3s;
-    --hover-scale: 1.05;
+  /* Animations */
+  --transition-speed: 0.3s;
+  --hover-scale: 1.05;
 }
 
 /* ==========================================
    RESET & BASE
    ========================================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body, html {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--color-background);
-    color: var(--color-text);
+body,
+html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 /* ==========================================
@@ -48,211 +54,207 @@ body, html {
 
 /* Path layer (fullscreen, z-index 5, pointer-events: none) */
 #path-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 5;
 }
 
 /* Enemy layer (fullscreen, z-index 6, pointer-events: none) */
 #enemy-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 6;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 6;
 }
 
 #canvas-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 10;
-    pointer-events: none; /* Le canvas ne bloque pas les interactions DOM */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  pointer-events: none; /* Le canvas ne bloque pas les interactions DOM */
 }
 
 /* ==========================================
    LAYOUT STRUCTURE
    ========================================== */
 body {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .game-header {
-    height: 60px;
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    flex-shrink: 0;
+  height: 60px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
 }
 
 .game-header h1 {
-    font-size: 24px;
-    margin: 0;
+  font-size: 24px;
+  margin: 0;
 }
 
 .header-btn {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .header-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
 }
-
 
 .sidebar-left,
 .sidebar-right {
-    width: 200px;
-    background: var(--color-surface);
-    border-right: 1px solid var(--color-border);
-    flex-shrink: 0;
+  width: 200px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .sidebar-right {
-    border-right: none;
-    border-left: 1px solid var(--color-border);
+  border-right: none;
+  border-left: 1px solid var(--color-border);
 }
 
-
-
 .game-footer {
-    height: 50px;
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    flex-shrink: 0;
-    font-size: 12px;
-    color: var(--color-text-dim);
-    padding: 0 16px;
+  height: 50px;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--color-text-dim);
+  padding: 0 16px;
 }
 
 /* Debug Buttons in Footer */
 .debug-btn {
-    background: rgba(99, 102, 241, 0.1);
-    color: var(--color-text);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--color-text);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .debug-btn:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.5);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
 .debug-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.2);
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.2);
 }
-
-
 
 /* Animation pulse pour les cellules sélectionnées */
 @keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 50px rgba(236, 72, 153, 0.7);
-    }
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(236, 72, 153, 0.7);
+  }
 }
 
 /* ==========================================
    INFO PANEL
    ========================================== */
 #info-panel {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: rgba(30, 41, 59, 0.9);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--color-border);
-    border-radius: 16px;
-    padding: 24px;
-    min-width: 300px;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(30, 41, 59, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+  min-width: 300px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 #info-panel h2 {
-    font-size: 20px;
-    margin-bottom: 12px;
-    color: var(--color-primary);
-    font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 #info-panel p {
-    font-size: 14px;
-    color: var(--color-text-dim);
-    margin-bottom: 8px;
-    line-height: 1.6;
+  font-size: 14px;
+  color: var(--color-text-dim);
+  margin-bottom: 8px;
+  line-height: 1.6;
 }
 
 #stats {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--color-border);
-    font-size: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  font-size: 16px;
 }
 
 #stats strong {
-    color: var(--color-secondary);
-    font-size: 20px;
+  color: var(--color-secondary);
+  font-size: 20px;
 }
 
 /* ==========================================
    RESPONSIVE
    ========================================== */
 @media (max-width: 768px) {
-    :root {
-        --cell-size: 60px;
-        --cell-gap: 6px;
-        --grid-cols: 6;
-        --grid-rows: 4;
-    }
+  :root {
+    --cell-size: 60px;
+    --cell-gap: 6px;
+    --grid-cols: 6;
+    --grid-rows: 4;
+  }
 
-    #info-panel {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        padding: 16px;
-        min-width: auto;
-    }
+  #info-panel {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 16px;
+    min-width: auto;
+  }
 }

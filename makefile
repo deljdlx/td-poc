@@ -13,27 +13,6 @@ help:
 	@echo "make indent-git   # Operate only on git-tracked files for indent conversion"
 	@echo "make indent-test  # Run the indent conversion test (tools/test_convert_indent.sh)"
 
-trim:
-	@./tools/trim_trailing_whitespace.sh
 
-trim-dry:
-	@./tools/trim_trailing_whitespace.sh --dry-run
-
-trim-git:
-	@./tools/trim_trailing_whitespace.sh --git-only
-
-trim-test:
-	@if [ -x ./tools/test_trim_trailing_whitespace.sh ]; then ./tools/test_trim_trailing_whitespace.sh; else echo "No test script found or not executable"; fi
-
-indent:
-	@./tools/convert_indent_4_to_2.sh
-
-indent-dry:
-	@./tools/convert_indent_4_to_2.sh --dry-run
-
-indent-git:
-	@./tools/convert_indent_4_to_2.sh --git-only
-
-indent-test:
-	@if [ -x ./tools/test_convert_indent.sh ]; then ./tools/test_convert_indent.sh; else echo "No test script found or not executable"; fi
-
+prettier:
+	@./node_modules/.bin/prettier --write "assets/js/**/*.js" "assets/css/**/*.css"
