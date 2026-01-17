@@ -21,8 +21,7 @@ export class TowerShopToolbar {
      * @param {string} containerId - DOM id where the toolbar will be rendered
      * @param {Array<Object>} towers - List of tower type objects
      */
-    constructor(containerId, towers = []) {
-        this.container = document.getElementById(containerId);
+    constructor(towers = []) {
         this.towers = towers;
     }
 
@@ -30,7 +29,13 @@ export class TowerShopToolbar {
      * Render the toolbar UI
      * @returns {void}
      */
-    render() {
+    render(selector) {
+        this.container = document.querySelector(selector);
+        console.group('%cTowerShopToolbar.js :: 34 =============================', 'color: #399583; font-size: 1rem');
+        console.log(this.container);
+        console.log(this.towers);
+        console.groupEnd();
+
         if (!this.container) return;
         this.container.innerHTML = '';
         const bar = document.createElement('div');
@@ -40,9 +45,9 @@ export class TowerShopToolbar {
             btn.className = 'tower-shop-btn';
             btn.dataset.towerId = tower.id;
             btn.innerHTML = `
-                <div class="tower-shop-icon">${tower.icon || '🗼'}</div>
+                <div class="tower-shop-icon">${tower.icon || '🚀'}</div>
                 <div class="tower-shop-label">${tower.name}</div>
-                <div class="tower-shop-price">${tower.price || '?'} $</div>
+                <div class="tower-shop-price">${tower.cost || '?'} $</div>
             `;
             btn.onclick = () => this.selectTower(tower.id);
             if (this.selectedTowerId === tower.id) {

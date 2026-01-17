@@ -23,6 +23,7 @@ import { TowerService } from '../services/TowerService.js';
 import { CombatService } from '../services/CombatService.js';
 import { RewardService } from '../services/RewardService.js';
 import { GameStateService } from '../services/GameStateService.js';
+import { TowerShopToolbar } from '../ui/TowerShopToolbar.js';
 
 /**
  * Game - Autonomous tower defense game instance
@@ -138,12 +139,17 @@ export class Game {
      * @type {RewardService}
      */
     rewardService;
-    
+
     /**
      * @type {GameStateService}
      */
     gameStateService;
-    
+
+    /**
+     * @type {TowerShopToolbar}
+     */
+    towerShopToolbar;
+
     /**
      * @type {Object}
      */
@@ -258,7 +264,9 @@ export class Game {
             gameState,
             this
         );
-        
+
+        this.towerShopToolbar = new TowerShopToolbar(Object.values(this.towerTypes));
+
         this.debug.success('✅ Game components and services created');
     }
     
@@ -280,7 +288,7 @@ export class Game {
         );
         this.gridModel.addPath(perimeterPath);
         this.debug.success('Perimeter path created');
-        
+
         // Render paths in DOM
         this.gridSystem.renderPaths();
         
@@ -577,7 +585,9 @@ export class Game {
      * @returns {void}
      */
     start() {
+        this.towerShopToolbar.render('#tower-shop-toolbar');
         this.gameStateService.start();
+
         // Sync state back to Game
         this.state = this.gameStateService.gameState.state;
     }

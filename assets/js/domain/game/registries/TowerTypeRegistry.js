@@ -9,6 +9,7 @@
 export const towerTypes = {
     'basic': {
         id: 'basic',
+        icon: '🗼',
         name: 'Basic Tower',
         description: 'Standard defensive tower with balanced stats',
         cost: 100,
