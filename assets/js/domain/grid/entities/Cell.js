@@ -1,4 +1,4 @@
-import { CellAttributes } from '../value-objects/CellAttributes.js';
+import { CellAttributes } from '../../map/value-objects/CellAttributes.js';
 import { EventBus } from '../../../services/core/EventBus.js';
 
 /**

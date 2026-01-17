@@ -1,9 +1,9 @@
-import { Cell } from '../../domain/map/entities/Cell.js';
+import { Cell } from './Cell.js';
 
 /**
  * Modèle de la grille
  */
-export class GridModel {
+export class Grid {
     /** @type {number} */
     rows = 6;
     
@@ -15,7 +15,7 @@ export class GridModel {
     
     /** @type {Path[]} */
     paths = [];
-    
+
     /** @type {Debug} */
     debug = null;
     

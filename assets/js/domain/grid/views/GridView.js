@@ -43,8 +43,20 @@ export class GridView {
     constructor(containerId, model, diContainer) {
         this.debug = diContainer.createDebug('GridView', true);
         this.container = document.getElementById(containerId);
+
         this.model = model;
+
         this.pathRenderer = new PathRenderer(diContainer);
+
+        // console.group('%cGridView.js :: 154 =============================', 'color: #906501; font-size: 1rem');
+        // console.log(
+        //   this.container,
+        //   this.container.clientWidth,
+        //   this.container.clientHeight
+        // );
+        // console.groupEnd();
+        // foobar();
+
         this.coordSystem = diContainer.get('coordinateSystem');
         this.debug.info('GridView initialisée');
         this.calculateAndApplyCellDimensions();
@@ -165,7 +177,7 @@ export class GridView {
         let cellSize = Math.floor(Math.min(cellSizeFromWidth, cellSizeFromHeight));
         // Contraintes min/max adaptées au viewport
         const isMobile = window.innerWidth < 768;
-        const minSize = isMobile ? 20 : 40;
+        const minSize = isMobile ? 20 : 20;
         const maxSize = 120;
         const beforeConstraint = cellSize;
         cellSize = Math.max(minSize, Math.min(cellSize, maxSize));

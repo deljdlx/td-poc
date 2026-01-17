@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tower Defense POC - ES6 Modules + MVC Architecture</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/game.css">
+    <link rel="stylesheet" href="assets/css/grid.css">
     <link rel="stylesheet" href="assets/css/cell.css">
     <link rel="stylesheet" href="assets/css/path.css">
     <link rel="stylesheet" href="assets/css/enemy.css">
@@ -13,6 +15,7 @@
     <link rel="stylesheet" href="assets/css/popup.css">
     <link rel="stylesheet" href="assets/css/tower-stats.css">
     <link rel="stylesheet" href="assets/css/debug-panel.css">
+    <link rel="stylesheet" href="assets/css/tower-shop-toolbar.css">
 </head>
 <body>
     <!-- Canvas Layer (fullscreen, non-interactif, overlay) -->
@@ -34,16 +37,21 @@
             <!-- Sidebar gauche -->
         </aside>
         
+
         <div class="game-area">
             <!-- Grid Container (DOM interactif) -->
             <div id="grid-container"></div>
         </div>
-        
+
+        <section id="tower-shop-toolbar">
+            <!-- Container pour la boutique de tours -->
+        </section>
+
         <aside class="sidebar-right">
             <!-- Sidebar droite -->
         </aside>
     </main>
-    
+
     <footer class="game-footer">
         <button id="player-info-btn" class="debug-btn" title="Player Info (Debug)">
             👤 Player Info
@@ -55,5 +63,7 @@
     
     <!-- Application - ES6 Module -->
     <script type="module" src="assets/js/main.js"></script>
+    <!-- TowerShopToolbar UI Test (à retirer en prod) -->
+    <script type="module" src="assets/js/domain/game/ui/TowerShopToolbarTest.js"></script>
 </body>
 </html>

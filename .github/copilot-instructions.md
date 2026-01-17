@@ -1,3 +1,14 @@
+Au debut d'une session de travail confirme moi toujours que tu as bien chargé les instructions
+
+
+
+si je te demande
+"analyse" ou "comprends tu" ou "qu'en penses tu" ou "quel est ton plan"
+ne pas code pas, fais un feedback PRO/CONS
+
+
+
+
 # Tower Defense Game - Instructions Copilot
 
 ## Instructions Générales
