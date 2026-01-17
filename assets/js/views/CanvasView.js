@@ -1,15 +1,15 @@
-import { MissileRenderer } from '../renderers/MissileRenderer.js';
-import { TowerRenderer } from '../renderers/TowerRenderer.js';
-import { EnemyRenderer } from '../renderers/EnemyRenderer.js';
-import { DOMEnemyRenderer } from '../renderers/DOMEnemyRenderer.js';
+import { MissileRenderer } from '../domain/game/renderers/MissileRenderer.js';
+import { TowerRenderer } from '../domain/game/renderers/TowerRenderer.js';
+import { EnemyRenderer } from '../domain/game/renderers/EnemyRenderer.js';
+import { DOMEnemyRenderer } from '../domain/game/renderers/DOMEnemyRenderer.js';
 import { FireworkEffect } from '../fx/FireworkEffect.js';
 import { SimpleExplosionEffect } from '../fx/SimpleExplosionEffect.js';
 import { SplashEffect } from '../fx/SplashEffect.js';
-import { CircleSpriteRenderer } from '../renderers/sprites/CircleSpriteRenderer.js';
-import { StarSpriteRenderer } from '../renderers/sprites/StarSpriteRenderer.js';
-import { SquareSpriteRenderer } from '../renderers/sprites/SquareSpriteRenderer.js';
-import { DiamondSpriteRenderer } from '../renderers/sprites/DiamondSpriteRenderer.js';
-import { TriangleSpriteRenderer } from '../renderers/sprites/TriangleSpriteRenderer.js';
+import { CircleSpriteRenderer } from '../sprites/CircleSpriteRenderer.js';
+import { StarSpriteRenderer } from '../sprites/StarSpriteRenderer.js';
+import { SquareSpriteRenderer } from '../sprites/SquareSpriteRenderer.js';
+import { DiamondSpriteRenderer } from '../sprites/DiamondSpriteRenderer.js';
+import { TriangleSpriteRenderer } from '../sprites/TriangleSpriteRenderer.js';
 
 /**
  * Vue Canvas pour dessiner des connexions

@@ -1,4 +1,4 @@
-import { CircleSpriteRenderer } from './sprites/CircleSpriteRenderer.js';
+import { CircleSpriteRenderer } from '../../../sprites/CircleSpriteRenderer.js';
 
 /**
  * EnemyRenderer - Renders enemy entities on canvas

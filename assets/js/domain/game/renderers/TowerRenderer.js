@@ -1,4 +1,4 @@
-import { CircleSpriteRenderer } from './sprites/CircleSpriteRenderer.js';
+import { CircleSpriteRenderer } from '../../../sprites/CircleSpriteRenderer.js';
 
 /**
  * TowerRenderer - Renders tower entities on canvas

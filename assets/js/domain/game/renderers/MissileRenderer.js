@@ -1,10 +1,10 @@
 import { DefaultTrailRenderer } from './DefaultTrailRenderer.js';
 import { ParticleTrailRenderer } from './ParticleTrailRenderer.js';
-import { CircleSpriteRenderer } from './sprites/CircleSpriteRenderer.js';
-import { StarSpriteRenderer } from './sprites/StarSpriteRenderer.js';
-import { DiamondSpriteRenderer } from './sprites/DiamondSpriteRenderer.js';
-import { SquareSpriteRenderer } from './sprites/SquareSpriteRenderer.js';
-import { TriangleSpriteRenderer } from './sprites/TriangleSpriteRenderer.js';
+import { CircleSpriteRenderer } from '../../../sprites/CircleSpriteRenderer.js';
+import { StarSpriteRenderer } from '../../../sprites/StarSpriteRenderer.js';
+import { DiamondSpriteRenderer } from '../../../sprites/DiamondSpriteRenderer.js';
+import { SquareSpriteRenderer } from '../../../sprites/SquareSpriteRenderer.js';
+import { TriangleSpriteRenderer } from '../../../sprites/TriangleSpriteRenderer.js';
 
 /**
  * MissileRenderer - Renders missile entities on canvas
