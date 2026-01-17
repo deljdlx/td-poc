@@ -22,6 +22,8 @@ import { RewardService } from "../services/RewardService.js";
 import { GameStateService } from "../services/GameStateService.js";
 import { TowerShopToolbar } from "../ui/TowerShopToolbar.js";
 
+import { EventListenersConfiguration } from "../EventListeners.js";
+
 /**
  * Game - Autonomous tower defense game instance
  * Creates and manages all game-specific components independently
@@ -270,6 +272,9 @@ export class Game {
       this,
     );
 
+
+    this.eventListenersConfiguration = new EventListenersConfiguration(this);
+
     this.towerShopToolbar = new TowerShopToolbar(
       Object.values(this.towerTypes),
     );
@@ -283,6 +288,9 @@ export class Game {
    */
   init() {
     this.debug.info("🎮 Initializing game...");
+
+    this.eventListenersConfiguration.init();
+
 
     // DATA: grid and paths
     this.setupData();
@@ -378,129 +386,7 @@ export class Game {
       "🎯 Setting up Game event listeners (command/event pattern)",
     );
 
-    // COMMAND: Tower move attempt → Validate and execute move
-    EventBus.onGlobal("tower:moveAttempt", (data) => {
-      const { tower, fromCell, toCell } = data;
 
-      // Validate move (business logic)
-      const isValid = this.moveTower(tower, fromCell, toCell);
-
-      if (isValid) {
-        // Update data layer (emits cell:towerChanged events)
-        fromCell.removeTower();
-        toCell.setTower(tower);
-
-        // Synchronize tower position for canvas rendering
-        tower.cell = toCell;
-        const center = this.coordSystem.getElementCenter(toCell.element);
-        tower.x = center.x;
-        tower.y = center.y;
-
-        // Emit SOURCEABLE business event for Event Sourcing
-        const movedEvent = new TowerMovedEvent(tower, fromCell, toCell, {
-          towerId: tower.id,
-          towerType: tower.type,
-          playerId: tower.playerId || "player1",
-          fromPosition: { row: fromCell.row, col: fromCell.col },
-          toPosition: { row: toCell.row, col: toCell.col },
-          timestamp: Date.now(),
-        });
-        this.events.emit("moved", movedEvent);
-
-        // Emit DOMAIN EVENT for UI layer to react
-        EventBus.emitGlobal("tower:moved", {
-          tower,
-          fromCell,
-          toCell,
-        });
-
-        this.debug.success("Tower moved", {
-          from: { row: fromCell.row, col: fromCell.col },
-          to: { row: toCell.row, col: toCell.col },
-        });
-      }
-    });
-
-    // Tower shoot → Create missile
-    EventBus.onGlobal("shoot", (data) => {
-      this.createMissile(
-        data.tower,
-        data.x,
-        data.y,
-        data.targetX,
-        data.targetY,
-        data.missileBlueprint,
-      );
-    });
-
-    // Missile impact → Visual effects + Combat logic
-    EventBus.onGlobal("missile:impact", (event) => {
-      this.debug.info("💥 Missile impact", {
-        x: event.x,
-        y: event.y,
-        splashRadius: event.splashRadius,
-        explosionType: event.visualFx?.explosion?.type,
-      });
-
-      // Visual effects based on blueprint configuration
-      const explosionConfig = event.visualFx?.explosion || {
-        type: "firework",
-        scale: 1.0,
-      };
-
-      // Choose explosion effect based on type
-      switch (explosionConfig.type) {
-        case "firework":
-          // Pass all firework parameters from blueprint
-          const { type, ...fireworkParams } = explosionConfig;
-          this.canvasView.addFirework(event.x, event.y, fireworkParams);
-          break;
-        case "simple":
-          this.canvasView.addSimpleExplosion(event.x, event.y, explosionConfig);
-          break;
-        case "none":
-          // No explosion effect
-          break;
-        default:
-          // Default to firework
-          const { type: _, ...defaultParams } = explosionConfig;
-          this.canvasView.addFirework(event.x, event.y, defaultParams);
-      }
-
-      // Always show splash zone
-      this.canvasView.addSplashEffect(event.x, event.y, event.splashRadius);
-
-      // Combat logic: delegate splash damage to CombatService
-      this.combatService.applyDamage(event.missile, event.x, event.y);
-    });
-
-    // Listen to enemy spawned events to setup per-enemy listeners
-    this.events.on("enemySpawned", (event) => {
-      const enemy = event.enemy;
-
-      // Enemy death → Handle rewards (gold, score) and visual effects
-      enemy.events.on("death", (deathEvent) => {
-        this.debug.event(
-          `💀 Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`,
-        );
-
-        // Business logic: award gold and update stats
-        if (deathEvent.killer) {
-          this.handleEnemyKilled(enemy, deathEvent.killer);
-        } else {
-          this.debug.info(`Enemy ${enemy.id} died from non-combat cause`);
-        }
-
-        // Visual effects handled by DOMEnemyRenderer
-      });
-
-      // Enemy reached end → Game over logic
-      enemy.events.on("reachedEnd", (endEvent) => {
-        this.handleEnemyReachedEnd(enemy);
-      });
-    });
-
-    this.debug.success("✅ Game event listeners configured");
   }
 
   /**
