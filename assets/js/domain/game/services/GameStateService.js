@@ -180,18 +180,18 @@ export class GameStateService {
         this.gameState.currentWaveNumber++;
         
         // Progressive difficulty: more enemies each wave
-        const enemyCount = 10 + (this.gameState.currentWaveNumber - 1) * this.gameState.config.waveEnemyIncrement;
+        const enemyCount = 10 + (this.gameState.currentWaveNumber - 1) * this.gameState.config.waves.enemyIncrement;
         
         const wave = new Wave(
             [
                 { 
                     type: 'basic', 
-                    health: 100 * this.gameState.config.difficulty, 
+                    health: 100 * this.gameState.config.waves.difficulty,
                     speed: 1.0, 
                     count: enemyCount 
                 }
             ],
-            this.gameState.config.startingWaveDelay,
+            this.gameState.config.waves.startingDelay,
             perimeterPath
         );
         

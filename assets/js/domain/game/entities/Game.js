@@ -84,7 +84,7 @@ export class Game {
      * @type {GridSystem}
      */
     gridSystem;
-    
+
     /**
      * @type {GridModel}
      */
@@ -154,17 +154,11 @@ export class Game {
      * @type {Object}
      */
     config = {
-        difficulty: 1.0,
-        startingWaveDelay: 1.0,
-        waveEnemyIncrement: 2,
-        towerCost: {
-            money: 500
+        waves: {
+            difficulty: 1.0,
+            startingDelay: 1.0,
+            enemyIncrement: 2,
         },
-        missile: {
-            speed: 300,        // pixels/sec
-            lifetime: 3.0,     // seconds
-            splashRadius: 0.5  // cells
-        }
     };
     
     /**
