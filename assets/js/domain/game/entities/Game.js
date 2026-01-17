@@ -614,16 +614,6 @@ export class Game {
   }
 
   /**
-   * Handle enemy killed event (delegates to RewardService)
-   * @param {Enemy} enemy
-   * @param {Tower} killer - Tower that killed the enemy
-   * @returns {void}
-   */
-  handleEnemyKilled(enemy, killer) {
-    this.rewardService.handleEnemyKilled(enemy, killer);
-  }
-
-  /**
    * Handle enemy reached end of path (delegates to GameStateService)
    * @param {Enemy} enemy
    * @returns {void}

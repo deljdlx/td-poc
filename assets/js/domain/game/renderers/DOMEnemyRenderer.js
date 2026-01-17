@@ -96,7 +96,7 @@ export class DOMEnemyRenderer {
    * @private
    */
   setupDeathListener(enemy, element) {
-    enemy.events.on("death", (event) => {
+    enemy.events.on("ennemy:death", (event) => {
       this.debug.info(`Enemy ${enemy.id} death animation triggered`, {
         position: event.position,
       });

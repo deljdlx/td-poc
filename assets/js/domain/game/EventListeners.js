@@ -50,8 +50,25 @@ export class EventListenersConfiguration {
     });
 
     EventBus.onGlobal("enemySpawned", (event) => {
-      const enemy = event.enemy;
       this.handleEnnemySpawned(event);
+    });
+
+    EventBus.onGlobal("death", (deathEvent) => {
+      const enemy = deathEvent.enemy;
+      this.game.debug.event(
+        `💀 Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`,
+      );
+
+      
+
+      // Business logic: award gold and update stats
+      if (deathEvent.killer) {
+        this.game.rewardService.handleEnemyKilled(enemy, deathEvent.killer);
+      } else {
+        this.game.debug.info(`Enemy ${enemy.id} died from non-combat cause`);
+      }
+
+      // Visual effects handled by DOMEnemyRenderer
     });
 
 
@@ -105,20 +122,6 @@ export class EventListenersConfiguration {
     const enemy = event.enemy;
     // Enemy death → Handle rewards (gold, score) and visual effects
     //enemy.events.on("death", (deathEvent) => {
-    EventBus.onGlobal("death", (deathEvent) => {
-      this.game.debug.event(
-        `💀 Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`,
-      );
-
-      // Business logic: award gold and update stats
-      if (deathEvent.killer) {
-        this.game.handleEnemyKilled(enemy, deathEvent.killer);
-      } else {
-        this.game.debug.info(`Enemy ${enemy.id} died from non-combat cause`);
-      }
-
-      // Visual effects handled by DOMEnemyRenderer
-    });
 
     // Enemy reached end → Game over logic
     enemy.events.on("reachedEnd", (endEvent) => {
