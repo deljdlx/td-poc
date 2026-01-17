@@ -29,7 +29,7 @@ export class TowerDragHandler {
     
     /**
      * @param {GridModel} model
-     * @param {GridView} gridView
+     * @param {import('../domain/grid/views/GridView.js').GridView} gridView
      * @param {CoordinateSystem} coordSystem
      * @param {EntityManager} entityManager
      * @param {DIContainer} diContainer

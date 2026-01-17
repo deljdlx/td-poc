@@ -10,6 +10,7 @@
     align-items: center;
     justify-content: center;
     border: solid 1px #f0f;
+    border-radius: 50%;
 }
 
 

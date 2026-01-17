@@ -1,5 +1,5 @@
 import { GridModel } from '../GridModel.js';
-import { GridView } from '../../../views/GridView.js';
+import { GridView } from '../../grid/views/GridView.js';
 
 /**
  * GridSystem - Facade encapsulating grid logic and rendering

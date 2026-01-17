@@ -77,7 +77,7 @@
 
 /* Cell with tower state */
 .grid-cell.has-tower {
-    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    /* background: linear-gradient(135deg, #3b82f6, #1e40af); */
     border-color: #2563eb;
     border-width: 3px;
     cursor: pointer;
