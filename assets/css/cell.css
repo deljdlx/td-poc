@@ -83,12 +83,12 @@
     cursor: pointer;
 }
 
-.grid-cell.has-tower::after {
+/* .grid-cell.has-tower::after {
     content: '🗼';
     position: absolute;
     font-size: 28px;
     opacity: 0.9;
-}
+} */
 
 .grid-cell.has-tower:hover {
     transform: scale(1.1);

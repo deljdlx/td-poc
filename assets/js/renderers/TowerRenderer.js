@@ -16,7 +16,7 @@ export class TowerRenderer {
     constructor(spriteRenderer = null) {
         this.spriteRenderer = spriteRenderer || new CircleSpriteRenderer();
     }
-    
+
     /**
      * Render tower on canvas
      * @param {CanvasRenderingContext2D} ctx

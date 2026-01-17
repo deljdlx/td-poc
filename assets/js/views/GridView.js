@@ -106,7 +106,9 @@ export class GridView {
             hasTower: !!newTower
         });
     }
-    
+
+
+    // TODO move this to TowerRenderer.js ?
     /**
      * Render tower icon in cell (PURE RENDERING)
      * @param {Cell} cell
@@ -119,15 +121,15 @@ export class GridView {
         if (existing) {
             existing.remove();
         }
-        
+
         // Create new icon
         const icon = document.createElement('div');
         icon.className = 'tower-icon';
-        icon.textContent = '🗼';
-        icon.style.position = 'absolute';
+        // icon.textContent = '🗼';
+        // icon.style.position = 'absolute';
         icon.style.fontSize = '24px';
         icon.style.pointerEvents = 'none';
-        
+
         cell.element.appendChild(icon);
     }
     
