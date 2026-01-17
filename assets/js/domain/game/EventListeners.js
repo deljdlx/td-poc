@@ -53,16 +53,14 @@ export class EventListenersConfiguration {
       this.handleEnnemySpawned(event);
     });
 
-    EventBus.onGlobal("death", (deathEvent) => {
+    EventBus.onGlobal("ennemy:death", (deathEvent) => {
       const enemy = deathEvent.enemy;
       this.game.debug.event(
         `💀 Enemy ${enemy.id} died at (${deathEvent.position.x}, ${deathEvent.position.y})`,
       );
 
-      
-
-      // Business logic: award gold and update stats
       if (deathEvent.killer) {
+        // Business logic: award gold and update stats
         this.game.rewardService.handleEnemyKilled(enemy, deathEvent.killer);
       } else {
         this.game.debug.info(`Enemy ${enemy.id} died from non-combat cause`);

@@ -1,3 +1,5 @@
+import { EventBus } from "../../../services/core/EventBus.js";
+
 /**
  * DOMEnemyRenderer - Renders enemies as DOM elements
  */
@@ -96,6 +98,7 @@ export class DOMEnemyRenderer {
    * @private
    */
   setupDeathListener(enemy, element) {
+    // EventBus.onGlobal("ennemy:death", (event) => {
     enemy.events.on("ennemy:death", (event) => {
       this.debug.info(`Enemy ${enemy.id} death animation triggered`, {
         position: event.position,
