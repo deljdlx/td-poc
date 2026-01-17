@@ -122,9 +122,15 @@ export class Game {
    */
   events;
 
-  /**
-   * @type {TowerService}
-   */
+    /**
+     * @type {Function|null} - Bound handler for towerPlaced event
+     */
+    boundOnTowerPlaced = null;
+
+    /**
+     * @type {Function|null} - Bound player info click handler
+     */
+    boundHandlePlayerInfoClick = null;
   towerService;
 
   /**
@@ -278,7 +284,41 @@ export class Game {
   init() {
     this.debug.info("🎮 Initializing game...");
 
-    // Initialize grid (render DOM elements)
+    // DATA: grid and paths
+    this.setupData();
+
+    // RENDER: initial path rendering
+    this.setupRender();
+
+    // UI / UX handlers (event wiring)
+    this.setupUXHandlers();
+
+    // DEV: place initial towers for development/testing (kept intentionally)
+    this.placeRandomTowers(5);
+    this.debug.success("Initial towers placed");
+
+    // Log tower drag handlers status
+    const towersCount = this.gridModel.getCellsWithTowers().length;
+    this.debug.info(`Drag enabled on ${towersCount} towers`);
+
+    // DOMAIN: game event listeners and game clock
+    this.setupGameEventListeners();
+    this.setupGameClock();
+
+    // INTERACTIONS: DOM listeners (clicks, hovers)
+    this.setupGridEvents();
+
+    // Finalize
+    this.state = GameState.READY;
+    this.debug.success("Game initialized - Ready to start");
+  }
+
+  /**
+   * Setup data-related systems: grid and paths
+   * @returns {void}
+   */
+  setupData() {
+    // Initialize grid (render DOM elements and attach cells)
     this.gridSystem.init();
 
     // Create perimeter path
@@ -289,34 +329,42 @@ export class Game {
     );
     this.gridModel.addPath(perimeterPath);
     this.debug.success("Perimeter path created");
+  }
 
-    // Render paths in DOM
+  /**
+   * Setup initial rendering
+   * @returns {void}
+   */
+  setupRender() {
+    // Render static paths and other initial visuals
     this.gridSystem.renderPaths();
+  }
 
-    // Setup tower drag handler to listen for tower placement (BEFORE placing towers!)
-    this.events.on("towerPlaced", (event) => {
-      this.towerDragHandler.enableTowerDrag(event.cell);
-    });
+  /**
+   * Setup UX handlers and small wiring for in-development tools
+   * @returns {void}
+   */
+  setupUXHandlers() {
+    // Bind and register tower placed handler so we can remove it later
+    this.boundOnTowerPlaced = this.onTowerPlaced.bind(this);
+    this.events.on("towerPlaced", this.boundOnTowerPlaced);
+  }
 
-    // Place initial towers for testing
-    this.placeRandomTowers(5);
-    this.debug.success("Initial towers placed");
+  /**
+   * Handler called when a tower has been placed (sourceable event)
+   * @param {TowerPlacedEvent|Object} event
+   * @returns {void}
+   */
+  onTowerPlaced(event) {
+    this.towerDragHandler.enableTowerDrag(event.cell);
+  }
 
-    // Log tower drag handlers status
-    const towersCount = this.gridModel.getCellsWithTowers().length;
-    this.debug.info(`Drag enabled on ${towersCount} towers`);
-
-    // Setup game event listeners for business logic
-    this.setupGameEventListeners();
-
-    // Setup GameClock callbacks
-    this.setupGameClock();
-
-    // Setup grid interaction events
-    this.setupGridEvents();
-
-    this.state = GameState.READY;
-    this.debug.success("Game initialized - Ready to start");
+  /**
+   * Player info button handler
+   * @returns {void}
+   */
+  handlePlayerInfoClick() {
+    this.playerInfoPopup.show();
   }
 
   /**
@@ -508,9 +556,7 @@ export class Game {
     // Player info button
     const playerInfoBtn = document.getElementById("player-info-btn");
     if (playerInfoBtn) {
-      this.boundHandlePlayerInfoClick = () => {
-        this.playerInfoPopup.show();
-      };
+      this.boundHandlePlayerInfoClick = this.handlePlayerInfoClick.bind(this);
       playerInfoBtn.addEventListener("click", this.boundHandlePlayerInfoClick);
     }
 
@@ -901,11 +947,17 @@ export class Game {
       );
     }
 
+    // Unregister game-scoped event handlers
+    if (this.boundOnTowerPlaced) {
+      this.events.off('towerPlaced', this.boundOnTowerPlaced);
+    }
+
     // Clear bound references
     this.boundHandleCellClick = null;
     this.boundHandleCellHover = null;
     this.boundHandleCellLeave = null;
     this.boundHandlePlayerInfoClick = null;
+    this.boundOnTowerPlaced = null;
 
     // 3. Destroy owned instances
     if (this.gridSystem?.destroy) {
