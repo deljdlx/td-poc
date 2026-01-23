@@ -59,4 +59,13 @@ export class TowerAttributes extends Attributes {
   get critMultiplier() {
     return this._getFinalValue("critMultiplier");
   }
+
+  /**
+   * Convenience getter: compute fireRate from cooldown (shots per second)
+   * @returns {number} - Fire rate (/sec)
+   */
+  get fireRate() {
+    const cd = this.cooldown;
+    return cd > 0 ? 1.0 / cd : 0;
+  }
 }

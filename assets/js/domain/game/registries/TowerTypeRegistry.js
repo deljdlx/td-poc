@@ -15,7 +15,7 @@ export const towerTypes = {
     cost: 100,
     stats: {
       range: 3.5, // cells
-      fireRate: 1.0, // shots per second (cooldown = 1/fireRate)
+      cooldown: 0.5, // seconds between shots (preferred over fireRate)
       critChance: 0.0, // 0.0 to 1.0
       critMultiplier: 1.5,
     },
@@ -36,7 +36,7 @@ export const towerTypes = {
     cost: 200,
     stats: {
       range: 6.0, // Double range
-      fireRate: 0.5, // Slow fire rate (2 sec cooldown)
+      cooldown: 2.0, // seconds between shots
       critChance: 0.15, // 15% crit chance
       critMultiplier: 2.0, // Higher crit damage
     },
@@ -57,7 +57,7 @@ export const towerTypes = {
     cost: 300,
     stats: {
       range: 4.0,
-      fireRate: 0.33, // Very slow (3 sec cooldown)
+      cooldown: 3.0, // seconds between shots
       critChance: 0.05,
       critMultiplier: 1.5,
     },

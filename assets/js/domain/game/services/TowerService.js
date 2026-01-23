@@ -123,7 +123,8 @@ export class TowerService {
         stats: {
           damage: tower.attributes.damage,
           range: tower.attributes.range,
-          fireRate: tower.attributes.fireRate,
+          cooldown: tower.attributes.cooldown,
+          fireRate: tower.attributes.fireRate, // provided for compatibility (computed from cooldown)
           critChance: tower.attributes.critChance,
           critMultiplier: tower.attributes.critMultiplier,
         },
@@ -205,7 +206,8 @@ export class TowerService {
           stats: {
             damage: tower.attributes.damage,
             range: tower.attributes.range,
-            fireRate: tower.attributes.fireRate,
+            cooldown: tower.attributes.cooldown,
+            fireRate: tower.attributes.fireRate, // provided for compatibility (computed from cooldown)
             critChance: tower.attributes.critChance,
             critMultiplier: tower.attributes.critMultiplier,
           },

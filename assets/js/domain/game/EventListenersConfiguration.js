@@ -118,8 +118,6 @@ export class EventListenersConfiguration {
 
   handleEnnemySpawned(event) {
     const enemy = event.enemy;
-    // Enemy death → Handle rewards (gold, score) and visual effects
-    //enemy.events.on("death", (deathEvent) => {
 
     // Enemy reached end → Game over logic
     enemy.events.on("reachedEnd", (endEvent) => {

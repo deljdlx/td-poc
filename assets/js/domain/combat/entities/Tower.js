@@ -126,7 +126,23 @@ export class Tower extends Entity {
     this.size = towerBlueprint.visualFx.size;
 
     // Gameplay attributes from blueprint
-    const cooldown = 1.0 / towerBlueprint.stats.fireRate; // Convert fireRate to cooldown
+    // Prefer explicit `cooldown` (seconds). For backward compatibility, support `fireRate` (shots/sec).
+    let cooldown = towerBlueprint.stats.cooldown;
+    if (cooldown === undefined || cooldown === null) {
+      if (towerBlueprint.stats.fireRate) {
+        cooldown = 1.0 / towerBlueprint.stats.fireRate;
+        const debug = diContainer.createDebug('Tower', true);
+        debug.warning('Deprecated blueprint property `fireRate` used. Use `cooldown` (seconds) instead. Converted to cooldown = 1/fireRate', {
+          towerId: towerBlueprint.id,
+          fireRate: towerBlueprint.stats.fireRate,
+          cooldown,
+        });
+      } else {
+        // sensible default 1 second
+        cooldown = 1.0;
+      }
+    }
+
     this._attributes = new TowerAttributes(
       towerBlueprint.stats.range,
       cooldown,

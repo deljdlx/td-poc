@@ -22,7 +22,7 @@ import { RewardService } from "../services/RewardService.js";
 import { GameStateService } from "../services/GameStateService.js";
 import { TowerShopToolbar } from "../ui/TowerShopToolbar.js";
 
-import { EventListenersConfiguration } from "../EventListeners.js";
+import { EventListenersConfiguration } from "../EventListenersConfiguration.js";
 
 /**
  * Game - Autonomous tower defense game instance
